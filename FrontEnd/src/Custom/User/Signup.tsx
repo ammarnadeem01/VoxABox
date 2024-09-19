@@ -9,16 +9,37 @@ import { useState } from "react";
 import api from "../../axiosConfig";
 function Signup() {
   const nav = useNavigate();
-
+  const [userData, setUserData] = useState({});
+  const initialValues = {
+    fname: "",
+    lname: "",
+    email: "",
+    password: "",
+    acceptTerms: false,
+    avatar: "ammar.com",
+  };
   const [visibility, setVisibility] = useState(true);
   const [errMessage, setErrorMessage] = useState("");
-  function register(values: {}) {
+  interface InitialValues {
+    fname: string;
+    lname: string;
+    email: string;
+    password: string;
+    acceptTerms: boolean;
+    avatar: string;
+  }
+  function register(values: InitialValues) {
+    console.log("values", values);
+    console.log("vars");
     api
-      .post("api/v3/user/signup", values)
+      .post("api/v1/user", values)
       .then((result) => {
+        const userData = result.data.data.user;
+        setUserData(userData);
         nav("/chat");
       })
       .catch((err) => {
+        console.log(err);
         // setErrorMessage(err.response.data);
       });
   }
@@ -48,12 +69,10 @@ function Signup() {
           </NavLink>
         </p>
         <Formik
-          initialValues={{ name: "", email: "", password: "" }}
+          initialValues={initialValues}
           validationSchema={SignupSchema}
-          onSubmit={(values, { setSubmitting }) => {
-            console.log(values);
-            setSubmitting(false);
-            alert("Form submitted successfully!");
+          onSubmit={(values) => {
+            register(values);
           }}
         >
           {({ isSubmitting }) => (
@@ -146,7 +165,7 @@ function Signup() {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="bg-purple-700 text-white px-4 py-2 rounded hover:bg-purple-500 w-full"
+                className="cursor-pointer bg-purple-700 text-white px-4 py-2 rounded hover:bg-purple-500 w-full"
               >
                 Create Account
               </button>

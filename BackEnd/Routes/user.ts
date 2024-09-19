@@ -12,11 +12,8 @@ import {
 const router = Router();
 
 router.route("/").post(createUser).get(getUsers);
-router
-  .route("/:email")
-  .get(getUserById)
-  .patch(updateAccount)
-  .delete(deleteAccount);
+router.route("/login").post(getUserById);
+router.route("/:email").patch(updateAccount).delete(deleteAccount);
 router.route("/byName/:fname").get(getUserByName);
 router.route("updatePassword/:email").patch(updatePassword);
 

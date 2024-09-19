@@ -1,6 +1,10 @@
 import SearchIcon from "@mui/icons-material/Search";
 import Contact from "./Contact";
-function ChatList() {
+import React from "react";
+interface ChatListProps {
+  data: {};
+}
+const ChatList: React.FC<ChatListProps> = ({ data }) => {
   return (
     <div className="w-1/5 h-[95%] text-white flex flex-wrap justify-betweeen items-start overflow-hidden overflow-y-auto scrollbar-thin scrollbar-thumb-gray-900 scrollbar-track-[#363638]">
       <div className="w-full flex flex-wrap justify-start items-start  ">
@@ -38,6 +42,6 @@ function ChatList() {
       </div>
     </div>
   );
-}
+};
 
 export default ChatList;

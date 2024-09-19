@@ -202,6 +202,7 @@ export const loadUnreadPrivateMessages = asyncHandler(
     // return response
     res.status(200).json({
       status: "Success",
+      length: UnreadMessages.length,
       data: {
         UnreadMessages,
       },

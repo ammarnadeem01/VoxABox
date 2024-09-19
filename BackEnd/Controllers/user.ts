@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { User } from "../Models/user";
 import asyncHandler from "../Utils/asyncErrorHandlers";
 import CustomError from "../Utils/CustomError";
-import { Op } from "sequelize";
+import { Op, where } from "sequelize";
 
 // Create a new user
 export const createUser = asyncHandler(
@@ -52,14 +52,14 @@ export const getUsers = asyncHandler(
 export const getUserById = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     // get email
-    const { email } = req.params;
+    const { email, password } = req.body;
     // if email is avaiable
     if (!email) {
       return next(new CustomError("Email is required", 400));
     }
-    const user = await User.findByPk(email);
+    const user = await User.findOne({ where: { email, password } });
     if (!user) {
-      return next(new CustomError("No User with given ID found", 404));
+      return next(new CustomError("Incorrect Email or password", 401));
     }
     res.status(200).json({
       status: "Success",

@@ -4,8 +4,13 @@ import SendIcon from "@mui/icons-material/Send";
 interface ChatContentProps {
   InfoOn: boolean;
   toggleInfo: () => void;
+  data: {};
 }
-const ChatContent: React.FC<ChatContentProps> = ({ InfoOn, toggleInfo }) => {
+const ChatContent: React.FC<ChatContentProps> = ({
+  InfoOn,
+  toggleInfo,
+  data,
+}) => {
   return (
     <div
       className={`${

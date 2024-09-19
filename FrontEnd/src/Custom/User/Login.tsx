@@ -10,34 +10,30 @@ function Login() {
   const [visibility, setVisibility] = useState(true);
   const [errMessage, setErrorMessage] = useState("");
   interface Values {
-    fname: string;
-    lname: string;
     email: string;
     password: string;
-    avatar: string;
   }
   const initialValues = {
-    fname: "",
-    lname: "",
     email: "",
     password: "",
-    avatar: "",
   };
   function login(values: Values) {
-    const formData: FormData = new FormData();
-    formData.set("fname", values.fname),
-      formData.set("lname", values.lname),
-      formData.set("email", values.email),
-      formData.set("password", values.password),
-      formData.set("avatar", values.avatar),
-      api
-        .post("api/v3/user/login", formData)
-        .then((result) => {
-          nav("/chat");
-        })
-        .catch((err) => {
-          // setErrorMessage(err.response.data);
-        });
+    // const formData: FormData = new FormData();
+    // formData.set("fname", values.fname),
+    //   formData.set("lname", values.lname),
+    //   formData.set("email", values.email),
+    //   formData.set("password", values.password),
+    //   formData.set("avatar", values.avatar),
+    api
+      .post("api/v1/user/login", values)
+      .then((result) => {
+        console.log(result);
+        nav("/chat");
+      })
+      .catch((err) => {
+        console.log(err);
+        // setErrorMessage(err.response.data);
+      });
   }
 
   const SignupSchema = Yup.object().shape({

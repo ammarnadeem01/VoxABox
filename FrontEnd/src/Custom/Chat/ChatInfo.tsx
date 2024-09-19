@@ -8,10 +8,9 @@ import CloseIcon from "@mui/icons-material/Close";
 interface ChatInfoProps {
   InfoOn: boolean;
   toggleInfo: () => void;
+  data: {};
 }
-const ChatInfo: React.FC<ChatInfoProps> = ({ InfoOn, toggleInfo }) => {
-  function blockFriends() {}
-  function clearChat() {}
+const ChatInfo: React.FC<ChatInfoProps> = ({ InfoOn, toggleInfo, data }) => {
   return (
     <div
       className={`${
@@ -65,20 +64,10 @@ const ChatInfo: React.FC<ChatInfoProps> = ({ InfoOn, toggleInfo }) => {
         </div>
         {/*Block & Delete Chat & Mute Notifications  */}
         <div className="bg-[#2c2c2e] w-full flex flex-col justify-center  text-red-700 font-semibold items-start pl-4 gap-2 py-2">
-          <p
-            className="cursor-pointer"
-            onClick={() => {
-              clearChat();
-            }}
-          >
+          <p className="cursor-pointer">
             <DeleteIcon /> Delete Chat
           </p>
-          <p
-            className="cursor-pointer"
-            onClick={() => {
-              blockFriends();
-            }}
-          >
+          <p className="cursor-pointer">
             <AppBlockingIcon /> Block Ammar Nadeem
           </p>
           <p>
