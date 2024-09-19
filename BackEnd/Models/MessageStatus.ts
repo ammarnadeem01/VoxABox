@@ -30,7 +30,7 @@ export class MessageStatus extends Model {
 
   @Column({
     type: DataType.BOOLEAN,
-    defaultValue: 0,
+    defaultValue: false,
     allowNull: false,
   })
   isDeleted!: boolean;

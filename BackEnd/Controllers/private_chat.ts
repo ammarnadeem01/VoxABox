@@ -6,9 +6,6 @@ import { Friend } from "../Models/friend";
 import { Op, where } from "sequelize";
 import { User } from "../Models/user";
 import sequelize from "sequelize";
-// export const deleteGroup = asyncHandler(
-//   async (req: Request, res: Response, next: NextFunction) => {}
-// );
 
 // helper func (for load all messages, delete all messages)
 const allMessages = async (
@@ -22,12 +19,14 @@ const allMessages = async (
       userId: fromUserId,
       friendId: toUserId,
     },
-    include: [{ model: User, as: "clearedBy" }],
+    attributes: ["clearedAt", "createdAt"],
   });
 
   if (!mutualFriends) {
     return next(new CustomError("UserId and FriendId are not friends", 400));
   }
+
+  const initialdate = mutualFriends.clearedAt || mutualFriends.createdAt;
 
   const AllMessages = await PrivateChat.findAll({
     where: {
@@ -44,7 +43,7 @@ const allMessages = async (
             },
           ],
         },
-        { createdAt: { [Op.gt]: mutualFriends.clearedAt } },
+        { createdAt: { [Op.gt]: initialdate } },
       ],
     },
   });
@@ -154,15 +153,10 @@ export const clearPrivateChat = asyncHandler(
     if (!userId || !friendId) {
       return next(new CustomError("UserId and FriendId are absent", 400));
     }
-    const [updatedRows] = await PrivateChat.update(
+    const [updatedRows] = await Friend.update(
       { clearedAt: new Date() },
       {
-        where: {
-          [Op.or]: [
-            { fromUserId: friendId, toUserId: userId },
-            { toUserId: friendId, fromUserId: userId },
-          ],
-        },
+        where: { userId, friendId },
       }
     );
 
@@ -180,7 +174,7 @@ export const clearPrivateChat = asyncHandler(
 export const loadUnreadPrivateMessages = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     // get userId
-    const { email } = req.body;
+    const { email } = req.params;
     // if userid not null
     if (!email) {
       return next(new CustomError("EmailID is required...", 400));
@@ -189,20 +183,20 @@ export const loadUnreadPrivateMessages = asyncHandler(
     const UnreadMessages = await PrivateChat.findAll({
       where: {
         toUserId: email,
-        status: "Not Seen",
+        seenStatus: "Not Seen",
       },
       include: [
         {
           model: User,
-          as: "fromUserId",
+          as: "fromUser",
           attributes: ["fname", "lname", "avatar", "email", "status"],
         },
       ],
-      group: ["PrivateChat.fromUserId"],
       attributes: [
         "fromUserId",
         [sequelize.fn("COUNT", sequelize.col("PrivateChat.id")), "unreadCount"],
       ],
+      group: ["PrivateChat.fromUserId", "fromUser.email"],
     });
 
     // return response
@@ -226,7 +220,7 @@ export const setUnreadMessageToSeen = asyncHandler(
 
     // set status to seen
     const [updatedRows] = await PrivateChat.update(
-      { status: "Seen" },
+      { seenStatus: "Seen" },
       {
         where: {
           fromUserId: friendID,

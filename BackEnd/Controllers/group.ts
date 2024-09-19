@@ -3,6 +3,8 @@ import { Group } from "../Models/group";
 import asyncHandler from "../Utils/asyncErrorHandlers";
 import CustomError from "../Utils/CustomError";
 import { groupMemberAdd } from "./group_member";
+import { where } from "sequelize";
+import { User } from "../Models/user";
 
 // make group
 export const createGroup = asyncHandler(
@@ -13,11 +15,17 @@ export const createGroup = asyncHandler(
         new CustomError("Required Fields:name,description,admin", 400)
       );
     }
+
+    // if user exist
+    const user = await User.findByPk(adminId);
+    if (!user) {
+      return next(new CustomError("User doesn't exist", 404));
+    }
     //create group
     const group = await Group.create({ name, description, avatar, adminId });
 
     // add admin as a group member
-    const newMember = groupMemberAdd(adminId, group.id, next);
+    const newMember = groupMemberAdd(adminId, group.id, "Admin", next);
 
     res.status(201).json({
       status: "Success",
@@ -47,15 +55,26 @@ export const allGroups = asyncHandler(
 export const deleteGroup = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     let { memberId, groupId } = req.query;
+
     // checks if id is ppresent
     if (!memberId || !groupId) {
       return next(new CustomError("MemberId and Group Id are required", 400));
     }
     // Find Group By ID
     let groupIdNum = Number(groupId);
-    const group = await Group.findByPk(groupIdNum);
+    if (isNaN(groupIdNum)) {
+      return next(new CustomError("Invalid Group Id", 400));
+    }
+    const group = await Group.findOne({
+      where: {
+        adminId: memberId,
+      },
+    });
+
     if (!group) {
-      return next(new CustomError("No group with the given ID found..", 404));
+      return next(
+        new CustomError("You are not allowed to delete this group", 401)
+      );
     }
     // delete the group
     const deletedGroup = await group.destroy();

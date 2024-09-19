@@ -5,8 +5,10 @@ import {
   DataType,
   ForeignKey,
   BelongsTo,
+  HasMany,
 } from "sequelize-typescript";
 import { User } from "./user";
+import { PrivateChat } from "./private_chat";
 
 @Table({
   tableName: "Friends",
@@ -40,10 +42,15 @@ export class Friend extends Model {
   })
   clearedAt!: Date;
 
+  @HasMany(() => PrivateChat, { foreignKey: "fromUserId" })
+  sentMessages!: PrivateChat[];
+
+  @HasMany(() => PrivateChat, { foreignKey: "toUserId" })
+  RecievedMessages!: PrivateChat[];
+
   @BelongsTo(() => User, { foreignKey: "userId", as: "user" })
   user!: User;
 
   @BelongsTo(() => User, { foreignKey: "friendId", as: "friend" })
   friend!: User;
 }
-Friend.belongsTo(User, { as: "clearedBy", foreignKey: "clearedById" });
