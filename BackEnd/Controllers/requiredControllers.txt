@@ -1,0 +1,60 @@
+===========================================
+Friend                                    | T
+-------------------------------------------
+blocked friends for given userID          | T
+fetch all friends                         | T
+delete friend                             | T
+block friend                              | T
+GroupsInCommon                            | T
+createFriend                              | T
+-------------------------------------------
+
+===========================================
+Group                                     | T
+------------------------------------------- 
+Create Group                              | T
+delete groups                             | T
+leave group from userid & groupid         | T  
+-------------------------------------------
+
+===========================================
+Private Chat                              | T
+------------------------------------------- 
+createPrivateMessage                      | T
+unreadMessages                            | T
+deleteChat                                | T
+deleteMessage                             | T
+upgradeMessageStatusToSeen                | T
+-------------------------------------------
+
+===========================================
+GroupChat                                 | T
+-------------------------------------------
+createGroupMessage                        | T
+fetchAllGroupMessages                     | T
+unreadMessages                            | T
+deleteChat                                | T
+deleteMessage                             | T
+upgradeMessageStatusToSeen                | T
+-------------------------------------------
+
+===========================================
+User                                      | F
+-------------------------------------------
+register user                             | T
+login user                                | F
+delete account                            | T
+update account                            | T
+update password                           | T
+searchById                                | T
+searchByName                              | T
+-------------------------------------------
+
+===========================================
+GroupMember                               | T
+------------------------------------------- 
+fetch all groups from userid              | T
+add member                                | T
+removeMember                              | T
+allMemberOfAGroup                         | T
+-------------------------------------------
