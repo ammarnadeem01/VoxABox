@@ -183,12 +183,15 @@ export const removeMember = asyncHandler(
     }
 
     const userIdStr = memberId as string;
+    const adminIdN = adminId as string;
     const groupIdN = Number(groupId);
-    const adminIdN = Number(adminId);
+
     const user = await User.findByPk(userIdStr);
+
     const group = await Group.findOne({
-      where: { groupId: groupIdN, adminId: adminIdN },
+      where: { id: groupIdN, adminId: adminIdN },
     });
+
     if (!user) {
       return next(
         new CustomError(`User with email ${userIdStr} doesn't exist`, 404)
@@ -202,7 +205,9 @@ export const removeMember = asyncHandler(
         )
       );
     }
-
+    if (memberId === adminId) {
+      return next(new CustomError("Admin can't remove himself/herself", 403));
+    }
     // if member is a part of group
     const isMember = await GroupMember.findOne({
       where: {
@@ -235,7 +240,8 @@ export const leaveGroup = asyncHandler(
     const groupIdN = Number(groupId);
     const user = await User.findByPk(userIdStr);
     const group = await Group.findOne({
-      where: { groupId: groupIdN },
+      where: { id: groupIdN },
+      attributes: ["adminId"],
     });
     if (!user) {
       return next(
@@ -257,6 +263,10 @@ export const leaveGroup = asyncHandler(
     });
     if (!isMember) {
       return next(new CustomError("User is not a part of this group", 404));
+    }
+
+    if (userIdStr === group.adminId) {
+      return next(new CustomError("Admin can't remove himself/herself", 403));
     }
     await isMember.destroy();
     res.status(200).json({

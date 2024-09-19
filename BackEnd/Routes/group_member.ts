@@ -12,6 +12,6 @@ router.route("/").post(addGroupMember).patch(removeMember);
 router.route("/commonGroups").get(groupsInCommon);
 router.route("/allMembers/:id").get(allMembersOfGroup);
 router.route("/allGroups/:email").get(allGroups);
-router.route("/leaveGroup").get(leaveGroup);
+router.route("/leaveGroup").delete(leaveGroup);
 
 export default router;

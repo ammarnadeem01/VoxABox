@@ -10,6 +10,7 @@ import { Friend } from "./friend";
 import { PrivateChat } from "./private_chat";
 import { GroupMember } from "./group_member";
 import { Group } from "./group";
+import { MessageStatus } from "./MessageStatus";
 
 @Table({
   tableName: "Users",
@@ -71,6 +72,9 @@ export class User extends Model {
 
   @HasMany(() => PrivateChat, { foreignKey: "toUserId" })
   receivedMessages!: PrivateChat[];
+
+  @HasMany(() => MessageStatus, { foreignKey: "userId" })
+  messageStatus!: MessageStatus;
 
   @HasMany(() => GroupMember, { foreignKey: "memberId" })
   groups!: GroupMember[];

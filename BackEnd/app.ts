@@ -3,7 +3,7 @@ import cors from "cors";
 import userRouter from "./Routes/user";
 import friendRouter from "./Routes/friend";
 import privateChatRouter from "./Routes/private_chat";
-// import groupChatRouter from "./Routes/group_chat";
+import groupChatRouter from "./Routes/group_chat";
 import groupRouter from "./Routes/group";
 import groupMemberRouter from "./Routes/group_member";
 import CustomError from "./Utils/CustomError";
@@ -14,7 +14,7 @@ app.use(cors());
 app.use("/api/v1/user", userRouter);
 app.use("/api/v1/friend", friendRouter);
 app.use("/api/v1/privatechat", privateChatRouter);
-// app.use("/api/v1/groupchat", groupChatRouter);
+app.use("/api/v1/groupchat", groupChatRouter);
 app.use("/api/v1/group", groupRouter);
 app.use("/api/v1/groupmember", groupMemberRouter);
 app.all("*", (req: Request, res: Response, next: NextFunction) => {

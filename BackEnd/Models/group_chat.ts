@@ -43,7 +43,6 @@ export class GroupChat extends Model {
   })
   sentAt!: Date;
 
-  // Define hasMany relation with MessageStatus
   @HasMany(() => MessageStatus)
   messageStatus!: MessageStatus[];
 

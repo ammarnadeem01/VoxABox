@@ -40,7 +40,7 @@ export class MessageStatus extends Model {
     defaultValue: "Not Seen",
     allowNull: false,
   })
-  status!: "Seen" | "Not Seen";
+  seenStatus!: "Seen" | "Not Seen";
 
   @BelongsTo(() => User, { foreignKey: "userId" })
   user!: User;
