@@ -1,16 +1,17 @@
-import { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 
-function CustomDropdown() {
+interface CustomDropDownProps {
+  options: string[];
+}
+const CustomDropdown: React.FC<CustomDropDownProps> = ({ options }) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
-
-  const options = ["Delete"];
 
   const toggleDropdown = () => setIsOpen(!isOpen);
 
   const handleOptionClick = (option: string) => {
-    console.log(option);
+    // console.log(option);
     setIsOpen(false);
   };
 
@@ -58,6 +59,6 @@ function CustomDropdown() {
       )}
     </div>
   );
-}
+};
 
 export default CustomDropdown;

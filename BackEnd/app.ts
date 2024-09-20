@@ -1,4 +1,6 @@
 import express, { Express, NextFunction, Request, Response } from "express";
+import { createServer } from "https";
+import { Server } from "socket.io";
 import cors from "cors";
 import userRouter from "./Routes/user";
 import friendRouter from "./Routes/friend";
@@ -9,8 +11,18 @@ import groupMemberRouter from "./Routes/group_member";
 import CustomError from "./Utils/CustomError";
 import globalErrorHandler from "./Controllers/error";
 const app: Express = express();
+const httpsServer = createServer(app);
+
+const io = new Server(httpsServer, {
+  cors: {
+    origin: "http://localhost:3000",
+    methods: ["GET", "POST"],
+  },
+});
+
 app.use(express.json());
 app.use(cors());
+
 app.use("/api/v1/user", userRouter);
 app.use("/api/v1/friend", friendRouter);
 app.use("/api/v1/privatechat", privateChatRouter);

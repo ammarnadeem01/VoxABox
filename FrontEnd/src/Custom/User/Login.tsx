@@ -108,7 +108,7 @@ function Login() {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="bg-purple-700 text-white px-4 py-2 rounded hover:bg-purple-500 w-full"
+                className="cursor-pointer bg-purple-700 text-white px-4 py-2 rounded hover:bg-purple-500 w-full"
               >
                 Login
               </button>

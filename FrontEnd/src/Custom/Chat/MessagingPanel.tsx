@@ -31,6 +31,7 @@ function MessagingPanel() {
       .get(`api/v1/friend/fetchBlockedFriends/test5@example.com`)
       .then((res) => {
         const data = res.data.data.BlockedFriends;
+
         setBlockedFriendsCount(res.data.length);
         setBlockedFriends(data);
       })
@@ -69,7 +70,6 @@ function MessagingPanel() {
         params: { memberId: "test5@example.com", groupId: 5 },
       })
       .then((res) => {
-        console.log(res);
         const data = res.data.data.UnreadMessages;
         setUnreadGroupMessagesCount(res.data.length);
         setUnreadGroupMessages(data);
@@ -83,6 +83,7 @@ function MessagingPanel() {
       .get(`api/v1/friend/fetchAllFriends/test5@example.com`)
       .then((res) => {
         const friends = res.data.data.AllFriends;
+
         setFriendsCount(res.data.length);
         setAllFriends(friends);
       })
@@ -95,6 +96,7 @@ function MessagingPanel() {
       .get(`api/v1/groupmember/allGroups/test5@example.com`)
       .then((res) => {
         const ans = res.data.data.allGroups;
+        // console.log("grop", ans);
         setGroupsCount(res.data.length);
         setAllGroups(ans);
       })
@@ -106,12 +108,13 @@ function MessagingPanel() {
     api
       .get(`api/v1/privateChat`, {
         params: {
-          fromUserId: "test6@example.com",
+          fromUserId: "test7@example.com",
           toUserId: "test5@example.com",
         },
       })
       .then((res) => {
         const data = res.data.data.AllMessages;
+        // console.log("prvtmsg", data);
         setPrivateChatCount(res.data.length);
         setPrivateChat(data);
       })
@@ -133,7 +136,7 @@ function MessagingPanel() {
         setGroupChat(data);
       })
       .catch((err) => {
-        console.log(err.response.data.message);
+        // console.log(err.response.data.message);
       });
   };
 
@@ -149,6 +152,10 @@ function MessagingPanel() {
   }, []);
 
   const [infoOn, setInfoOn] = useState<boolean>(false);
+  const [selectedContact, setSelectedContact] = useState(null);
+  const handleContactClick = (contact: any) => {
+    setSelectedContact(contact);
+  };
 
   const toggleInfo = () => {
     setInfoOn(!infoOn);
@@ -174,12 +181,16 @@ function MessagingPanel() {
             blockedFriends,
             unreadGroupMessages,
             unreadPrivateMessages,
+            friendsCount,
+            groupsCount,
           }}
+          onContactClick={handleContactClick}
         />
         <ChatContent
           InfoOn={infoOn}
           toggleInfo={toggleInfo}
           data={{ privateChat, groupChat }}
+          contact={selectedContact}
         />
         <ChatInfo
           InfoOn={infoOn}

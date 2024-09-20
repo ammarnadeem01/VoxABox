@@ -1,7 +1,7 @@
 import User from "../../assets/manprvtcaht.png";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AppBlockingIcon from "@mui/icons-material/AppBlocking";
-import Group from "./Group";
+// import Group from "./Group";
 import { Switch } from "@mui/material";
 import VolumeMuteIcon from "@mui/icons-material/VolumeMute";
 import CloseIcon from "@mui/icons-material/Close";
@@ -42,6 +42,7 @@ const ChatInfo: React.FC<ChatInfoProps> = ({ InfoOn, toggleInfo, data }) => {
         <p className="text-[#a1a1a3]">22 roups in common</p>
         <div className=" w-full  h-[40%] ">
           <div className="bg-[#2c2c2e] w-full h-full flex flex-col justify-start items-start pl-4 gap-1 py-2 overflow-hidden overflow-y-auto scrollbar-thin scrollbar-thumb-gray-900 scrollbar-track-[#363638]">
+            {/* <Group />
             <Group />
             <Group />
             <Group />
@@ -58,8 +59,7 @@ const ChatInfo: React.FC<ChatInfoProps> = ({ InfoOn, toggleInfo, data }) => {
             <Group />
             <Group />
             <Group />
-            <Group />
-            <Group />
+            <Group /> */}
           </div>
         </div>
         {/*Block & Delete Chat & Mute Notifications  */}
