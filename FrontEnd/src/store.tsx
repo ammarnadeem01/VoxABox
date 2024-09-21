@@ -1,12 +1,12 @@
-import create from "zustand";
+import { create } from "zustand";
 import { devtools, persist } from "zustand/middleware";
 
 // Define the state for private chat
 interface PrivateChatState {
   selectedFriendId: string | null;
   selectedFriendName: string | null;
-  selectedPrivateChatId: number | null;
-  setSelectedPrivateChatId: (chatId: number) => void;
+  selectedPrivateChatId: string | null;
+  setSelectedPrivateChatId: (chatId: string) => void;
   setFriendId: (id: string) => void;
   setFriendName: (name: string) => void;
 }
@@ -48,7 +48,7 @@ const useAppStore = (
   selectedFriendId: null,
   selectedFriendName: null,
   selectedPrivateChatId: null,
-  setSelectedPrivateChatId: (chatId: number) =>
+  setSelectedPrivateChatId: (chatId: string) =>
     set(() => ({ selectedPrivateChatId: chatId })),
   setFriendId: (id: string) => set(() => ({ selectedFriendId: id })),
   setFriendName: (name: string) => set(() => ({ selectedFriendName: name })),
@@ -85,7 +85,7 @@ const useAppStore = (
       userName: null,
       userAvatar: null,
     })),
-      useStore.persist.clearStorage();
+      useStore.persist.clearStorage(); // Clear storage on logout
   },
 });
 

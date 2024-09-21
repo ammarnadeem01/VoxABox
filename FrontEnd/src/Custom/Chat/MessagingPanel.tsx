@@ -4,8 +4,23 @@ import ChatInfo from "./ChatInfo";
 import ChatList from "./ChatList";
 import SideBar from "./SideBar";
 import api from "../../axiosConfig";
+import useStore from "../../store";
 
 function MessagingPanel() {
+  //import states from store
+  const { userId, setSelectedPrivateChatId } = useStore();
+  //
+  const [selectedContact, setSelectedContact] = useState(null);
+  const [infoOn, setInfoOn] = useState<boolean>(false);
+  const handleContactClick = (contact: any) => {
+    setSelectedPrivateChatId(contact);
+    setSelectedContact(contact);
+  };
+  const [selectedGroup, setSelectedGroup] = useState(null);
+  const handleGroupClick = (group: any) => {
+    // setSelectedPrivateChatId(contact);
+    setSelectedGroup(group);
+  };
   // states to store data
   const [allFriends, setAllFriends] = useState({});
   const [allGroups, setAllGroups] = useState({});
@@ -28,7 +43,7 @@ function MessagingPanel() {
   const [unreadGroupMessagesCount, setUnreadGroupMessagesCount] = useState(0);
   const getBlockedFriends = () => {
     api
-      .get(`api/v1/friend/fetchBlockedFriends/test5@example.com`)
+      .get(`api/v1/friend/fetchBlockedFriends/${userId}`)
       .then((res) => {
         const data = res.data.data.BlockedFriends;
 
@@ -42,7 +57,7 @@ function MessagingPanel() {
 
   const getCommonGroups = () => {
     api
-      .get(`api/v1/friend/fetchBlockedFriends/test5@example.com`)
+      .get(`api/v1/friend/fetchBlockedFriends/${userId}`)
       .then((res) => {
         const data = res.data.data.BlockedFriends;
         setCommonGroupsCount(res.data.length);
@@ -54,7 +69,7 @@ function MessagingPanel() {
   };
   const getUnreadPrivateMessages = () => {
     api
-      .get(`api/v1/privateChat/test5@example.com`)
+      .get(`api/v1/privateChat/${userId}`)
       .then((res) => {
         const data = res.data.data.UnreadMessages;
         setUnreadPrivateMessagesCount(res.data.length);
@@ -67,7 +82,7 @@ function MessagingPanel() {
   const getUnreadGroupMessages = () => {
     api
       .get(`api/v1/groupChat/fetchUnreadMessages`, {
-        params: { memberId: "test5@example.com", groupId: 5 },
+        params: { memberId: userId, groupId: 5 },
       })
       .then((res) => {
         const data = res.data.data.UnreadMessages;
@@ -80,7 +95,7 @@ function MessagingPanel() {
   };
   const getAllFriends = () => {
     api
-      .get(`api/v1/friend/fetchAllFriends/test5@example.com`)
+      .get(`api/v1/friend/fetchAllFriends/${userId}`)
       .then((res) => {
         const friends = res.data.data.AllFriends;
 
@@ -93,7 +108,7 @@ function MessagingPanel() {
   };
   const getAllGroups = () => {
     api
-      .get(`api/v1/groupmember/allGroups/test5@example.com`)
+      .get(`api/v1/groupmember/allGroups/${userId}`)
       .then((res) => {
         const ans = res.data.data.allGroups;
         // console.log("grop", ans);
@@ -108,8 +123,8 @@ function MessagingPanel() {
     api
       .get(`api/v1/privateChat`, {
         params: {
-          fromUserId: "test7@example.com",
-          toUserId: "test5@example.com",
+          fromUserId: selectedContact,
+          toUserId: userId,
         },
       })
       .then((res) => {
@@ -126,8 +141,8 @@ function MessagingPanel() {
     api
       .get(`api/v1/groupChat/fetchAllGroupMessages`, {
         params: {
-          memberId: "test7@example.com",
-          groupId: 6,
+          memberId: userId,
+          groupId: 5,
         },
       })
       .then((res) => {
@@ -149,13 +164,7 @@ function MessagingPanel() {
     getAllPrivateMessages();
     getAllGroupMessages();
     getCommonGroups();
-  }, []);
-
-  const [infoOn, setInfoOn] = useState<boolean>(false);
-  const [selectedContact, setSelectedContact] = useState(null);
-  const handleContactClick = (contact: any) => {
-    setSelectedContact(contact);
-  };
+  }, [selectedContact]);
 
   const toggleInfo = () => {
     setInfoOn(!infoOn);
@@ -184,13 +193,15 @@ function MessagingPanel() {
             friendsCount,
             groupsCount,
           }}
-          onContactClick={handleContactClick}
+          // onContactClick={handleContactClick}
+          onContactClick={handleGroupClick}
         />
         <ChatContent
           InfoOn={infoOn}
           toggleInfo={toggleInfo}
           data={{ privateChat, groupChat }}
           contact={selectedContact}
+          group={selectedGroup}
         />
         <ChatInfo
           InfoOn={infoOn}

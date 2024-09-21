@@ -18,6 +18,7 @@
     "axios": "^1.7.7",
     "bootstrap": "^5.3.3",
     "country-flag-icons": "^1.5.13",
+    "default-import": "^2.0.1",
     "formik": "^2.4.6",
     "react": "^18.3.1",
     "react-bootstrap": "^2.10.4",

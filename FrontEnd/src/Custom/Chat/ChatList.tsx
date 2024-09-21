@@ -1,9 +1,7 @@
 import SearchIcon from "@mui/icons-material/Search";
-import Contact from "./Contact";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import CustomDropdown from "./DropDown";
 import Group from "./Group";
-import SideBar from "./SideBar";
 
 interface Friend {
   avatar: string | null;
@@ -34,44 +32,47 @@ interface PrivateMessage {
 }
 // interface ChatListProps {
 //   data: {
-// allFriends: Friend[];
-// allGroups: GroupInterface[];
-// blockedFriends: Friend[];
-// unreadGroupMessages: GroupMessage[];
-// unreadPrivateMessages: PrivateMessage[];
-// friendsCount: number;
-// groupsCount: number;
-// };
+//     allFriends: Friend[];
+//     allGroups: GroupInterface[];
+//     blockedFriends: Friend[];
+//     unreadGroupMessages: GroupMessage[];
+//     unreadPrivateMessages: PrivateMessage[];
+//     friendsCount: number;
+//     groupsCount: number;
+//   };
+//   onContactClick: any;
 // }
+
 interface ChatListProps {
-  data: {
-    allFriends: any;
-    allGroups: any;
-    blockedFriends: any;
-    unreadGroupMessages: any;
-    unreadPrivateMessages: any;
-    friendsCount: number;
-    groupsCount: number;
-  };
+  data: any;
   onContactClick: any;
 }
+
 const ChatList: React.FC<ChatListProps> = ({ data, onContactClick }) => {
-  const [friends, setFriends] = useState<any>([]);
-  // const [groups, setGroups] = useState<any | null>([]);
+  // const [friends, setFriends] = useState<any>([]);
+  const [groups, setGroups] = useState<any | null>([]);
 
   useEffect(() => {
     console.log(data?.allFriends);
-    // setGroups(data?.allGroups);
+    setGroups(data?.allGroups);
     // if (data?.allFriends) {
-    setFriends(data?.allFriends);
+    // setFriends(data?.allFriends);
     // }
   }, [data]);
-
+  function addFriend() {}
+  function createGroup() {}
+  function logout() {}
   return (
     <div className="w-1/5 h-[95%] text-white flex flex-wrap justify-betweeen items-start overflow-hidden overflow-y-auto scrollbar-thin scrollbar-thumb-gray-900 scrollbar-track-[#363638]">
       <div className="w-full flex flex-wrap justify-start items-start  ">
         <div className="flex justify-end items-center w-full">
-          <CustomDropdown options={["Add Friend", "Create Group"]} />
+          <CustomDropdown
+            table={[
+              { option: "Add Friend", action: addFriend },
+              { option: "Create Group", action: createGroup },
+              { option: "Logout", action: logout },
+            ]}
+          />
         </div>
         <div className="w-full flex justify-center items-start text-black ">
           <div className="flex items-center w-10/12 text-white  bg-[#101717]  rounded-lg">
@@ -86,7 +87,7 @@ const ChatList: React.FC<ChatListProps> = ({ data, onContactClick }) => {
           </div>
         </div>
         <div className="w-full flex flex-wrap justify-center items-center py-3 pl-2 gap-3">
-          {friends && friends.length > 0 ? (
+          {/* {friends && friends.length > 0 ? (
             friends.map((friend: any) => (
               <Contact
                 key={friend.email}
@@ -96,19 +97,19 @@ const ChatList: React.FC<ChatListProps> = ({ data, onContactClick }) => {
             ))
           ) : (
             <p>No friends available</p>
-          )}
-
-          {/* {groups && groups.length > 0 ? (
+          )} */}
+          {groups && groups.length > 0 && console.log("idk", groups)}
+          {groups && groups.length > 0 ? (
             groups.map((group: any) => (
               <Group
                 key={group.email}
                 data={group}
-               
+                onClick={() => onContactClick(group.group)}
               />
             ))
           ) : (
             <p>No groups available</p>
-          )} */}
+          )}
         </div>
       </div>
     </div>

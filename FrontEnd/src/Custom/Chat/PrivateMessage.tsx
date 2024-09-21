@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import CustomDropdown from "./DropDown";
+import api from "../../axiosConfig";
 interface PrivateMessageProps {
   data: {
     content: string;
@@ -14,7 +15,14 @@ interface PrivateMessageProps {
 const PrivateMessage: React.FC<PrivateMessageProps> = ({ data }) => {
   const [content, setContent] = useState<string>("");
   const [sender, setSender] = useState<string>("");
-  function deletePrivateMessage() {}
+  const deletePM = () => {
+    // api.patch(`api/v1/groupchat`, {
+    //   messageId,
+    //   groupId,
+    //   memberId: userId,
+    //   senderId: sender,
+    // });
+  };
   useEffect(() => {
     console.log("siuuu", data);
     setContent(data?.content);
@@ -35,7 +43,7 @@ const PrivateMessage: React.FC<PrivateMessageProps> = ({ data }) => {
         {content}
       </p>
       <div>
-        <CustomDropdown options={["Delete"]} />
+        <CustomDropdown table={[{ option: "Delete", action: deletePM }]} />
       </div>
     </div>
   );

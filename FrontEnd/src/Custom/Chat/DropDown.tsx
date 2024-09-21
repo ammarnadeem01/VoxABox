@@ -1,23 +1,33 @@
-import React, { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 
 interface CustomDropDownProps {
-  options: string[];
+  table: {
+    option: string;
+    action: () => void;
+  }[];
 }
-const CustomDropdown: React.FC<CustomDropDownProps> = ({ options }) => {
+
+const CustomDropdown: React.FC<CustomDropDownProps> = ({ table }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const dropdownRef = useRef(null);
 
-  const toggleDropdown = () => setIsOpen(!isOpen);
+  const dropdownRef = useRef<HTMLDivElement | null>(null);
 
-  const handleOptionClick = (option: string) => {
-    // console.log(option);
+  const toggleDropdown = () => {
+    setIsOpen(!isOpen);
+  };
+
+  const handleOptionClick = (option: string, action: () => void) => {
     setIsOpen(false);
+    action();
   };
 
   useEffect(() => {
-    const handleClickOutside = () => {
-      if (dropdownRef.current) {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
         setIsOpen(false);
       }
     };
@@ -29,7 +39,7 @@ const CustomDropdown: React.FC<CustomDropDownProps> = ({ options }) => {
   }, []);
 
   return (
-    <div className="relative inline-block text-left">
+    <div className="relative inline-block text-left" ref={dropdownRef}>
       <div>
         <button
           onClick={toggleDropdown}
@@ -40,16 +50,13 @@ const CustomDropdown: React.FC<CustomDropDownProps> = ({ options }) => {
       </div>
 
       {isOpen && (
-        <div
-          ref={dropdownRef}
-          className="absolute right-0 z-10 mt-2 w-40 origin-top-right bg-gray-800 text-gray-300 rounded-md shadow-lg"
-        >
+        <div className="absolute right-0 z-10 mt-2 w-40 origin-top-right bg-[#424246] text-gray-300 rounded-md shadow-lg">
           <div className="py-1">
-            {options.map((option) => (
+            {table.map(({ option, action }) => (
               <button
                 key={option}
-                onClick={() => handleOptionClick(option)}
-                className="block w-full px-4 py-2 text-sm text-left hover:bg-gray-700 hover:text-white"
+                onClick={() => handleOptionClick(option, action)}
+                className="w-full px-4 py-2 text-sm text-left hover:bg-gray-700 hover:text-white"
               >
                 {option}
               </button>

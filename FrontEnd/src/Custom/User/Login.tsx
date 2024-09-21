@@ -5,10 +5,12 @@ import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import { useState } from "react";
 import api from "../../axiosConfig";
+import useStore from "../../store";
 function Login() {
   const nav = useNavigate();
   const [visibility, setVisibility] = useState(true);
   const [errMessage, setErrorMessage] = useState("");
+  const { login } = useStore();
   interface Values {
     email: string;
     password: string;
@@ -17,17 +19,17 @@ function Login() {
     email: "",
     password: "",
   };
-  function login(values: Values) {
-    // const formData: FormData = new FormData();
-    // formData.set("fname", values.fname),
-    //   formData.set("lname", values.lname),
-    //   formData.set("email", values.email),
-    //   formData.set("password", values.password),
-    //   formData.set("avatar", values.avatar),
+  function loginUser(values: Values) {
     api
       .post("api/v1/user/login", values)
       .then((result) => {
-        console.log(result);
+        const user = result.data.data.user;
+        login(
+          user.email,
+          "dummy token",
+          user.fname + " " + user.lname,
+          user.avatar
+        );
         nav("/chat");
       })
       .catch((err) => {
@@ -57,7 +59,7 @@ function Login() {
           initialValues={initialValues}
           validationSchema={SignupSchema}
           onSubmit={(values) => {
-            login(values);
+            loginUser(values);
           }}
         >
           {({ isSubmitting }) => (

@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import User from "../../assets/manprvtcaht.png";
-import ChatContent from "./ChatContent";
+// import ChatContent from "./ChatContent";
 interface GroupInterface {
   name: string;
   id: number;
@@ -21,16 +21,20 @@ interface GroupProps {
     role: "Admin" | "Regular";
     updatedAt: string | null;
   };
+  onClick: any;
 }
-const Group: React.FC<GroupProps> = ({ data }) => {
+const Group: React.FC<GroupProps> = ({ data, onClick }) => {
   const [group, setGroup] = useState<GroupInterface | null>();
 
   useEffect(() => {
     setGroup(data?.group);
-    console.log("group", group);
+    console.log("grouppppppppppppppppppppppppppppp  ", data.group);
   }, [data]);
   return (
-    <div className="w-full flex flex-wrap justify-start cursor-pointer">
+    <div
+      className="w-full flex flex-wrap justify-start cursor-pointer"
+      onClick={onClick}
+    >
       <div className="w-full flex justify-start items-center p-1 rounded-xl">
         <div className="w-1/4">
           <img src={User} alt="" className="w-12 h-12 rounded-full" />

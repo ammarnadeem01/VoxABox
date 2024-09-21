@@ -27,7 +27,7 @@ const ChatInfo: React.FC<ChatInfoProps> = ({ InfoOn, toggleInfo, data }) => {
           />
         </div>
         {/* avatar & name */}
-        <div className="flex flex-col justify-center  items-center bg-[#2c2c2e] p-5 gap-1">
+        <div className="flex flex-col justify-center  items-center bg-[#404040] p-5 gap-1">
           {/* button */}
           {/* image */}
           {/* <div className=""> */}
@@ -39,9 +39,9 @@ const ChatInfo: React.FC<ChatInfoProps> = ({ InfoOn, toggleInfo, data }) => {
         {/* Media Links And Documents */}
         <div className=""></div>
         {/* groups in common */}
-        <p className="text-[#a1a1a3]">22 roups in common</p>
+        <p className="bg-[#404040]">22 roups in common</p>
         <div className=" w-full  h-[40%] ">
-          <div className="bg-[#2c2c2e] w-full h-full flex flex-col justify-start items-start pl-4 gap-1 py-2 overflow-hidden overflow-y-auto scrollbar-thin scrollbar-thumb-gray-900 scrollbar-track-[#363638]">
+          <div className="bg-[#404040] w-full h-full flex flex-col justify-start items-start pl-4 gap-1 py-2 overflow-hidden overflow-y-auto scrollbar-thin scrollbar-thumb-gray-900 scrollbar-track-[#363638]">
             {/* <Group />
             <Group />
             <Group />
@@ -63,7 +63,7 @@ const ChatInfo: React.FC<ChatInfoProps> = ({ InfoOn, toggleInfo, data }) => {
           </div>
         </div>
         {/*Block & Delete Chat & Mute Notifications  */}
-        <div className="bg-[#2c2c2e] w-full flex flex-col justify-center  text-red-700 font-semibold items-start pl-4 gap-2 py-2">
+        <div className="bg-[#404040]  w-full flex flex-col justify-center  text-red-700 font-semibold items-start pl-4 gap-2 py-2">
           <p className="cursor-pointer">
             <DeleteIcon /> Delete Chat
           </p>
