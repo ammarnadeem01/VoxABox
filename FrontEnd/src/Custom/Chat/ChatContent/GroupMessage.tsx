@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import CustomDropdown from "./DropDown";
-import api from "../../axiosConfig";
-import useStore from "../../store";
+import CustomDropdown from "../DropDown";
+import api from "../../../axiosConfig";
+import useStore from "../../../store";
 interface GroupMessageInterface {
   data: {
     message: {

@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
-import ChatContent from "./ChatContent";
-import ChatInfo from "./ChatInfo";
-import ChatList from "./ChatList";
-import SideBar from "./SideBar";
+import ChatContent from "./ChatContent/ChatContent";
+import ChatInfo from "./ChatList/ChatInfo";
+import ChatList from "./ChatList/ChatList";
+import SideBar from "./Sidebar/SideBar";
 import api from "../../axiosConfig";
 import useStore from "../../store";
 
@@ -191,13 +191,14 @@ function MessagingPanel() {
     getAllPrivateMessages();
     getAllGroupMessages();
     getCommonGroups();
-    // getAllMembersOfAGroup();
+    getAllMembersOfAGroup();
   }, [
     selectedContact,
     selectedGroup,
     selectedGroupId,
     selectedContactId,
     selectedOption,
+    // members,
   ]);
 
   const toggleInfo = () => {
@@ -246,6 +247,7 @@ function MessagingPanel() {
           data={{ commonGroupsCount, commonGroups }}
           selectedCnt={selectedContact}
           selectedGrp={selectedGroup}
+          allMembers={members}
         />
       </div>
     </div>

@@ -5,7 +5,7 @@ import { devtools, persist } from "zustand/middleware";
 interface PrivateChatState {
   selectedFriendId: string | null;
   selectedFriendName: string | null;
-  selectedPrivateChatId: string | null;
+  selectedPrivateChatId: any | null;
   setSelectedPrivateChatId: (chatId: string) => void;
   setFriendId: (id: string) => void;
   setFriendName: (name: string) => void;

@@ -1,69 +1,56 @@
 import { useEffect, useState } from "react";
 import User from "../../assets/manprvtcaht.png";
 import SendIcon from "@mui/icons-material/Send";
-import CustomDropdown from "./DropDown";
-import PrivateMessage from "./PrivateMessage";
-import api from "../../axiosConfig";
-import useStore from "../../store";
+import GroupMessage from "./GroupMessage";
+import CustomDropdown from "../DropDown";
+import api from "../../../axiosConfig";
 
-interface PrivateChatContentProps {
+interface GroupChatContentProps {
   InfoOn: boolean;
   toggleInfo: () => void;
   data: any;
-  contact: any;
+  group: any;
+  members: any;
 }
-const PrivateChatContent: React.FC<PrivateChatContentProps> = ({
+const GroupChatContent: React.FC<GroupChatContentProps> = ({
   InfoOn,
   toggleInfo,
   data,
-  contact,
+  group,
+  members,
 }) => {
-  const { userId } = useStore();
   const [messages, setMessages] = useState<any[]>([]);
+  const [membersOfGroup, setMembersOfGroup] = useState<any[]>([]);
+  const [membersName, setMembersName] = useState<any[]>([]);
   const [message, setMessage] = useState("");
-  const [friendName, setFriendName] = useState("");
-  const [friendId, setFriendId] = useState();
+  const [groupName, setGroupName] = useState("");
+  const [groupId, setGroupId] = useState();
+  const getAllMembersOfAGroup = () => {
+    api
+      .get(`api/v1/groupmember/allMembers/${groupId}`)
+      .then((res) => {
+        const data = res.data.data.group_members;
+        data.map((member: any) => {
+          const user = member.member;
+          const name: string = user.fname + " " + user.lname;
+        });
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  // const seenIds = new Set();
   const messageText = (event: any) => {
     setMessage(event?.target?.value);
   };
   useEffect(() => {
-    setMessages(data?.privateChat);
-    setFriendId(contact.email);
-    console.log("fri", contact.email);
-    setFriendName(contact.fname + " " + contact.lname);
-  }, [data, contact]);
-
-  const clearChat = () => {
-    api
-      .patch(`api/v1/privatechat`, {
-        userId: friendId,
-        friendId: userId,
-      })
-      .then((dataa) => {
-        console.log("res", dataa);
-      });
-  };
-  const blockFriend = () => {
-    api
-      .patch(`api/v1/friend/blockFriends`, {
-        userId: userId,
-        friendId: friendId,
-      })
-      .then((dataa) => {
-        console.log("res", dataa);
-      });
-  };
-
-  const unblockFriend = () => {
-    api
-      .patch(`api/v1/friend/unblockFriends`, {
-        userId: userId,
-        friendId: friendId,
-      })
-      .then((dataa) => {
-        console.log("res", dataa);
-      });
-  };
+    setGroupName(group.name);
+    setGroupId(group.id);
+    setMessages(data?.groupChat);
+  }, [data, members, group]);
+  const clearChat = () => {};
+  const leaveGroup = () => {};
   return (
     <div
       className={`${
@@ -82,7 +69,12 @@ const PrivateChatContent: React.FC<PrivateChatContentProps> = ({
                 <img src={User} alt="" className="w-12 h-12 rounded-full" />
               </div>
               <div className="flex flex-col gap-0.5">
-                <p className="font-semibold">{friendName}</p>
+                <p className="font-semibold">{groupName}</p>
+                <p>
+                  {/* {membersName.map((elem) => {
+                    return elem;
+                  })} */}
+                </p>
                 <p className="text-gray-500 text-xs">Click for Contact Info</p>
               </div>
             </div>
@@ -90,8 +82,7 @@ const PrivateChatContent: React.FC<PrivateChatContentProps> = ({
               <CustomDropdown
                 table={[
                   { option: "Clear Chat", action: clearChat },
-                  { option: "Block Friend", action: blockFriend },
-                  { option: "Unblock Friend", action: unblockFriend },
+                  { option: "Leave Group", action: leaveGroup },
                 ]}
               />
             </div>
@@ -103,7 +94,7 @@ const PrivateChatContent: React.FC<PrivateChatContentProps> = ({
             messages?.map((msg: any) => {
               return (
                 <>
-                  <PrivateMessage data={msg} />
+                  <GroupMessage data={msg} />
                 </>
               );
             })
@@ -138,4 +129,4 @@ const PrivateChatContent: React.FC<PrivateChatContentProps> = ({
   );
 };
 
-export default PrivateChatContent;
+export default GroupChatContent;

@@ -1,8 +1,8 @@
 import SearchIcon from "@mui/icons-material/Search";
 import { useEffect, useState } from "react";
-import CustomDropdown from "./DropDown";
+import CustomDropdown from "../DropDown";
 import Group from "./Group";
-import Contact from "./Contact";
+import Contact from "../ChatContent/Contact";
 
 interface Friend {
   avatar: string | null;

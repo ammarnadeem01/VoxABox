@@ -33,7 +33,6 @@ const Contact: React.FC<ContactProps> = ({ data, onClick }) => {
   const [friend, setFriend] = useState<Friend | null>();
 
   useEffect(() => {
-    console.log("s");
     setFriend(data);
   }, [data, friend]);
   return (
