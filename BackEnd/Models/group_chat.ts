@@ -46,9 +46,9 @@ export class GroupChat extends Model {
   @HasMany(() => MessageStatus)
   messageStatus!: MessageStatus[];
 
-  @BelongsTo(() => Group, { foreignKey: "toGroupId" })
+  @BelongsTo(() => Group, { foreignKey: "toGroupId", as: "group" })
   group!: Group;
 
-  @BelongsTo(() => User, { foreignKey: "fromUserId" })
+  @BelongsTo(() => User, { foreignKey: "fromUserId", as: "user" })
   user!: User;
 }

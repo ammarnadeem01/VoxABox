@@ -37,27 +37,24 @@ const GroupMessage: React.FC<GroupMessageInterface> = ({ data }) => {
   const [groupId, setGroupId] = useState<number>();
   const [time, setTime] = useState<string>("");
   useEffect(() => {
-    console.log("data for ", data);
-    console.log("siuuu", data.message.content);
     setContent(data?.message.content);
     setSender(data?.message.fromUserId);
     setTime(data.messageStatus.createdAt);
     setMessageId(data.message.id);
     setGroupId(5);
-    console.log(sender);
   }, [data, content]);
   return (
     <div
       className={`w-full flex  ${
-        sender === "test5@example.com" ? "flex-row-reverse" : "flex-row"
+        sender === userId ? "flex-row-reverse" : "flex-row"
       } `}
     >
-      <p
+      <div
         className={`bg-[#0d0d0d] px-3 py-1 max-w-[60%]  rounded-t-xl  flex flex-wrap items-center gap-1 ${
-          sender === "test5@example.com" ? "rounded-bl-xl" : " rounded-br-xl"
+          sender === userId ? "rounded-bl-xl" : " rounded-br-xl"
         } `}
       >
-        {sender === "test5@example.com" ? (
+        {sender === userId ? (
           ""
         ) : (
           <p className="w-full text-xs text-gray-400">~ {sender}</p>
@@ -67,7 +64,7 @@ const GroupMessage: React.FC<GroupMessageInterface> = ({ data }) => {
           {new Date(time).toLocaleTimeString()},&nbsp;&nbsp;
           {new Date(time).toLocaleDateString()}
         </p>
-      </p>
+      </div>
       <div>
         <CustomDropdown table={[{ option: "Delete", action: deleteGM }]} />
       </div>

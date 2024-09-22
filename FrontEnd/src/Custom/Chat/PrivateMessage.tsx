@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import CustomDropdown from "./DropDown";
 import api from "../../axiosConfig";
+import useStore from "../../store";
 interface PrivateMessageProps {
   data: {
     content: string;
@@ -15,6 +16,7 @@ interface PrivateMessageProps {
 const PrivateMessage: React.FC<PrivateMessageProps> = ({ data }) => {
   const [content, setContent] = useState<string>("");
   const [sender, setSender] = useState<string>("");
+  const { userId } = useStore();
   const deletePM = () => {
     // api.patch(`api/v1/groupchat`, {
     //   messageId,
@@ -24,7 +26,6 @@ const PrivateMessage: React.FC<PrivateMessageProps> = ({ data }) => {
     // });
   };
   useEffect(() => {
-    console.log("siuuu", data);
     setContent(data?.content);
     setSender(data?.fromUserId);
   }, [data, content]);
@@ -32,12 +33,12 @@ const PrivateMessage: React.FC<PrivateMessageProps> = ({ data }) => {
   return (
     <div
       className={`w-full flex ${
-        sender === "test5@example.com" ? "flex-row-reverse" : "flex-row"
+        sender === userId ? "flex-row-reverse" : "flex-row"
       } `}
     >
       <p
         className={`bg-[#0d0d0d] px-3 py-1 max-w-[60%] ${
-          sender === "test5@example.com" ? "rounded-bl-xl" : " rounded-br-xl"
+          sender === userId ? "rounded-bl-xl" : " rounded-br-xl"
         } rounded-t-xl  flex items-center`}
       >
         {content}

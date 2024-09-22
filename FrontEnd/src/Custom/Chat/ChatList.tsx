@@ -2,6 +2,7 @@ import SearchIcon from "@mui/icons-material/Search";
 import { useEffect, useState } from "react";
 import CustomDropdown from "./DropDown";
 import Group from "./Group";
+import Contact from "./Contact";
 
 interface Friend {
   avatar: string | null;
@@ -46,19 +47,36 @@ interface PrivateMessage {
 interface ChatListProps {
   data: any;
   onContactClick: any;
+  onGroupClick: any;
+  selectedOption: any;
 }
 
-const ChatList: React.FC<ChatListProps> = ({ data, onContactClick }) => {
-  // const [friends, setFriends] = useState<any>([]);
+const ChatList: React.FC<ChatListProps> = ({
+  data,
+  onContactClick,
+  onGroupClick,
+  selectedOption,
+}) => {
+  const [friends, setFriends] = useState<any>([]);
   const [groups, setGroups] = useState<any | null>([]);
+  const [option, setOption] = useState("All");
 
   useEffect(() => {
-    console.log(data?.allFriends);
-    setGroups(data?.allGroups);
-    // if (data?.allFriends) {
-    // setFriends(data?.allFriends);
-    // }
-  }, [data]);
+    setOption(selectedOption);
+  }, [selectedOption, data]);
+
+  useEffect(() => {
+    if (option === "Blocked") {
+      setFriends(data?.blockedFriends);
+      setGroups(null);
+    } else if (option === "Groups") {
+      setFriends(null);
+      setGroups(data?.unreadGroupMessages);
+    } else if (option === "Direct Messages") {
+      setFriends(data?.unreadPrivateMessages);
+      setGroups(null);
+    }
+  }, [data, option]);
   function addFriend() {}
   function createGroup() {}
   function logout() {}
@@ -87,29 +105,39 @@ const ChatList: React.FC<ChatListProps> = ({ data, onContactClick }) => {
           </div>
         </div>
         <div className="w-full flex flex-wrap justify-center items-center py-3 pl-2 gap-3">
-          {/* {friends && friends.length > 0 ? (
-            friends.map((friend: any) => (
-              <Contact
-                key={friend.email}
-                data={friend}
-                onClick={() => onContactClick(friend.friendId)}
-              />
-            ))
-          ) : (
-            <p>No friends available</p>
-          )} */}
-          {groups && groups.length > 0 && console.log("idk", groups)}
-          {groups && groups.length > 0 ? (
-            groups.map((group: any) => (
-              <Group
-                key={group.email}
-                data={group}
-                onClick={() => onContactClick(group.group)}
-              />
-            ))
-          ) : (
-            <p>No groups available</p>
-          )}
+          {friends &&
+            friends.length > 0 &&
+            friends.map((friend: any) => {
+              let friendObj = null;
+              switch (option) {
+                case "Direct Messages":
+                  friendObj = friend.fromUser;
+                  break;
+                case "Blocked":
+                  friendObj = friend.friend;
+                  break;
+              }
+              return (
+                <>
+                  <Contact
+                    key={friend.fromUserId}
+                    data={friendObj}
+                    onClick={() => onContactClick(friendObj)}
+                  />
+                </>
+              );
+            })}
+          {groups &&
+            groups.length > 0 &&
+            groups.map((group: any) => {
+              return (
+                <Group
+                  key={group.message[0].toGroupId}
+                  data={group}
+                  onClick={() => onGroupClick(group.message[0].group)}
+                />
+              );
+            })}
         </div>
       </div>
     </div>

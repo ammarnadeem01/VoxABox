@@ -8,6 +8,7 @@ import { GroupMember } from "../Models/group_member";
 import { MessageStatus } from "../Models/MessageStatus";
 import { User } from "../Models/user";
 import { Group } from "../Models/group";
+import { Sequelize } from "sequelize-typescript";
 
 // helper funcs
 const allMessages = async (
@@ -77,52 +78,68 @@ const findAllUnreadMessages = async (
   next: NextFunction
 ) => {
   // final date:user was a member of grp? leftAt or CurrentDate?
-  const isMember = await GroupMember.findOne({
+  const Member = await GroupMember.findAll({
     where: {
       memberId,
-      groupId,
     },
     attributes: [
       [fn("COALESCE", col("leftAt"), fn("NOW")), "leftAt"],
       [fn("COALESCE", col("clearedAt"), col("joinedAt")), "clearedAt"],
+      "groupId",
+    ],
+    group: [
+      "groupId",
+      "GroupMember.leftAt",
+      "GroupMember.clearedAt",
+      "GroupMember.joinedAt",
     ],
   });
 
-  if (!isMember) {
+  if (!Member) {
     return next(
       new CustomError("User is/was not a member of this group...", 400)
     );
   }
 
-  const UnfilteredMessages = await GroupChat.findAll({
-    where: {
-      toGroupId: groupId,
-      sentAt: {
-        [Op.between]: [isMember.clearedAt, isMember.leftAt],
+  let UnfilteredMessages: any[] = [];
+  for (const isMember in Member) {
+    UnfilteredMessages[isMember] = await GroupChat.findAll({
+      where: {
+        toGroupId: Member[isMember].dataValues.groupId,
+        sentAt: {
+          [Op.between]: [
+            Member[isMember].dataValues.clearedAt,
+            Member[isMember].dataValues.leftAt,
+          ],
+        },
       },
-    },
-    attributes: ["id", "content", "fromUserId", "toGroupId"],
-  });
+      include: { model: Group },
+    });
+  }
 
-  console.log("UnfilteredMessages", UnfilteredMessages);
-
-  // Initialize an array to store all messages with their statuses
   let UnreadMessages = [];
 
-  for (const message of UnfilteredMessages) {
-    const messageStatus = await MessageStatus.findOne({
-      where: {
-        userId: memberId,
-        messageId: message.dataValues.id,
-        seenStatus: "Not Seen",
-      },
-    });
+  for (const message of UnfilteredMessages!) {
+    let messageStatus;
+    for (const m of message!) {
+      messageStatus = await MessageStatus.findOne({
+        where: {
+          userId: memberId,
+          messageId: m.dataValues.id,
+          seenStatus: "Not Seen",
+        },
+        // include: { model: GroupChat, attributes: ["toGroupId"] },
+        // group: ["GroupChat.toGroupId"],
+        // attributes: [
+        //   "toGroupId",
+        //   [Sequelize.fn("COUNT", Sequelize.col("id")), "unreadCount"],
+        // ],
+      });
+    }
 
-    // Add the message and its status to the AllMessages array
     if (messageStatus) {
       UnreadMessages.push({
         message,
-        messageStatus,
       });
     }
   }

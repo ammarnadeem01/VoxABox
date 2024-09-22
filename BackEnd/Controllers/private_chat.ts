@@ -62,25 +62,28 @@ export const createPrivateMessage = asyncHandler(
     }
     // 3. if from and to are valid  & if friend is not blocked
 
-    const mutualFriends = await Friend.findOne({
+    const friendOne = await Friend.findOne({
       where: {
         userId: fromUserId,
         friendId: toUserId,
-        status: {
-          [Op.ne]: "Blocked",
-        },
+        status: { [Op.ne]: "Blocked" },
       },
     });
 
-    // 4. if contact is blocked / users are not present
-    if (!mutualFriends) {
+    const friendTwo = await Friend.findOne({
+      where: {
+        userId: toUserId,
+        friendId: fromUserId,
+        status: { [Op.ne]: "Blocked" },
+      },
+    });
+
+    if (!friendOne || !friendTwo) {
       return next(
-        new CustomError(
-          "Either contact is blocked OR some user is not present on VoxABox.",
-          404
-        )
+        new CustomError("Either contact is blocked or not friends.", 404)
       );
     }
+
     // 5. createMessage
     const privateMessaage = await PrivateChat.create({
       fromUserId,
@@ -149,6 +152,12 @@ export const clearPrivateChat = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     // get data from query
     const { userId, friendId } = req.body;
+    console.log(
+      "=================================================================================================userid",
+      userId,
+      "friendId",
+      friendId
+    );
     // if data is present
     if (!userId || !friendId) {
       return next(new CustomError("UserId and FriendId are absent", 400));
@@ -189,7 +198,6 @@ export const loadUnreadPrivateMessages = asyncHandler(
         {
           model: User,
           as: "fromUser",
-          attributes: ["fname", "lname", "avatar", "email", "status"],
         },
       ],
       attributes: [

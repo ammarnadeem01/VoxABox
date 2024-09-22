@@ -128,6 +128,39 @@ export const blockFriend = asyncHandler(
   }
 );
 
+//unblock friend
+export const unblockFriend = asyncHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
+    // get userid And friendid
+    const { userId, friendId } = req.body;
+    // if both fields are present
+    if (!userId || !friendId) {
+      return next(new CustomError("Required : UserID , FriendID.", 404));
+    }
+    // if both are friends
+    const mutualFriends = await Friend.findOne({
+      where: {
+        userId,
+        friendId,
+      },
+    });
+    // check if they are friends
+    if (!mutualFriends) {
+      return next(new CustomError("Both users are not friends", 404));
+    }
+
+    // update friendship status
+    mutualFriends.update({ status: "Accepted" });
+    //send response
+    res.status(200).json({
+      status: "Success",
+      data: {
+        mutualFriends,
+      },
+    });
+  }
+);
+
 // fetch all friends
 export const fetchAllFriends = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {

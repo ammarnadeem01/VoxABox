@@ -11,26 +11,30 @@ interface Friend {
   status: "offline" | "online";
   updatedAt: string | null;
 }
-interface ContactProps {
-  data: {
-    clearedAt: string;
-    createdAt: string | null;
-    friend: Friend;
-    friendId: string;
-    id: number;
-    status: "offline" | "online";
-    updatedAt: string | null;
-    userId: string;
-  };
+// interface ContactProps {
+//   data: {
+//     clearedAt: string;
+//     createdAt: string | null;
+//     friend: Friend;
+//     friendId: string;
+//     id: number;
+//     status: "offline" | "online";
+//     updatedAt: string | null;
+//     userId: string;
+//   };
 
+//   onClick: any;
+// }
+interface ContactProps {
+  data: any;
   onClick: any;
 }
 const Contact: React.FC<ContactProps> = ({ data, onClick }) => {
   const [friend, setFriend] = useState<Friend | null>();
 
   useEffect(() => {
-    setFriend(data?.friend);
-    console.log("friend", friend);
+    console.log("s");
+    setFriend(data);
   }, [data, friend]);
   return (
     <div

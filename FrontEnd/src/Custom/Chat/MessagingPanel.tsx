@@ -11,15 +11,29 @@ function MessagingPanel() {
   const { userId, setSelectedPrivateChatId } = useStore();
   //
   const [selectedContact, setSelectedContact] = useState(null);
+  const [selectedContactId, setSelectedContactId] = useState(null);
+  const [selectedGroup, setSelectedGroup] = useState<any>(null);
+  const [selectedGroupId, setSelectedGroupId] = useState<number | null>(null);
+  const [members, setMembers] = useState<string[]>([]);
+  const [selectedOption, setSelectedOption] = useState();
   const [infoOn, setInfoOn] = useState<boolean>(false);
   const handleContactClick = (contact: any) => {
+    setSelectedContactId(contact.email);
     setSelectedPrivateChatId(contact);
     setSelectedContact(contact);
+    setSelectedGroupId(null);
+    setSelectedGroup(null);
   };
-  const [selectedGroup, setSelectedGroup] = useState(null);
+
   const handleGroupClick = (group: any) => {
-    // setSelectedPrivateChatId(contact);
+    setSelectedGroupId(group.id);
     setSelectedGroup(group);
+    setSelectedContact(null);
+    setSelectedContactId(null);
+  };
+
+  const selectOption = (option: any) => {
+    setSelectedOption(option);
   };
   // states to store data
   const [allFriends, setAllFriends] = useState({});
@@ -111,7 +125,6 @@ function MessagingPanel() {
       .get(`api/v1/groupmember/allGroups/${userId}`)
       .then((res) => {
         const ans = res.data.data.allGroups;
-        // console.log("grop", ans);
         setGroupsCount(res.data.length);
         setAllGroups(ans);
       })
@@ -123,13 +136,12 @@ function MessagingPanel() {
     api
       .get(`api/v1/privateChat`, {
         params: {
-          fromUserId: selectedContact,
+          fromUserId: selectedContactId,
           toUserId: userId,
         },
       })
       .then((res) => {
         const data = res.data.data.AllMessages;
-        // console.log("prvtmsg", data);
         setPrivateChatCount(res.data.length);
         setPrivateChat(data);
       })
@@ -142,7 +154,7 @@ function MessagingPanel() {
       .get(`api/v1/groupChat/fetchAllGroupMessages`, {
         params: {
           memberId: userId,
-          groupId: 5,
+          groupId: selectedGroupId,
         },
       })
       .then((res) => {
@@ -155,6 +167,21 @@ function MessagingPanel() {
       });
   };
 
+  const getAllMembersOfAGroup = () => {
+    api
+      .get(`api/v1/groupmember/allMembers/${selectedGroupId}`)
+      .then((res) => {
+        const data = res.data.data.group_members;
+        data.map((member: any) => {
+          const user = member.member;
+          setMembers([...members, user]);
+        });
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
   useEffect(() => {
     getBlockedFriends();
     getUnreadPrivateMessages();
@@ -164,7 +191,14 @@ function MessagingPanel() {
     getAllPrivateMessages();
     getAllGroupMessages();
     getCommonGroups();
-  }, [selectedContact]);
+    // getAllMembersOfAGroup();
+  }, [
+    selectedContact,
+    selectedGroup,
+    selectedGroupId,
+    selectedContactId,
+    selectedOption,
+  ]);
 
   const toggleInfo = () => {
     setInfoOn(!infoOn);
@@ -182,6 +216,7 @@ function MessagingPanel() {
             unreadGroupMessagesCount,
             unreadPrivateMessagesCount,
           }}
+          option={selectOption}
         />
         <ChatList
           data={{
@@ -193,8 +228,9 @@ function MessagingPanel() {
             friendsCount,
             groupsCount,
           }}
-          // onContactClick={handleContactClick}
-          onContactClick={handleGroupClick}
+          onContactClick={handleContactClick}
+          onGroupClick={handleGroupClick}
+          selectedOption={selectedOption}
         />
         <ChatContent
           InfoOn={infoOn}
@@ -202,11 +238,14 @@ function MessagingPanel() {
           data={{ privateChat, groupChat }}
           contact={selectedContact}
           group={selectedGroup}
+          allMembers={members}
         />
         <ChatInfo
           InfoOn={infoOn}
           toggleInfo={toggleInfo}
           data={{ commonGroupsCount, commonGroups }}
+          selectedCnt={selectedContact}
+          selectedGrp={selectedGroup}
         />
       </div>
     </div>

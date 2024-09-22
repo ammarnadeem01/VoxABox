@@ -158,6 +158,7 @@ export const allMembersOfGroup = asyncHandler(
       where: {
         groupId: parseInt(id),
       },
+      include: { model: User },
     });
 
     if (group_members.length == 0) {

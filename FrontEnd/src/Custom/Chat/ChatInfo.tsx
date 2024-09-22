@@ -1,16 +1,28 @@
-import User from "../../assets/manprvtcaht.png";
-import DeleteIcon from "@mui/icons-material/Delete";
-import AppBlockingIcon from "@mui/icons-material/AppBlocking";
-// import Group from "./Group";
-import { Switch } from "@mui/material";
-import VolumeMuteIcon from "@mui/icons-material/VolumeMute";
 import CloseIcon from "@mui/icons-material/Close";
+import { useEffect, useState } from "react";
+import ContactChatInfo from "./ContactChatInfo";
+import GroupChatInfo from "./GroupChatInfo";
 interface ChatInfoProps {
   InfoOn: boolean;
   toggleInfo: () => void;
   data: {};
+  selectedCnt: any;
+  selectedGrp: any;
 }
-const ChatInfo: React.FC<ChatInfoProps> = ({ InfoOn, toggleInfo, data }) => {
+const ChatInfo: React.FC<ChatInfoProps> = ({
+  InfoOn,
+  toggleInfo,
+  data,
+  selectedCnt,
+  selectedGrp,
+}) => {
+  const [contact, setContact] = useState();
+  const [group, setGroup] = useState();
+
+  useEffect(() => {
+    setContact(selectedCnt);
+    setGroup(selectedGrp);
+  }, [data, selectedCnt, selectedGrp]);
   return (
     <div
       className={`${
@@ -26,54 +38,10 @@ const ChatInfo: React.FC<ChatInfoProps> = ({ InfoOn, toggleInfo, data }) => {
             onClick={toggleInfo}
           />
         </div>
-        {/* avatar & name */}
-        <div className="flex flex-col justify-center  items-center bg-[#404040] p-5 gap-1">
-          {/* button */}
-          {/* image */}
-          {/* <div className=""> */}
-          <img src={User} alt="" className="w-[50%] h-[50%] rounded-full" />
-          {/* </div> */}
-          {/* mail */}
-          <p className="text-[#e5e5e7]">ammarnadeem@gmail.com</p>
-        </div>
-        {/* Media Links And Documents */}
-        <div className=""></div>
-        {/* groups in common */}
-        <p className="bg-[#404040]">22 roups in common</p>
-        <div className=" w-full  h-[40%] ">
-          <div className="bg-[#404040] w-full h-full flex flex-col justify-start items-start pl-4 gap-1 py-2 overflow-hidden overflow-y-auto scrollbar-thin scrollbar-thumb-gray-900 scrollbar-track-[#363638]">
-            {/* <Group />
-            <Group />
-            <Group />
-            <Group />
-            <Group />
-            <Group />
-            <Group />
-            <Group />
-            <Group />
-            <Group />
-            <Group />
-            <Group />
-            <Group />
-            <Group />
-            <Group />
-            <Group />
-            <Group />
-            <Group /> */}
-          </div>
-        </div>
-        {/*Block & Delete Chat & Mute Notifications  */}
-        <div className="bg-[#404040]  w-full flex flex-col justify-center  text-red-700 font-semibold items-start pl-4 gap-2 py-2">
-          <p className="cursor-pointer">
-            <DeleteIcon /> Delete Chat
-          </p>
-          <p className="cursor-pointer">
-            <AppBlockingIcon /> Block Ammar Nadeem
-          </p>
-          <p>
-            <VolumeMuteIcon /> Mute Notification <Switch color="error" />
-          </p>
-        </div>
+        {/* start */}
+        {contact && <ContactChatInfo data={contact} />}
+        {group && <GroupChatInfo data={group} />}
+        {/* end */}
       </div>
     </div>
   );
