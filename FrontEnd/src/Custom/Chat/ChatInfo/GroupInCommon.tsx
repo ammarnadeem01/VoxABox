@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import User from "../../assets/manprvtcaht.png";
+import User from "../../../assets/manprvtcaht.png";
 interface CommonGroupProps {
   data: {
     adminId: string;
@@ -21,7 +21,10 @@ const GroupInCommon: React.FC<CommonGroupProps> = ({ data }) => {
       <div>
         <img src={User} alt="" className="w-12 h-12 rounded-full" />
       </div>
-      <div>{group?.name}</div>
+      <div className="flex flex-col flex-wrap w-full">
+        <p>{group?.name}</p>
+        <p className="text-xs text-gray-300">Admin:{group?.adminId}</p>
+      </div>
     </div>
   );
 };

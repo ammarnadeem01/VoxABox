@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import User from "../../assets/manprvtcaht.png";
+import User from "../../../assets/manprvtcaht.png";
 interface Friend {
   avatar: string | null;
   createdAt: string | null;
@@ -60,7 +60,7 @@ const Contact: React.FC<ContactProps> = ({ data, onClick }) => {
           </div>
         </div>
         <div className="w-1/6   text-black text-xs flex justify-center items-center ">
-          <p className="bg-white rounded-full px-1">5</p>
+          <p className="bg-green-500 w-2 h-2 rounded-full"></p>
         </div>
       </div>
     </div>

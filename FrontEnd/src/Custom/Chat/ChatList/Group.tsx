@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import User from "../../assets/manprvtcaht.png";
+import User from "../../../assets/manprvtcaht.png";
 // import ChatContent from "./ChatContent";
 interface GroupInterface {
   name: string;
@@ -28,7 +28,7 @@ const Group: React.FC<GroupProps> = ({ data, onClick }) => {
   const [group, setGroup] = useState<GroupInterface | null>();
 
   useEffect(() => {
-    setGroup(data.message[0].group);
+    setGroup(data);
   }, [data]);
   return (
     <div
@@ -45,9 +45,6 @@ const Group: React.FC<GroupProps> = ({ data, onClick }) => {
 
             <p className="w-full text-xs line-clamp-1 ">{group?.description}</p>
           </div>
-        </div>
-        <div className="w-1/6   text-black text-xs flex justify-center items-center ">
-          <p className="bg-white rounded-full px-1">5</p>
         </div>
       </div>
     </div>

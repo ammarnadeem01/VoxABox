@@ -1,0 +1,8 @@
+// user auth
+// middlewares of avatar,protect and restrict
+// block,unblock,unfriend
+// clear chat (private and group)
+// status (online or offline)
+// add friend and group
+// leave group and kick off member
+// sockets

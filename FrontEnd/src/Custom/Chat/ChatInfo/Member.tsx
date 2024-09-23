@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import User from "../../assets/manprvtcaht.png";
+import User from "../../../assets/manprvtcaht.png";
 import * as React from "react";
 interface User {
   avatar: string | null;
@@ -42,7 +42,11 @@ const Member: React.FC<MemberProps> = ({ data }) => {
       <div className="w-full line-clamp-1">
         <div className="flex w-full justify-start gap-2 items-center">
           <p className="line-clamp-1">{member?.fname + " " + member?.lname}</p>
-          <p className="text-green-600">{role === "Admin" ? "Admin" : ""}</p>
+          {role === "Admin" && (
+            <p className="bg-purple-500 text-white font-semibold text-xs px-1  rounded-full">
+              {role}
+            </p>
+          )}
         </div>
         <p className="text-xs text-gray-400">{member?.email}</p>
       </div>

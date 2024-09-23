@@ -113,7 +113,14 @@ export const groupsInCommon = asyncHandler(
       });
 
       if (isUser2Member) {
-        const group = await Group.findByPk(groupM.groupId);
+        const group = await Group.findByPk(groupM.groupId, {
+          include: [
+            {
+              model: GroupMember,
+              include: [{ model: User }],
+            },
+          ],
+        });
         if (group) {
           commonGroups.push(group);
         }

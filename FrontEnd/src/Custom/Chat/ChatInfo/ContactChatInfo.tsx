@@ -1,10 +1,10 @@
-import User from "../../assets/manprvtcaht.png";
+import User from "../../../assets/manprvtcaht.png";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AppBlockingIcon from "@mui/icons-material/AppBlocking";
 import { useEffect, useState } from "react";
 import api from "../../../axiosConfig";
 import useStore from "../../../store";
-import GroupInCommon from "../GroupInCommon";
+import GroupInCommon from "./GroupInCommon";
 interface ContactChatInfoProps {
   data: {
     avatar: string | null;
@@ -41,7 +41,6 @@ const ContactChatInfo: React.FC<ContactChatInfoProps> = ({ data }) => {
       })
       .then((res) => {
         const data = res.data.data.commonGroups;
-        console.log("data", res.data.data.commonGroups);
         setCommonGroup(data);
       })
       .catch((err) => {
@@ -52,7 +51,6 @@ const ContactChatInfo: React.FC<ContactChatInfoProps> = ({ data }) => {
   useEffect(() => {
     setContact(data);
     if (userId && selectedPrivateChatId) {
-      console.log(1);
       fetchCommonGroups();
     }
   }, [data, contact]);

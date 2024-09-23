@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import User from "../../assets/manprvtcaht.png";
+import User from "../../../assets/manprvtcaht.png";
 import SendIcon from "@mui/icons-material/Send";
 import GroupMessage from "./GroupMessage";
 import CustomDropdown from "../DropDown";

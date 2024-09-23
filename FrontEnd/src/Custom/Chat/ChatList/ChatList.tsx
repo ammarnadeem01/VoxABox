@@ -1,8 +1,9 @@
 import SearchIcon from "@mui/icons-material/Search";
 import { useEffect, useState } from "react";
-import CustomDropdown from "../DropDown";
-import Group from "./Group";
+
 import Contact from "../ChatContent/Contact";
+import Group from "./Group";
+import CustomDropdown from "../DropDown";
 
 interface Friend {
   avatar: string | null;
@@ -75,7 +76,12 @@ const ChatList: React.FC<ChatListProps> = ({
     } else if (option === "Direct Messages") {
       setFriends(data?.unreadPrivateMessages);
       setGroups(null);
+    } else if (option === "All") {
+      console.log("data =======================", data);
+      setFriends(data.allFriends);
+      setGroups(data.allGroups);
     }
+    console.log("da", data);
   }, [data, option]);
   function addFriend() {}
   function createGroup() {}
@@ -116,6 +122,9 @@ const ChatList: React.FC<ChatListProps> = ({
                 case "Blocked":
                   friendObj = friend.friend;
                   break;
+                case "All":
+                  friendObj = friend.friend;
+                  break;
               }
               return (
                 <>
@@ -130,11 +139,22 @@ const ChatList: React.FC<ChatListProps> = ({
           {groups &&
             groups.length > 0 &&
             groups.map((group: any) => {
+              let groupObj = null;
+              switch (option) {
+                case "Groups":
+                  console.log(" grp in grps", group);
+                  groupObj =
+                    group && group.message ? group.message[0].group : group;
+                  break;
+                case "All":
+                  groupObj = group.group;
+                  break;
+              }
               return (
                 <Group
-                  key={group.message[0].toGroupId}
-                  data={group}
-                  onClick={() => onGroupClick(group.message[0].group)}
+                  key={group}
+                  data={groupObj}
+                  onClick={() => onGroupClick(groupObj)}
                 />
               );
             })}

@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import CustomDropdown from "../DropDown";
-import api from "../../../axiosConfig";
 import useStore from "../../../store";
 interface PrivateMessageProps {
   data: {
@@ -32,7 +31,7 @@ const PrivateMessage: React.FC<PrivateMessageProps> = ({ data }) => {
 
   return (
     <div
-      className={`w-full flex ${
+      className={`w-full flex  ${
         sender === userId ? "flex-row-reverse" : "flex-row"
       } `}
     >

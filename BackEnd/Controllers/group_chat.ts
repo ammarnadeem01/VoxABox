@@ -42,6 +42,7 @@ const allMessages = async (
       },
     },
     attributes: ["id", "content", "fromUserId", "toGroupId"],
+    include: { model: User },
   });
 
   // console.log("UnfilteredMessages", UnfilteredMessages);
@@ -71,6 +72,59 @@ const allMessages = async (
 };
 
 // helper func
+
+const unreadseen = async (
+  memberId: string,
+  groupId: number,
+  next: NextFunction
+) => {
+  // final date:user was a member of grp? leftAt or CurrentDate?
+  const isMember = await GroupMember.findOne({
+    where: {
+      memberId,
+      groupId,
+    },
+    attributes: [
+      [fn("COALESCE", col("leftAt"), fn("NOW")), "leftAt"],
+      [fn("COALESCE", col("clearedAt"), col("joinedAt")), "clearedAt"],
+    ],
+  });
+
+  if (!isMember) {
+    return next(
+      new CustomError("User is/was not a member of this group...", 400)
+    );
+  }
+
+  const UnfilteredMessages = await GroupChat.findAll({
+    where: {
+      toGroupId: groupId,
+      sentAt: {
+        [Op.between]: [isMember.clearedAt, isMember.leftAt],
+      },
+    },
+    attributes: ["id", "content", "fromUserId", "toGroupId"],
+  });
+  console.log("UnfilteredMessages", UnfilteredMessages); // Initialize an array to store all messages with their statuses
+  let UnreadMessages = [];
+
+  for (const message of UnfilteredMessages) {
+    const messageStatus = await MessageStatus.findOne({
+      where: {
+        userId: memberId,
+        messageId: message.dataValues.id,
+        seenStatus: "Not Seen",
+      },
+    });
+    if (messageStatus) {
+      UnreadMessages.push({
+        message,
+        messageStatus,
+      });
+    }
+  }
+  return UnreadMessages;
+};
 
 const findAllUnreadMessages = async (
   memberId: string,
@@ -355,7 +409,7 @@ export const setUnreadMessageToSeen = asyncHandler(
     if (!memberId || !groupId) {
       return next(new CustomError("MemberId and GroupID are required...", 400));
     }
-    const UnreadMessages = await findAllUnreadMessages(memberId, groupId, next);
+    const UnreadMessages = await unreadseen(memberId, groupId, next);
 
     if (!UnreadMessages || UnreadMessages.length === 0) {
       res.status(200).json({
@@ -364,8 +418,11 @@ export const setUnreadMessageToSeen = asyncHandler(
       });
     } else {
       // loop through the unread messages and update the messageStatus to 'Seen'
-
+      console.log(
+        "sssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss1"
+      );
       for (const message of UnreadMessages) {
+        console.log(message);
         const ans = await MessageStatus.update(
           { seenStatus: "Seen" },
           {

@@ -7,9 +7,8 @@ import api from "../../axiosConfig";
 import useStore from "../../store";
 
 function MessagingPanel() {
-  //import states from store
   const { userId, setSelectedPrivateChatId } = useStore();
-  //
+
   const [selectedContact, setSelectedContact] = useState(null);
   const [selectedContactId, setSelectedContactId] = useState(null);
   const [selectedGroup, setSelectedGroup] = useState<any>(null);
@@ -17,7 +16,42 @@ function MessagingPanel() {
   const [members, setMembers] = useState<string[]>([]);
   const [selectedOption, setSelectedOption] = useState();
   const [infoOn, setInfoOn] = useState<boolean>(false);
+  // |=======================================================================================================|
+  // |=======================================================================================================|
+  // |                                     SET UNREAD MESSAGES TO SEEN APIS                                  |
+  // |=======================================================================================================|
+  // |=======================================================================================================|
+  const setUnreadPrivateMessagesToSeen = (contact: any) => {
+    api
+      .patch(`api/v1/privatechat/${contact}`)
+      .then((res) => {
+        console.log("contact Messages set to seen", res);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+  const setUnreadGroupMessagesToSeen = (group: any) => {
+    api
+      .patch(`api/v1/groupchat/unreadMessageToSeen`, {
+        memberId: userId,
+        groupId: group,
+      })
+      .then((res) => {
+        console.log("Group Messages set to seen", res);
+      })
+      .catch((err) => {
+        console.log("err occured");
+        console.log(err);
+      });
+  };
+  // |=======================================================================================================|
+  // |=======================================================================================================|
+  // |                             HANDLE SELECTED CONTACT AND SELECTED GROUP                                |
+  // |=======================================================================================================|
+  // |=======================================================================================================|
   const handleContactClick = (contact: any) => {
+    setUnreadPrivateMessagesToSeen(contact.email);
     setSelectedContactId(contact.email);
     setSelectedPrivateChatId(contact);
     setSelectedContact(contact);
@@ -26,6 +60,7 @@ function MessagingPanel() {
   };
 
   const handleGroupClick = (group: any) => {
+    setUnreadGroupMessagesToSeen(group.id);
     setSelectedGroupId(group.id);
     setSelectedGroup(group);
     setSelectedContact(null);
@@ -35,7 +70,12 @@ function MessagingPanel() {
   const selectOption = (option: any) => {
     setSelectedOption(option);
   };
-  // states to store data
+
+  // |=======================================================================================================|
+  // |=======================================================================================================|
+  // |                                          STATES TO STORE DATA                                         |
+  // |=======================================================================================================|
+  // |=======================================================================================================|
   const [allFriends, setAllFriends] = useState({});
   const [allGroups, setAllGroups] = useState({});
   const [blockedFriends, setBlockedFriends] = useState({});
@@ -45,7 +85,11 @@ function MessagingPanel() {
   const [unreadGroupMessages, setUnreadGroupMessages] = useState({});
   const [commonGroups, setCommonGroups] = useState({});
 
-  // states to store count
+  // |=======================================================================================================|
+  // |=======================================================================================================|
+  // |                                         STATES TO STORE COUNT                                         |
+  // |=======================================================================================================|
+  // |=======================================================================================================|
   const [friendsCount, setFriendsCount] = useState(0);
   const [groupsCount, setGroupsCount] = useState(0);
   const [blockedFriendsCount, setBlockedFriendsCount] = useState(0);
@@ -55,6 +99,11 @@ function MessagingPanel() {
   const [unreadPrivateMessagesCount, setUnreadPrivateMessagesCount] =
     useState(0);
   const [unreadGroupMessagesCount, setUnreadGroupMessagesCount] = useState(0);
+  // |=======================================================================================================|
+  // |=======================================================================================================|
+  // |                                     GET DATA FROM DB                                                  |
+  // |=======================================================================================================|
+  // |=======================================================================================================|
   const getBlockedFriends = () => {
     api
       .get(`api/v1/friend/fetchBlockedFriends/${userId}`)
@@ -142,6 +191,7 @@ function MessagingPanel() {
       })
       .then((res) => {
         const data = res.data.data.AllMessages;
+        console.log("private data==================", res);
         setPrivateChatCount(res.data.length);
         setPrivateChat(data);
       })
@@ -159,6 +209,7 @@ function MessagingPanel() {
       })
       .then((res) => {
         const data = res.data.data.AllMessages;
+        console.log("grop data============", res);
         setGroupChatCount(res.data.length);
         setGroupChat(data);
       })
@@ -226,6 +277,8 @@ function MessagingPanel() {
             blockedFriends,
             unreadGroupMessages,
             unreadPrivateMessages,
+            privateChat,
+            groupChat,
             friendsCount,
             groupsCount,
           }}

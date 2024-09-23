@@ -1,10 +1,10 @@
-import Graph from "../../assets/premium-removebg-preview.png";
-import ChatIcon from "@mui/icons-material/Chat";
+import Graph from "../../../assets/premium-removebg-preview.png";
 import GroupIcon from "@mui/icons-material/Group";
 import DoNotDisturbAltIcon from "@mui/icons-material/DoNotDisturbAlt";
 import TextsmsIcon from "@mui/icons-material/Textsms";
-import Logo from "../../assets/logo1.png";
+import Logo from "../../../assets/logo1.png";
 import WorkspacePremiumIcon from "@mui/icons-material/WorkspacePremium";
+import GradingIcon from "@mui/icons-material/Grading";
 import { useNavigate } from "react-router-dom";
 interface SideBarProps {
   data: {
@@ -34,6 +34,14 @@ const SideBar: React.FC<SideBarProps> = ({ data, option }) => {
           </p>
           <div
             onClick={() => {
+              option("All");
+            }}
+            className="flex w-full gap-2 pl-10  py-3 rounded cursor-pointer active:bg-gray-300 active:text-black"
+          >
+            <GradingIcon /> All
+          </div>
+          <div
+            onClick={() => {
               option("Groups");
             }}
             className="flex w-full gap-2 pl-10  py-3 rounded cursor-pointer active:bg-gray-300 active:text-black"
@@ -41,7 +49,9 @@ const SideBar: React.FC<SideBarProps> = ({ data, option }) => {
             <GroupIcon /> Groups
             <div className="w-1/6   text-black text-xs flex justify-center items-center ">
               <p className="bg-white rounded-full px-1">
-                {data.unreadGroupMessagesCount}
+                {data.unreadGroupMessagesCount > 0
+                  ? data.unreadGroupMessagesCount
+                  : ""}
               </p>
             </div>
           </div>
@@ -54,7 +64,9 @@ const SideBar: React.FC<SideBarProps> = ({ data, option }) => {
             <TextsmsIcon /> Direct Messages
             <div className="w-1/6   text-black text-xs flex justify-center items-center ">
               <p className="bg-white rounded-full px-1">
-                {data.unreadPrivateMessagesCount}
+                {data.unreadPrivateMessagesCount > 0
+                  ? data.unreadPrivateMessagesCount
+                  : ""}
               </p>
             </div>
           </div>
@@ -65,12 +77,8 @@ const SideBar: React.FC<SideBarProps> = ({ data, option }) => {
               option("Blocked");
             }}
           >
-            <DoNotDisturbAltIcon /> Blocked
-            <div className="w-1/6   text-black text-xs flex justify-center items-center ">
-              <p className="bg-white rounded-full px-1">
-                {data.blockedFriendsCount}
-              </p>
-            </div>
+            <DoNotDisturbAltIcon /> Blocked Friend List
+            <div className="w-1/6   text-black text-xs flex justify-center items-center "></div>
           </div>
         </div>
       </div>

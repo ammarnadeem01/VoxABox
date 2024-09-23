@@ -1,8 +1,8 @@
-import User from "../../assets/manprvtcaht.png";
+import User from "../../../assets/manprvtcaht.png";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AppBlockingIcon from "@mui/icons-material/AppBlocking";
 import { useEffect, useState } from "react";
-import Member from "../Member";
+import Member from "./Member";
 import api from "../../../axiosConfig";
 interface GroupChatInfoProps {
   data: {
