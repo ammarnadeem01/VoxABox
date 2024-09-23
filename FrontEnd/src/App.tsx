@@ -10,17 +10,32 @@ import Signup from "./Custom/User/Signup.tsx";
 import MessagingPanel from "./Custom/Chat/MessagingPanel.tsx";
 import TermsAndConditions from "./Custom/LandingPage/TermsAndConditions.tsx";
 import PrivacyPolicy from "./Custom/LandingPage/PrivacyPolicy.tsx";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
+import useStore from "./store.tsx";
+import api from "./axiosConfig.tsx";
 
 function App() {
-  const [isOnline, setIsOnline] = useState(false);
+  const { userId, setOnlineStatus } = useStore();
+  const updateStatus = (status: "online" | "offline") => {
+    api
+      .patch(`api/v1/user/status/setStatus`, {
+        userId,
+        status,
+      })
+      .then(() => {
+        setOnlineStatus(status);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
   const location = useLocation();
-  const url = "http://localhost:5173/chat";
+  const url = "/chat";
   useEffect(() => {
     if (location.pathname === url) {
-      setIsOnline(true);
+      updateStatus("online");
     } else {
-      setIsOnline(false);
+      updateStatus("offline");
     }
   }, [location]);
   const showFooter =

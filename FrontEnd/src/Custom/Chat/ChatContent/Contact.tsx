@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import User from "../../../assets/manprvtcaht.png";
+import useStore from "../../../store";
+import api from "../../../axiosConfig";
 interface Friend {
   avatar: string | null;
   createdAt: string | null;
@@ -31,10 +33,32 @@ interface ContactProps {
 }
 const Contact: React.FC<ContactProps> = ({ data, onClick }) => {
   const [friend, setFriend] = useState<Friend | null>();
+  const [status, setStatus] = useState<"online" | "offline">();
+  const checkStatus = () => {
+    api
+      .get(`api/v1/user/status/checkStatus`, {
+        params: { userId: data?.email },
+        headers: { "Cache-Control": "no-cache" },
+      })
+      .then((res) => {
+        setStatus(res.data.data.status.status);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+  // useEffect(() => {
+  //   const interval = setInterval(() => {
+  //     checkStatus();
+  //   }, 5000);
+
+  //   return () => clearInterval(interval);
+  // }, [data]);
 
   useEffect(() => {
     setFriend(data);
-  }, [data, friend]);
+    checkStatus();
+  }, [data]);
   return (
     <div
       className="w-full flex flex-wrap justify-start cursor-pointer"
@@ -51,17 +75,14 @@ const Contact: React.FC<ContactProps> = ({ data, onClick }) => {
             </p>
             <p className="w-full flex  items-center gap-3 text-xs">
               {friend?.email}
-              {friend?.status == "online" ? (
-                <p className="text-xs w-2 h-2 rounded-full bg-green-600"></p>
-              ) : (
-                <></>
-              )}
             </p>
           </div>
         </div>
-        <div className="w-1/6   text-black text-xs flex justify-center items-center ">
-          <p className="bg-green-500 w-2 h-2 rounded-full"></p>
-        </div>
+        {status === "online" && (
+          <div className="w-1/6  flex justify-center items-center ">
+            <p className="bg-green-500 w-2 h-2 rounded-full"></p>
+          </div>
+        )}
       </div>
     </div>
   );

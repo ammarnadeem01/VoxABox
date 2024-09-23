@@ -4,6 +4,9 @@ import { useEffect, useState } from "react";
 import Contact from "../ChatContent/Contact";
 import Group from "./Group";
 import CustomDropdown from "../DropDown";
+import AddFriend from "./AddFriend";
+import AddGroup from "./AddGroup";
+import AddGroupMembers from "./AddGroupMembers";
 
 interface Friend {
   avatar: string | null;
@@ -61,6 +64,11 @@ const ChatList: React.FC<ChatListProps> = ({
   const [friends, setFriends] = useState<any>([]);
   const [groups, setGroups] = useState<any | null>([]);
   const [option, setOption] = useState("All");
+  const [menuOption, setMenuOption] = useState<string>("");
+
+  const setMenu = (option: string) => {
+    setMenuOption(option);
+  };
 
   useEffect(() => {
     setOption(selectedOption);
@@ -77,14 +85,16 @@ const ChatList: React.FC<ChatListProps> = ({
       setFriends(data?.unreadPrivateMessages);
       setGroups(null);
     } else if (option === "All") {
-      console.log("data =======================", data);
       setFriends(data.allFriends);
       setGroups(data.allGroups);
     }
-    console.log("da", data);
-  }, [data, option]);
-  function addFriend() {}
-  function createGroup() {}
+  }, [data, option, menuOption]);
+  function addFriend() {
+    setMenu("addFriend");
+  }
+  function createGroup() {
+    setMenu("addGroup");
+  }
   function logout() {}
   return (
     <div className="w-1/5 h-[95%] text-white flex flex-wrap justify-betweeen items-start overflow-hidden overflow-y-auto scrollbar-thin scrollbar-thumb-gray-900 scrollbar-track-[#363638]">
@@ -99,19 +109,22 @@ const ChatList: React.FC<ChatListProps> = ({
           />
         </div>
         <div className="w-full flex justify-center items-start text-black ">
-          <div className="flex items-center w-10/12 text-white  bg-[#101717]  rounded-lg">
-            <div className="p-2 ">
-              <SearchIcon />
+          {menuOption != "addFriend" && (
+            <div className="flex items-center w-10/12 text-white  bg-[#101717]  rounded-lg">
+              <div className="p-2 ">
+                <SearchIcon />
+              </div>
+              <input
+                type="text"
+                placeholder="Search..."
+                className="py-2 px-4 border-none outline-none  rounded-lg w-full bg-[#101717]"
+              />
             </div>
-            <input
-              type="text"
-              placeholder="Search..."
-              className="py-2 px-4 border-none outline-none  rounded-lg w-full bg-[#101717]"
-            />
-          </div>
+          )}
         </div>
         <div className="w-full flex flex-wrap justify-center items-center py-3 pl-2 gap-3">
-          {friends &&
+          {!menuOption &&
+            friends &&
             friends.length > 0 &&
             friends.map((friend: any) => {
               let friendObj = null;
@@ -136,7 +149,8 @@ const ChatList: React.FC<ChatListProps> = ({
                 </>
               );
             })}
-          {groups &&
+          {!menuOption &&
+            groups &&
             groups.length > 0 &&
             groups.map((group: any) => {
               let groupObj = null;
@@ -158,6 +172,11 @@ const ChatList: React.FC<ChatListProps> = ({
                 />
               );
             })}
+          {menuOption == "addFriend" && <AddFriend setMenuOption={setMenu} />}
+          {menuOption == "addGroup" && <AddGroup setMenuOption={setMenu} />}
+          {menuOption == "addGroupMembers" && (
+            <AddGroupMembers setMenuOption={setMenu} />
+          )}
         </div>
       </div>
     </div>

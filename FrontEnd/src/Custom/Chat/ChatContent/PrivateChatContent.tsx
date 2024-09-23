@@ -27,6 +27,7 @@ const PrivateChatContent: React.FC<PrivateChatContentProps> = ({
     setMessage(event?.target?.value);
   };
   useEffect(() => {
+    console.log("data in pcc", data);
     setMessages(data?.privateChat);
     setFriendId(contact.email);
     setFriendName(contact.fname + " " + contact.lname);
@@ -50,6 +51,9 @@ const PrivateChatContent: React.FC<PrivateChatContentProps> = ({
       })
       .then((dataa) => {
         console.log("res", dataa);
+      })
+      .catch((err) => {
+        console.log("err", err);
       });
   };
 

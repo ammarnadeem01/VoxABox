@@ -193,3 +193,68 @@ export const updatePassword = asyncHandler(
     });
   }
 );
+
+export const setStatus = asyncHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
+    console.log(
+      "===================================================================================="
+    );
+    console.log(1);
+    const { userId, status } = req.body;
+    console.log(
+      "----------------------------------------------------------------------------------------"
+    );
+    console.log(userId, status);
+    if (!userId || !status) {
+      return next(new CustomError("Missing Required Fields", 400));
+    }
+    const [updated] = await User.update(
+      { status },
+      {
+        where: { email: userId },
+      }
+    );
+    if (!updated) {
+      return next(new CustomError("User with given ID not found", 404));
+    }
+
+    const updatedUser = await User.findByPk(userId);
+    res.status(200).json({
+      status: "Success",
+      data: {
+        updatedUser,
+      },
+    });
+  }
+);
+
+export const checkStatus = asyncHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { userId } = req.query;
+    console.log(
+      "======================================================================================================"
+    );
+    console.log(userId);
+    console.log(
+      "======================================================================================================"
+    );
+
+    const userIdStr = userId as string;
+    if (!userId) {
+      return next(new CustomError("Missing Required Fields", 400));
+    }
+    const status = await User.findByPk(userIdStr, {
+      attributes: ["status"],
+    });
+    if (!status) {
+      return next(new CustomError("User with given ID not found", 404));
+    }
+
+    res.status(200).json({
+      status: "Success",
+      data: {
+        status,
+      },
+    });
+  }
+);

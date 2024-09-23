@@ -14,7 +14,7 @@ export const createFriends = asyncHandler(
     const { userId, friendId } = req.body;
     // if required data is present
     if (!userId || !friendId) {
-      return next(new CustomError("UserId and FriendId are required.", 400));
+      return next(new CustomError("Required Field Missing", 400));
     }
     // if they are already friends
     const alreadyFriends = await Friend.findOne({

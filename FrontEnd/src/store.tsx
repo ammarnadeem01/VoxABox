@@ -7,6 +7,8 @@ interface PrivateChatState {
   selectedFriendName: string | null;
   selectedPrivateChatId: any | null;
   onlineStatus: "online" | "offline";
+  friends: any[];
+  setFriends: (data: any[]) => void;
   setOnlineStatus: (status: "online" | "offline") => void;
   setSelectedPrivateChatId: (chatId: string) => void;
   setFriendId: (id: string) => void;
@@ -47,7 +49,9 @@ const useAppStore = (
   ) => void
 ): AuthState & PrivateChatState & GroupChatState => ({
   // Private Chat slice
-  onlineStatus: "offline",
+  onlineStatus: "online",
+  friends: [],
+  setFriends: (data: any[]) => set(() => ({ friends: data })),
   setOnlineStatus: (status: "offline" | "online") =>
     set(() => ({ onlineStatus: status })),
   selectedFriendId: null,
@@ -100,6 +104,7 @@ const useStore = create(
     persist(useAppStore, {
       name: "chat-app-storage",
       partialize: (state) => ({
+        onlineStatus: state.onlineStatus,
         userId: state.userId,
         token: state.token,
         selectedPrivateChatId: state.selectedPrivateChatId,

@@ -7,7 +7,7 @@ import api from "../../axiosConfig";
 import useStore from "../../store";
 
 function MessagingPanel() {
-  const { userId, setSelectedPrivateChatId } = useStore();
+  const { userId, setSelectedPrivateChatId, setFriends } = useStore();
 
   const [selectedContact, setSelectedContact] = useState(null);
   const [selectedContactId, setSelectedContactId] = useState(null);
@@ -161,7 +161,8 @@ function MessagingPanel() {
       .get(`api/v1/friend/fetchAllFriends/${userId}`)
       .then((res) => {
         const friends = res.data.data.AllFriends;
-
+        const newA = friends.map((f: any) => f.friend);
+        setFriends(newA);
         setFriendsCount(res.data.length);
         setAllFriends(friends);
       })
@@ -191,7 +192,6 @@ function MessagingPanel() {
       })
       .then((res) => {
         const data = res.data.data.AllMessages;
-        console.log("private data==================", res);
         setPrivateChatCount(res.data.length);
         setPrivateChat(data);
       })
@@ -209,7 +209,6 @@ function MessagingPanel() {
       })
       .then((res) => {
         const data = res.data.data.AllMessages;
-        console.log("grop data============", res);
         setGroupChatCount(res.data.length);
         setGroupChat(data);
       })

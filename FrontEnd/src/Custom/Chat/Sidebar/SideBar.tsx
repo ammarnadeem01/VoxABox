@@ -46,7 +46,8 @@ const SideBar: React.FC<SideBarProps> = ({ data, option }) => {
             }}
             className="flex w-full gap-2 pl-10  py-3 rounded cursor-pointer active:bg-gray-300 active:text-black"
           >
-            <GroupIcon /> Groups
+            <GroupIcon />
+            New Groups Messages
             <div className="w-1/6   text-black text-xs flex justify-center items-center ">
               <p className="bg-white rounded-full px-1">
                 {data.unreadGroupMessagesCount > 0
@@ -61,7 +62,8 @@ const SideBar: React.FC<SideBarProps> = ({ data, option }) => {
             }}
             className="flex py-3 gap-2 pl-10 w-full rounded  cursor-pointer active:bg-gray-300 active:text-black"
           >
-            <TextsmsIcon /> Direct Messages
+            <TextsmsIcon />
+            New Direct Messages
             <div className="w-1/6   text-black text-xs flex justify-center items-center ">
               <p className="bg-white rounded-full px-1">
                 {data.unreadPrivateMessagesCount > 0

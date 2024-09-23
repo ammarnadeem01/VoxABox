@@ -6,6 +6,7 @@ import { Friend } from "../Models/friend";
 import { Op, where } from "sequelize";
 import { User } from "../Models/user";
 import sequelize from "sequelize";
+import { PrivateMessageStatus } from "../Models/PrivateMessageStatus";
 
 // helper func (for load all messages, delete all messages)
 const allMessages = async (
@@ -25,10 +26,11 @@ const allMessages = async (
   if (!mutualFriends) {
     return next(new CustomError("UserId and FriendId are not friends", 400));
   }
+  console.log();
 
   const initialdate = mutualFriends.clearedAt || mutualFriends.createdAt;
 
-  const AllMessages = await PrivateChat.findAll({
+  const UnfilteredMessages = await PrivateChat.findAll({
     where: {
       [Op.and]: [
         {
@@ -47,6 +49,25 @@ const allMessages = async (
       ],
     },
   });
+  let AllMessages = [];
+  for (const message of UnfilteredMessages) {
+    const messageStatus = await PrivateMessageStatus.findOne({
+      where: {
+        userId: toUserId,
+        messageId: message.dataValues.id,
+        isDeleted: false,
+      },
+    });
+
+    // Add the message and its status to the AllMessages array
+    if (messageStatus) {
+      AllMessages.push({
+        message,
+        // messageStatus,
+      });
+    }
+  }
+
   return AllMessages;
 };
 // send message
@@ -92,6 +113,18 @@ export const createPrivateMessage = asyncHandler(
       seenStatus,
     });
 
+    // create message status for both users
+    const messageStatus1 = await PrivateMessageStatus.create({
+      userId: toUserId,
+      messageId: privateMessaage.id,
+      isDeleted: false,
+    });
+    const messageStatus2 = await PrivateMessageStatus.create({
+      userId: fromUserId,
+      messageId: privateMessaage.id,
+      isDeleted: false,
+    });
+
     //6. send response
     res.status(200).json({
       status: "Success",
@@ -105,15 +138,28 @@ export const createPrivateMessage = asyncHandler(
 // delete message
 export const deletePrivateMessage = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
-    // check id
-    const { id } = req.params;
-    // if msg with given id preseent
-    const privateMessaage = await PrivateChat.findByPk(id);
+    const { messageId, sender, userId } = req.body;
+
+    // if msg with given id preseent and whoo is sender of message
+    const privateMessaage = await PrivateChat.findByPk(messageId, {
+      attributes: ["fromUserId", "content", "id"],
+    });
     if (!privateMessaage) {
       return next(new CustomError("No message with given ID found", 404));
     }
-    // detroy msg
-    await privateMessaage.destroy();
+
+    if (userId === sender) {
+      //if own msg, detroy msg
+      await privateMessaage.destroy();
+    } else {
+      // delete for friend only
+      let ans;
+      ans = await PrivateMessageStatus.update(
+        { isDeleted: true },
+        { where: { userId, messageId } }
+      );
+    }
+
     res.status(200).json({
       status: "Success",
       data: {

@@ -5,8 +5,10 @@ import {
   ForeignKey,
   DataType,
   BelongsTo,
+  HasMany,
 } from "sequelize-typescript";
 import { User } from "./user";
+import { PrivateMessageStatus } from "./PrivateMessageStatus";
 
 @Table({
   tableName: "Private_Chats",
@@ -39,6 +41,9 @@ export class PrivateChat extends Model {
     defaultValue: "Not Seen",
   })
   seenStatus!: "Seen" | "Not Seen";
+
+  @HasMany(() => PrivateMessageStatus)
+  messageStatus!: PrivateMessageStatus[];
 
   @BelongsTo(() => User, { foreignKey: "fromUserId" })
   fromUser!: User;

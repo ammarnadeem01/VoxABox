@@ -29,7 +29,7 @@ const validationErrorHandler = (err: any) => {
   return new CustomError(msg, 400);
 };
 const ForeignKeyConstraintErrorHandler = (err: any) => {
-  const msg = err.parent.detail;
+  const msg = `${err.parent.parameters[1]} is not present`;
 
   return new CustomError(msg, 400);
 };

@@ -66,26 +66,30 @@ const GroupMessage: React.FC<GroupMessageInterface> = ({ data }) => {
       } `}
     >
       <div
-        className={`bg-[#0d0d0d]   px-3 py-1 max-w-[60%]  rounded-t-xl  flex flex-wrap items-center gap-1 ${
+        className={`bg-[#0d0d0d]   px-3 py-1 max-w-[60%]  rounded-t-xl  flex flex-col flex-wrap justify-center items-start gap-1 ${
           sender === userId ? "rounded-bl-xl" : " rounded-br-xl"
         } `}
       >
         {sender === userId ? (
           ""
         ) : (
-          <div className="w-full flex text-xs justify-between items-center ">
+          <div
+            className={`max-w-full flex gap-2 text-xs justify-between items-center ${
+              userId != sender ? "border-b-2  border-gray-900" : ""
+            }`}
+          >
             <p className="text-gray-200">~ {senderName}</p>
             <p className="text-gray-500">{sender}</p>
           </div>
         )}
         <p
-          className={`w-full text-white ${
-            userId != sender ? "border-t-2 pt-1 border-gray-900" : ""
+          className={`max-w-full text-white py-1  ${
+            userId != sender ? "border-t-2  border-gray-900" : ""
           }`}
         >
           {content}
         </p>
-        <p className="text-xs text-right w-full text-gray-700">
+        <p className="text-[10px] text-right w-full text-gray-700">
           {new Date(time).toLocaleTimeString()},&nbsp;&nbsp;
           {new Date(time).toLocaleDateString()}
         </p>

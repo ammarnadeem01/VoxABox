@@ -8,6 +8,7 @@ import { GroupMember } from "./Models/group_member";
 import { PrivateChat } from "./Models/private_chat";
 import { GroupChat } from "./Models/group_chat";
 import { MessageStatus } from "./Models/MessageStatus";
+import { PrivateMessageStatus } from "./Models/PrivateMessageStatus";
 import { createServer } from "http";
 import { Server } from "socket.io";
 
@@ -18,8 +19,8 @@ const httpsServer = createServer(app);
 
 const io = new Server(httpsServer, {
   cors: {
-    origin: "http://localhost:3000",
-    methods: ["GET", "POST"],
+    origin: "*",
+    methods: ["GET", "POST", "PATCH", "DELETE", "PUT"],
   },
 });
 
@@ -41,6 +42,7 @@ const sequelize = new Sequelize({
     PrivateChat,
     GroupMember,
     MessageStatus,
+    PrivateMessageStatus,
   ],
 });
 
