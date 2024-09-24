@@ -7,6 +7,7 @@ import {
   unfriend,
   // deleteFriend,
   unblockFriend,
+  fetchFriendShipStatus,
 } from "../Controllers/friend";
 const router = Router();
 router.route("/").post(createFriends);
@@ -16,5 +17,6 @@ router.route("/fetchBlockedFriends/:email").get(fetchBlockedFriends);
 router.route("/blockFriends").patch(blockFriend);
 router.route("/unblockFriends").patch(unblockFriend);
 router.route("/unfriend").delete(unfriend);
+router.route("/friendshipStatus").get(fetchFriendShipStatus);
 
 export default router;

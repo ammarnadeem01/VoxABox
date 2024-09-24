@@ -23,11 +23,26 @@ const PrivateChatContent: React.FC<PrivateChatContentProps> = ({
   const [message, setMessage] = useState("");
   const [friendName, setFriendName] = useState("");
   const [friendId, setFriendId] = useState();
+  const [friendShipStatus, setFriendShipStatus] = useState<string>("Blocked");
+  function friendShipStatusCheck() {
+    api
+      .get(`api/v1/friend/friendshipStatus`, { params: { userId, friendId } })
+      .then((res) => {
+        console.log(res);
+        setFriendShipStatus(res.data.data.friendShipStatus.status);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
+  useEffect(() => {
+    friendShipStatusCheck();
+  });
   const messageText = (event: any) => {
     setMessage(event?.target?.value);
   };
   useEffect(() => {
-    console.log("data in pcc", data);
+    console.log("data in pcc", data, contact);
     setMessages(data?.privateChat);
     setFriendId(contact.email);
     setFriendName(contact.fname + " " + contact.lname);
@@ -93,8 +108,9 @@ const PrivateChatContent: React.FC<PrivateChatContentProps> = ({
               <CustomDropdown
                 table={[
                   { option: "Clear Chat", action: clearChat },
-                  { option: "Block Friend", action: blockFriend },
-                  { option: "Unblock Friend", action: unblockFriend },
+                  friendShipStatus === "Blocked"
+                    ? { option: "Unblock Friend", action: unblockFriend }
+                    : { option: "Block Friend", action: blockFriend },
                 ]}
               />
             </div>

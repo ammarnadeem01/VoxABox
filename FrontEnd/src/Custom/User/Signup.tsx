@@ -17,7 +17,7 @@ function Signup() {
     email: "",
     password: "",
     acceptTerms: false,
-    avatar: null,
+    avatar: "",
   };
   const [visibility, setVisibility] = useState(true);
   const [errMessage, setErrorMessage] = useState("");
@@ -27,7 +27,7 @@ function Signup() {
     email: string;
     password: string;
     acceptTerms: boolean;
-    avatar: any;
+    avatar: string;
   }
   const handleChange = () => {};
   function register(values: InitialValues) {

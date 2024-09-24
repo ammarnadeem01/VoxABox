@@ -8,8 +8,8 @@ import api from "../../axiosConfig";
 import useStore from "../../store";
 function Login() {
   const nav = useNavigate();
-  const [visibility, setVisibility] = useState(true);
-  const [errMessage, setErrorMessage] = useState("");
+  const [visibility, setVisibility] = useState<boolean>(true);
+  const [errMessage, setErrorMessage] = useState<string>("");
   const { login } = useStore();
   interface Values {
     email: string;

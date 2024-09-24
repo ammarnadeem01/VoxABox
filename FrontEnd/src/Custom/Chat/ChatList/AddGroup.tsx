@@ -2,6 +2,7 @@ import { useState } from "react";
 import useStore from "../../../store";
 import api from "../../../axiosConfig";
 import * as React from "react";
+import { ErrorMessage } from "formik";
 
 interface AddGroupProps {
   setMenuOption: any;
@@ -9,6 +10,7 @@ interface AddGroupProps {
 }
 const AddGroup: React.FC<AddGroupProps> = ({ setMenuOption, setGroupId }) => {
   const { userId } = useStore();
+  const [errorMessage, setErrorMessage] = useState("");
   const createGroup = (e: any) => {
     e.preventDefault();
     const formData = new FormData();
@@ -45,7 +47,7 @@ const AddGroup: React.FC<AddGroupProps> = ({ setMenuOption, setGroupId }) => {
           setMenuOption("addGroupMembers");
         })
         .catch((err) => {
-          console.log(err);
+          setErrorMessage(err.response.data.message);
         });
     } else {
       console.log("userid", userId);
@@ -113,7 +115,7 @@ const AddGroup: React.FC<AddGroupProps> = ({ setMenuOption, setGroupId }) => {
         <div className="w-full  flex flex-col space-y-2">
           <label
             htmlFor="avatar"
-            className=" w-full h-10 py-2 px-4 rounded-lg bg-purple-400 text-center"
+            className=" w-full h-10 py-2 px-4 cursor-pointer rounded-lg bg-purple-400 text-center"
           >
             Select Avatar
             <input
@@ -127,6 +129,7 @@ const AddGroup: React.FC<AddGroupProps> = ({ setMenuOption, setGroupId }) => {
         </div>
 
         {/* Submit Button */}
+        {errorMessage && <p className="text-red-400">{errorMessage}</p>}
         <div className="flex justify-evenly items-center w-full gap-1">
           <button
             className="bg-purple-400 py-1 px-2 rounded-lg flex-1"

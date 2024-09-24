@@ -235,6 +235,36 @@ export const fetchBlockedFriends = asyncHandler(
   }
 );
 
+// fetchFriendShipStatus;
+export const fetchFriendShipStatus = asyncHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
+    // get user email
+    const { userId, friendId } = req.query;
+    // err if no email
+    if (!userId || !friendId) {
+      return next(new CustomError("UserId and FriendId are required.", 400));
+    }
+
+    //fetch status
+    const friendShipStatus = await Friend.findOne({
+      where: {
+        userId,
+        friendId,
+      },
+      attributes: ["status"],
+    });
+    if (!friendShipStatus) {
+      return next(new CustomError("Both users are not friends.", 404));
+    }
+
+    // generate response
+    res.status(200).json({
+      status: "Success",
+      data: { friendShipStatus },
+    });
+  }
+);
+
 // //delete friend
 // export const deleteFriend = asyncHandler(
 //   async (req: Request, res: Response, next: NextFunction) => {

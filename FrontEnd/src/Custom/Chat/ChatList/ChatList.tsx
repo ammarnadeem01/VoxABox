@@ -64,6 +64,7 @@ const ChatList: React.FC<ChatListProps> = ({
   selectedOption,
 }) => {
   const [friends, setFriends] = useState<any>([]);
+  const [search, setSearch] = useState<string>("");
   const [groups, setGroups] = useState<any | null>([]);
   const [option, setOption] = useState("All");
   const [menuOption, setMenuOption] = useState<string>("");
@@ -124,6 +125,11 @@ const ChatList: React.FC<ChatListProps> = ({
               </div>
               <input
                 type="text"
+                value={search}
+                onChange={(e) => {
+                  setSearch(e.target.value);
+                }}
+                disabled={true}
                 placeholder="Search..."
                 className="py-2 px-4 border-none outline-none  rounded-lg w-full bg-[#101717]"
               />

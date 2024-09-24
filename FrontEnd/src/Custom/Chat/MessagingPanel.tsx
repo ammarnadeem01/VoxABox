@@ -5,23 +5,26 @@ import ChatList from "./ChatList/ChatList";
 import SideBar from "./Sidebar/SideBar";
 import api from "../../axiosConfig";
 import useStore from "../../store";
+import { Group, Friend } from "../../Types";
 
 function MessagingPanel() {
   const { userId, setSelectedPrivateChatId, setFriends } = useStore();
 
-  const [selectedContact, setSelectedContact] = useState(null);
-  const [selectedContactId, setSelectedContactId] = useState(null);
-  const [selectedGroup, setSelectedGroup] = useState<any>(null);
+  const [selectedContact, setSelectedContact] = useState<Friend | null>(null);
+  const [selectedContactId, setSelectedContactId] = useState<string | null>(
+    null
+  );
+  const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
   const [selectedGroupId, setSelectedGroupId] = useState<number | null>(null);
   const [members, setMembers] = useState<string[]>([]);
-  const [selectedOption, setSelectedOption] = useState();
+  const [selectedOption, setSelectedOption] = useState<string>();
   const [infoOn, setInfoOn] = useState<boolean>(false);
   // |=======================================================================================================|
   // |=======================================================================================================|
   // |                                     SET UNREAD MESSAGES TO SEEN APIS                                  |
   // |=======================================================================================================|
   // |=======================================================================================================|
-  const setUnreadPrivateMessagesToSeen = (contact: any) => {
+  const setUnreadPrivateMessagesToSeen = (contact: string) => {
     api
       .patch(`api/v1/privatechat/${contact}`)
       .then((res) => {
@@ -31,7 +34,7 @@ function MessagingPanel() {
         console.log(err);
       });
   };
-  const setUnreadGroupMessagesToSeen = (group: any) => {
+  const setUnreadGroupMessagesToSeen = (group: number) => {
     api
       .patch(`api/v1/groupchat/unreadMessageToSeen`, {
         memberId: userId,
@@ -50,16 +53,16 @@ function MessagingPanel() {
   // |                             HANDLE SELECTED CONTACT AND SELECTED GROUP                                |
   // |=======================================================================================================|
   // |=======================================================================================================|
-  const handleContactClick = (contact: any) => {
+  const handleContactClick = (contact: Friend) => {
     setUnreadPrivateMessagesToSeen(contact.email);
     setSelectedContactId(contact.email);
-    setSelectedPrivateChatId(contact);
+    // setSelectedPrivateChatId(contact);
     setSelectedContact(contact);
     setSelectedGroupId(null);
     setSelectedGroup(null);
   };
 
-  const handleGroupClick = (group: any) => {
+  const handleGroupClick = (group: Group) => {
     setUnreadGroupMessagesToSeen(group.id);
     setSelectedGroupId(group.id);
     setSelectedGroup(group);
@@ -67,7 +70,7 @@ function MessagingPanel() {
     setSelectedContactId(null);
   };
 
-  const selectOption = (option: any) => {
+  const selectOption = (option: string) => {
     setSelectedOption(option);
   };
 
@@ -76,8 +79,8 @@ function MessagingPanel() {
   // |                                          STATES TO STORE DATA                                         |
   // |=======================================================================================================|
   // |=======================================================================================================|
-  const [allFriends, setAllFriends] = useState({});
-  const [allGroups, setAllGroups] = useState({});
+  const [allFriends, setAllFriends] = useState<Friend[]>();
+  const [allGroups, setAllGroups] = useState<Group[]>();
   const [blockedFriends, setBlockedFriends] = useState({});
   const [privateChat, setPrivateChat] = useState({});
   const [groupChat, setGroupChat] = useState({});

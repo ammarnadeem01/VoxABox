@@ -18,7 +18,9 @@ const ChatContent: React.FC<ChatContentProps> = ({
   group,
   allMembers,
 }) => {
-  useEffect(() => {}, [data, allMembers]);
+  useEffect(() => {
+    console.log(data, contact, group);
+  }, [data, allMembers]);
   return (
     <>
       {contact && (
