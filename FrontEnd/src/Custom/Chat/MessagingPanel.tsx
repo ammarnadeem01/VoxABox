@@ -5,12 +5,20 @@ import ChatList from "./ChatList/ChatList";
 import SideBar from "./Sidebar/SideBar";
 import api from "../../axiosConfig";
 import useStore from "../../store";
-import { Group, Friend } from "../../Types";
+import {
+  Group,
+  User,
+  UnreadPrivateMessage,
+  UnreadGroupMessage,
+  BlockedFriends,
+  AllPrivateMessages,
+  AllGroupMessages,
+} from "../../Types";
 
 function MessagingPanel() {
-  const { userId, setSelectedPrivateChatId, setFriends } = useStore();
+  const { userId, setFriends } = useStore();
 
-  const [selectedContact, setSelectedContact] = useState<Friend | null>(null);
+  const [selectedContact, setSelectedContact] = useState<User | null>(null);
   const [selectedContactId, setSelectedContactId] = useState<string | null>(
     null
   );
@@ -53,16 +61,15 @@ function MessagingPanel() {
   // |                             HANDLE SELECTED CONTACT AND SELECTED GROUP                                |
   // |=======================================================================================================|
   // |=======================================================================================================|
-  const handleContactClick = (contact: Friend) => {
+  const handleContactClick = (contact: User): void => {
     setUnreadPrivateMessagesToSeen(contact.email);
     setSelectedContactId(contact.email);
-    // setSelectedPrivateChatId(contact);
     setSelectedContact(contact);
     setSelectedGroupId(null);
     setSelectedGroup(null);
   };
 
-  const handleGroupClick = (group: Group) => {
+  const handleGroupClick = (group: Group): void => {
     setUnreadGroupMessagesToSeen(group.id);
     setSelectedGroupId(group.id);
     setSelectedGroup(group);
@@ -70,7 +77,7 @@ function MessagingPanel() {
     setSelectedContactId(null);
   };
 
-  const selectOption = (option: string) => {
+  const selectOption = (option: string): void => {
     setSelectedOption(option);
   };
 
@@ -79,35 +86,37 @@ function MessagingPanel() {
   // |                                          STATES TO STORE DATA                                         |
   // |=======================================================================================================|
   // |=======================================================================================================|
-  const [allFriends, setAllFriends] = useState<Friend[]>();
+  const [allFriends, setAllFriends] = useState<User[]>();
   const [allGroups, setAllGroups] = useState<Group[]>();
-  const [blockedFriends, setBlockedFriends] = useState({});
-  const [privateChat, setPrivateChat] = useState({});
-  const [groupChat, setGroupChat] = useState({});
-  const [unreadPrivateMessages, setUnreadPrivateMessages] = useState({});
-  const [unreadGroupMessages, setUnreadGroupMessages] = useState({});
-  const [commonGroups, setCommonGroups] = useState({});
+  const [blockedFriends, setBlockedFriends] = useState<BlockedFriends[]>();
+  const [privateChat, setPrivateChat] = useState<AllPrivateMessages[]>();
+  const [groupChat, setGroupChat] = useState<AllGroupMessages[]>();
+  const [unreadPrivateMessages, setUnreadPrivateMessages] =
+    useState<UnreadPrivateMessage[]>();
+  const [unreadGroupMessages, setUnreadGroupMessages] =
+    useState<UnreadGroupMessage[]>();
 
   // |=======================================================================================================|
   // |=======================================================================================================|
   // |                                         STATES TO STORE COUNT                                         |
   // |=======================================================================================================|
   // |=======================================================================================================|
-  const [friendsCount, setFriendsCount] = useState(0);
-  const [groupsCount, setGroupsCount] = useState(0);
-  const [blockedFriendsCount, setBlockedFriendsCount] = useState(0);
-  const [privateChatCount, setPrivateChatCount] = useState(0);
-  const [groupChatCount, setGroupChatCount] = useState(0);
-  const [commonGroupsCount, setCommonGroupsCount] = useState(0);
+  const [friendsCount, setFriendsCount] = useState<number>(0);
+  const [groupsCount, setGroupsCount] = useState<number>(0);
+  const [blockedFriendsCount, setBlockedFriendsCount] = useState<number>(0);
+  const [privateChatCount, setPrivateChatCount] = useState<number>(0);
+  const [groupChatCount, setGroupChatCount] = useState<number>(0);
+  // const [commonGroupsCount, setCommonGroupsCount] = useState<number>(0);
   const [unreadPrivateMessagesCount, setUnreadPrivateMessagesCount] =
-    useState(0);
-  const [unreadGroupMessagesCount, setUnreadGroupMessagesCount] = useState(0);
+    useState<number>(0);
+  const [unreadGroupMessagesCount, setUnreadGroupMessagesCount] =
+    useState<number>(0);
   // |=======================================================================================================|
   // |=======================================================================================================|
   // |                                     GET DATA FROM DB                                                  |
   // |=======================================================================================================|
   // |=======================================================================================================|
-  const getBlockedFriends = () => {
+  const getBlockedFriends = (): void => {
     api
       .get(`api/v1/friend/fetchBlockedFriends/${userId}`)
       .then((res) => {
@@ -121,19 +130,20 @@ function MessagingPanel() {
       });
   };
 
-  const getCommonGroups = () => {
-    api
-      .get(`api/v1/friend/fetchBlockedFriends/${userId}`)
-      .then((res) => {
-        const data = res.data.data.BlockedFriends;
-        setCommonGroupsCount(res.data.length);
-        setCommonGroups(data);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  };
-  const getUnreadPrivateMessages = () => {
+  // const getCommonGroups = (): void => {
+  //   api
+  //     .get(`api/v1/friend/fetchBlockedFriends/${userId}`)
+  //     .then((res) => {
+  //       const data = res.data.data.BlockedFriends;
+  //       console.log("cmn grp", data);
+  //       setCommonGroupsCount(res.data.length);
+  //       setCommonGroups(data);
+  //     })
+  //     .catch((err) => {
+  //       console.log(err);
+  //     });
+  // };
+  const getUnreadPrivateMessages = (): void => {
     api
       .get(`api/v1/privateChat/${userId}`)
       .then((res) => {
@@ -145,7 +155,7 @@ function MessagingPanel() {
         console.log(err);
       });
   };
-  const getUnreadGroupMessages = () => {
+  const getUnreadGroupMessages = (): void => {
     api
       .get(`api/v1/groupChat/fetchUnreadMessages`, {
         params: { memberId: userId, groupId: 5 },
@@ -159,7 +169,7 @@ function MessagingPanel() {
         console.log(err);
       });
   };
-  const getAllFriends = () => {
+  const getAllFriends = (): void => {
     api
       .get(`api/v1/friend/fetchAllFriends/${userId}`)
       .then((res) => {
@@ -173,7 +183,7 @@ function MessagingPanel() {
         console.log(err);
       });
   };
-  const getAllGroups = () => {
+  const getAllGroups = (): void => {
     api
       .get(`api/v1/groupmember/allGroups/${userId}`)
       .then((res) => {
@@ -185,7 +195,7 @@ function MessagingPanel() {
         console.log(err);
       });
   };
-  const getAllPrivateMessages = () => {
+  const getAllPrivateMessages = (): void => {
     api
       .get(`api/v1/privateChat`, {
         params: {
@@ -195,6 +205,7 @@ function MessagingPanel() {
       })
       .then((res) => {
         const data = res.data.data.AllMessages;
+
         setPrivateChatCount(res.data.length);
         setPrivateChat(data);
       })
@@ -202,7 +213,7 @@ function MessagingPanel() {
         console.log(err);
       });
   };
-  const getAllGroupMessages = () => {
+  const getAllGroupMessages = (): void => {
     api
       .get(`api/v1/groupChat/fetchAllGroupMessages`, {
         params: {
@@ -212,15 +223,17 @@ function MessagingPanel() {
       })
       .then((res) => {
         const data = res.data.data.AllMessages;
+        console.log("allgrpmsg", data);
         setGroupChatCount(res.data.length);
         setGroupChat(data);
       })
       .catch((err) => {
+        console.log(err);
         // console.log(err.response.data.message);
       });
   };
 
-  const getAllMembersOfAGroup = () => {
+  const getAllMembersOfAGroup = (): void => {
     api
       .get(`api/v1/groupmember/allMembers/${selectedGroupId}`)
       .then((res) => {
@@ -243,7 +256,6 @@ function MessagingPanel() {
     getAllGroups();
     getAllPrivateMessages();
     getAllGroupMessages();
-    getCommonGroups();
     getAllMembersOfAGroup();
   }, [
     selectedContact,
@@ -251,10 +263,9 @@ function MessagingPanel() {
     selectedGroupId,
     selectedContactId,
     selectedOption,
-    // members,
   ]);
 
-  const toggleInfo = () => {
+  const toggleInfo = (): void => {
     setInfoOn(!infoOn);
   };
   return (
@@ -279,8 +290,7 @@ function MessagingPanel() {
             blockedFriends,
             unreadGroupMessages,
             unreadPrivateMessages,
-            privateChat,
-            groupChat,
+
             friendsCount,
             groupsCount,
           }}
@@ -294,15 +304,12 @@ function MessagingPanel() {
           data={{ privateChat, groupChat }}
           contact={selectedContact}
           group={selectedGroup}
-          allMembers={members}
         />
         <ChatInfo
           InfoOn={infoOn}
           toggleInfo={toggleInfo}
-          data={{ commonGroupsCount, commonGroups }}
           selectedCnt={selectedContact}
           selectedGrp={selectedGroup}
-          allMembers={members}
         />
       </div>
     </div>

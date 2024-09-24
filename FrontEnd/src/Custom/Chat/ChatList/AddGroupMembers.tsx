@@ -2,18 +2,15 @@ import { useEffect, useState } from "react";
 import useStore from "../../../store";
 import FriendToAdd from "./FriendToAdd";
 import api from "../../../axiosConfig";
+import { AddGroupMembersProps, Member, User } from "../../../Types";
 
-interface AddGroupMembersProps {
-  setMenuOption: any;
-  groupId: number | undefined;
-}
 const AddGroupMembers: React.FC<AddGroupMembersProps> = ({
   setMenuOption,
   groupId,
 }) => {
   const { friends } = useStore();
   const [checkedFriends, setCheckedFriends] = useState<string[]>([]);
-  const [mem, setMem] = useState<any[]>();
+  const [mem, setMem] = useState<Member[]>();
   function members() {
     if (groupId) {
       api
@@ -66,8 +63,8 @@ const AddGroupMembers: React.FC<AddGroupMembersProps> = ({
       <p>Select the friends you want to add in the group : </p>
       {friends &&
         friends.length > 0 &&
-        friends.map((friend: any) => {
-          const isMember = mem?.some((m: any) => {
+        friends.map((friend: User) => {
+          const isMember = mem?.some((m: Member) => {
             console.log(
               "m.email",
               m.member.email,
@@ -80,7 +77,7 @@ const AddGroupMembers: React.FC<AddGroupMembersProps> = ({
             <>
               {!isMember && (
                 <FriendToAdd
-                  key={friend.id}
+                  key={friend.email}
                   friend={friend}
                   onCheckboxChange={handleCheckboxChange}
                   isChecked={checkedFriends.includes(friend.email)}

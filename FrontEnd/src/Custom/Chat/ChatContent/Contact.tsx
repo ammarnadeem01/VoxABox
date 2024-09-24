@@ -1,38 +1,10 @@
 import { useEffect, useState } from "react";
 import User from "../../../assets/manprvtcaht.png";
-import useStore from "../../../store";
 import api from "../../../axiosConfig";
-interface Friend {
-  avatar: string | null;
-  createdAt: string | null;
-  deletedAt: string | null;
-  email: string;
-  fname: string;
-  lname: string;
-  password: string;
-  status: "offline" | "online";
-  updatedAt: string | null;
-}
-// interface ContactProps {
-//   data: {
-//     clearedAt: string;
-//     createdAt: string | null;
-//     friend: Friend;
-//     friendId: string;
-//     id: number;
-//     status: "offline" | "online";
-//     updatedAt: string | null;
-//     userId: string;
-//   };
+import { ContactProps, User as U } from "../../../Types";
 
-//   onClick: any;
-// }
-interface ContactProps {
-  data: any;
-  onClick: any;
-}
 const Contact: React.FC<ContactProps> = ({ data, onClick }) => {
-  const [friend, setFriend] = useState<Friend | null>();
+  const [friend, setFriend] = useState<U | null>();
   const [status, setStatus] = useState<"online" | "offline">();
   const checkStatus = () => {
     api
@@ -47,13 +19,6 @@ const Contact: React.FC<ContactProps> = ({ data, onClick }) => {
         console.log(err);
       });
   };
-  // useEffect(() => {
-  //   const interval = setInterval(() => {
-  //     checkStatus();
-  //   }, 5000);
-
-  //   return () => clearInterval(interval);
-  // }, [data]);
 
   useEffect(() => {
     setFriend(data);

@@ -9,53 +9,7 @@ import AddGroup from "./AddGroup";
 import AddGroupMembers from "./AddGroupMembers";
 import useStore from "../../../store";
 import { useNavigate } from "react-router-dom";
-
-interface Friend {
-  avatar: string | null;
-  createdAt: string | null;
-  deletedAt: string | null;
-  email: string;
-  fname: string;
-  lname: string;
-  password: string;
-  status: "offline" | "online";
-  updatedAt: string | null;
-}
-interface GroupInterface {
-  name: string;
-  id: number;
-  description: string;
-  avatar: string | null;
-}
-interface GroupMessage {}
-interface PrivateMessage {
-  content: string;
-  createdAt: string;
-  fromUserId: string;
-  id: number;
-  seenStatus: "Not Seen" | "Seen";
-  toUserId: string;
-  updatedAt: string | null;
-}
-// interface ChatListProps {
-//   data: {
-//     allFriends: Friend[];
-//     allGroups: GroupInterface[];
-//     blockedFriends: Friend[];
-//     unreadGroupMessages: GroupMessage[];
-//     unreadPrivateMessages: PrivateMessage[];
-//     friendsCount: number;
-//     groupsCount: number;
-//   };
-//   onContactClick: any;
-// }
-
-interface ChatListProps {
-  data: any;
-  onContactClick: any;
-  onGroupClick: any;
-  selectedOption: any;
-}
+import type { ChatListProps } from "../../../Types";
 
 const ChatList: React.FC<ChatListProps> = ({
   data,
@@ -65,12 +19,12 @@ const ChatList: React.FC<ChatListProps> = ({
 }) => {
   const [friends, setFriends] = useState<any>([]);
   const [search, setSearch] = useState<string>("");
-  const [groups, setGroups] = useState<any | null>([]);
-  const [option, setOption] = useState("All");
-  const [menuOption, setMenuOption] = useState<string>("");
+  const [groups, setGroups] = useState<any>([]);
+  const [option, setOption] = useState<string | undefined>("All");
+  const [menuOption, setMenuOption] = useState<string | null>();
   const [groupId, setGroupId] = useState<number>();
 
-  const setMenu = (option: string) => {
+  const setMenu = (option: string | null): void => {
     setMenuOption(option);
   };
 

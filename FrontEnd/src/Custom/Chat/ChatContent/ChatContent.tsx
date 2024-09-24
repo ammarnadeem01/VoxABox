@@ -1,26 +1,14 @@
-import { useEffect } from "react";
 import GroupChatContent from "./GroupChatContent";
 import PrivateChatContent from "./PrivateChatContent";
+import { ChatContentProps } from "../../../Types";
 
-interface ChatContentProps {
-  InfoOn: boolean;
-  toggleInfo: () => void;
-  data: any;
-  contact: any;
-  group: any;
-  allMembers: any;
-}
 const ChatContent: React.FC<ChatContentProps> = ({
   InfoOn,
   toggleInfo,
   data,
   contact,
   group,
-  allMembers,
 }) => {
-  useEffect(() => {
-    console.log(data, contact, group);
-  }, [data, allMembers]);
   return (
     <>
       {contact && (
@@ -37,7 +25,6 @@ const ChatContent: React.FC<ChatContentProps> = ({
           toggleInfo={toggleInfo}
           data={data}
           group={group}
-          members={allMembers}
         />
       )}
     </>

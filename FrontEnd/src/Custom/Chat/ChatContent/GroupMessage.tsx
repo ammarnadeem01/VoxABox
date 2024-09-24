@@ -2,40 +2,11 @@ import { useEffect, useState } from "react";
 import CustomDropdown from "../DropDown";
 import api from "../../../axiosConfig";
 import useStore from "../../../store";
-interface Friend {
-  avatar: string | null;
-  createdAt: string | null;
-  deletedAt: string | null;
-  email: string;
-  fname: string;
-  lname: string;
-  password: string;
-  status: "offline" | "online";
-  updatedAt: string | null;
-}
-interface GroupMessageInterface {
-  data: {
-    message: {
-      content: string;
-      fromUserId: string;
-      id: number;
-      toGroupId: number;
-      user: Friend;
-    };
-    messageStatus: {
-      createdAt: string;
-      id: number;
-      isDeleted: boolean;
-      messageId: number;
-      seenStatus: "Not Seen" | "Seen";
-      updatedAt: string | null;
-      userId: string;
-    };
-  };
-}
+import { GroupMessageInterface } from "../../../Types";
+
 const GroupMessage: React.FC<GroupMessageInterface> = ({ data }) => {
   const { userId } = useStore();
-  function deleteGM() {
+  function deleteGM(): void {
     api.patch(`api/v1/groupchat`, {
       messageId,
       groupId,

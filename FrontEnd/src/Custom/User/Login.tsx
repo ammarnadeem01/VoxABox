@@ -34,7 +34,7 @@ function Login() {
       })
       .catch((err) => {
         console.log(err);
-        // setErrorMessage(err.response.data);
+        setErrorMessage(err.response.data.message);
       });
   }
 

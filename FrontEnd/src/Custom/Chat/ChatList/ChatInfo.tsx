@@ -2,29 +2,26 @@ import CloseIcon from "@mui/icons-material/Close";
 import { useEffect, useState } from "react";
 import ContactChatInfo from "../ChatInfo/ContactChatInfo";
 import GroupChatInfo from "../ChatInfo/GroupChatInfo";
+import { Group, User } from "../../../Types";
 interface ChatInfoProps {
   InfoOn: boolean;
   toggleInfo: () => void;
-  data: {};
-  selectedCnt: any;
-  selectedGrp: any;
-  allMembers: any;
+  selectedCnt: User | null;
+  selectedGrp: Group | null;
 }
 const ChatInfo: React.FC<ChatInfoProps> = ({
   InfoOn,
   toggleInfo,
-  data,
   selectedCnt,
   selectedGrp,
-  allMembers,
 }) => {
-  const [contact, setContact] = useState();
-  const [group, setGroup] = useState();
+  const [contact, setContact] = useState<User | null>();
+  const [group, setGroup] = useState<Group | null>();
 
   useEffect(() => {
     setContact(selectedCnt);
     setGroup(selectedGrp);
-  }, [data, selectedCnt, selectedGrp]);
+  }, [selectedCnt, selectedGrp]);
   return (
     <div
       className={`${
@@ -42,7 +39,7 @@ const ChatInfo: React.FC<ChatInfoProps> = ({
         </div>
         {/* start */}
         {contact && <ContactChatInfo data={contact} />}
-        {group && <GroupChatInfo data={group} allMembers={allMembers} />}
+        {group && <GroupChatInfo data={group} />}
         {/* end */}
       </div>
     </div>

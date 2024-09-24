@@ -4,33 +4,13 @@ import { useEffect, useState } from "react";
 import api from "../../../axiosConfig";
 import useStore from "../../../store";
 import GroupInCommon from "./GroupInCommon";
-interface ContactChatInfoProps {
-  data: {
-    avatar: string | null;
-    createdAt: string;
-    deletedAt: string | null;
-    email: string;
-    fname: string;
-    lname: string;
-    password: string;
-    status: "offline" | "onlinne";
-    updatedAt: string | null;
-  };
-}
-interface Group {
-  adminId: string;
-  avatar: string | null;
-  createdAt: string;
-  description: string;
-  id: number;
-  name: string;
-  updatedAt: string | null;
-}
+import { ContactChatInfoProps, Group, User as U } from "../../../Types";
+
 const ContactChatInfo: React.FC<ContactChatInfoProps> = ({ data }) => {
   const { userId, selectedPrivateChatId } = useStore();
-  const [contact, setContact] = useState<ContactChatInfoProps["data"]>();
+  const [contact, setContact] = useState<U | null>();
   const [commonGroup, setCommonGroup] = useState<Group[]>();
-  function fetchCommonGroups() {
+  function fetchCommonGroups(): void {
     api
       .get(`api/v1/groupmember/commonGroups`, {
         params: {
@@ -53,7 +33,7 @@ const ContactChatInfo: React.FC<ContactChatInfoProps> = ({ data }) => {
       fetchCommonGroups();
     }
   }, [data, contact]);
-  const unFriend = () => {
+  const unFriend = (): void => {
     api
       .delete(`api/v1/friend/unfriend`, {
         data: { userId, friendId: contact?.email },

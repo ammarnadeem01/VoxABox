@@ -1,12 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
-
-interface CustomDropDownProps {
-  table: {
-    option: string;
-    action: () => void;
-  }[];
-}
+import { CustomDropDownProps } from "../../Types";
 
 const CustomDropdown: React.FC<CustomDropDownProps> = ({ table }) => {
   const [isOpen, setIsOpen] = useState(false);

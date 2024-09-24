@@ -1,31 +1,9 @@
 import { useEffect, useState } from "react";
 import User from "../../../assets/manprvtcaht.png";
-// import ChatContent from "./ChatContent";
-interface GroupInterface {
-  name: string;
-  id: number;
-  description: string;
-  avatar: string | null;
-}
-interface GroupProps {
-  data: any;
-  //  {
-  //   clearedAt: string | null;
-  //   createdAt: string;
-  //   group: GroupInterface;
-  //   groupId: number;
-  //   id: number;
-  //   joinedAt: string;
-  //   leftAt: null;
-  //   memberId: string;
-  //   membershipStatus: "Pending" | "Left";
-  //   role: "Admin" | "Regular";
-  //   updatedAt: string | null;
-  // };
-  onClick: any;
-}
+import type { Group, GroupProps } from "../../../Types";
+
 const Group: React.FC<GroupProps> = ({ data, onClick }) => {
-  const [group, setGroup] = useState<GroupInterface | null>();
+  const [group, setGroup] = useState<Group>();
 
   useEffect(() => {
     setGroup(data);

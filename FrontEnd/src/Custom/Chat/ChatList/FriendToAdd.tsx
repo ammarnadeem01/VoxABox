@@ -1,20 +1,6 @@
 import User from "../../../assets/manprvtcaht.png";
-interface Friend {
-  avatar: string | null;
-  createdAt: string | null;
-  deletedAt: string | null;
-  email: string;
-  fname: string;
-  lname: string;
-  password: string;
-  status: "offline" | "online";
-  updatedAt: string | null;
-}
-interface FriendToAddProps {
-  friend: any;
-  onCheckboxChange: (friendId: string) => void;
-  isChecked: boolean;
-}
+import { FriendToAddProps } from "../../../Types";
+
 const FriendToAdd: React.FC<FriendToAddProps> = ({
   friend,
   onCheckboxChange,

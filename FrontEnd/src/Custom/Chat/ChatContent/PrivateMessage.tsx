@@ -4,15 +4,6 @@ import useStore from "../../../store";
 import api from "../../../axiosConfig";
 interface PrivateMessageProps {
   data: any;
-  // data: {
-  //   content: string;
-  //   createdAt: string;
-  //   fromUserId: string;
-  //   id: number;
-  //   seenStatus: "Not Seen" | "Seen";
-  //   toUserId: string;
-  //   updatedAt: string | null;
-  // };
 }
 const PrivateMessage: React.FC<PrivateMessageProps> = ({ data }) => {
   const [content, setContent] = useState<string>("");
@@ -31,7 +22,7 @@ const PrivateMessage: React.FC<PrivateMessageProps> = ({ data }) => {
       });
   };
   useEffect(() => {
-    console.log("data in pm", data?.message);
+    console.log("data in pm", data);
     setContent(data?.message.content);
     setSender(data?.message.fromUserId);
     setTime(data?.message.createdAt);

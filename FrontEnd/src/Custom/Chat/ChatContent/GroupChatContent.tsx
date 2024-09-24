@@ -5,54 +5,31 @@ import GroupMessage from "./GroupMessage";
 import CustomDropdown from "../DropDown";
 import api from "../../../axiosConfig";
 import useStore from "../../../store";
+import { GroupChatContentProps } from "../../../Types";
 
-interface GroupChatContentProps {
-  InfoOn: boolean;
-  toggleInfo: () => void;
-  data: any;
-  group: any;
-  members: any;
-}
 const GroupChatContent: React.FC<GroupChatContentProps> = ({
   InfoOn,
   toggleInfo,
   data,
   group,
-  members,
 }) => {
   const { userId } = useStore();
-  const [messages, setMessages] = useState<any[]>([]);
-  const [membersOfGroup, setMembersOfGroup] = useState<any[]>([]);
-  const [membersName, setMembersName] = useState<any[]>([]);
-  const [message, setMessage] = useState("");
-  const [groupName, setGroupName] = useState("");
-  const [groupId, setGroupId] = useState();
-  const getAllMembersOfAGroup = () => {
-    api
-      .get(`api/v1/groupmember/allMembers/${groupId}`)
-      .then((res) => {
-        const data = res.data.data.group_members;
-        data.map((member: any) => {
-          const user = member.member;
-          const name: string = user.fname + " " + user.lname;
-        });
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  };
+  const [messages, setMessages] = useState<any[]>();
+  const [message, setMessage] = useState<string | undefined>();
+  const [groupName, setGroupName] = useState<string | null>();
+  const [groupId, setGroupId] = useState<number | null>();
 
   // const seenIds = new Set();
-  const messageText = (event: any) => {
+  const messageText = (event: any): void => {
     setMessage(event?.target?.value);
   };
   const [errorMessage, setErrorMessage] = useState("");
   useEffect(() => {
-    setGroupName(group.name);
-    setGroupId(group.id);
+    setGroupName(group?.name);
+    setGroupId(group?.id);
     setMessages(data?.groupChat);
-  }, [data, members, group]);
-  const clearChat = () => {
+  }, [data, group]);
+  const clearChat = (): void => {
     api
       .patch(`api/v1/groupchat/clearGroupChat`, { memberId: userId, groupId })
       .then((res) => {
@@ -62,7 +39,7 @@ const GroupChatContent: React.FC<GroupChatContentProps> = ({
         console.log(err);
       });
   };
-  const leaveGroup = () => {
+  const leaveGroup = (): void => {
     api
       .delete(`api/v1/groupmember/leaveGroup`, {
         data: { memberId: userId, groupId },
@@ -94,11 +71,7 @@ const GroupChatContent: React.FC<GroupChatContentProps> = ({
               </div>
               <div className="flex flex-col gap-0.5">
                 <p className="font-semibold">{groupName}</p>
-                <p>
-                  {/* {membersName.map((elem) => {
-                    return elem;
-                  })} */}
-                </p>
+                <p></p>
                 <p className="text-gray-500 text-xs">Click for Contact Info</p>
               </div>
             </div>

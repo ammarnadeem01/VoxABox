@@ -8,9 +8,16 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 import { useState } from "react";
 import api from "../../axiosConfig";
 import useStore from "../../store";
+interface InitialValues {
+  fname: string;
+  lname: string;
+  email: string;
+  password: string;
+  acceptTerms: boolean;
+  avatar: string;
+}
 function Signup() {
   const nav = useNavigate();
-  const [userData, setUserData] = useState({});
   const initialValues = {
     fname: "",
     lname: "",
@@ -21,15 +28,6 @@ function Signup() {
   };
   const [visibility, setVisibility] = useState(true);
   const [errMessage, setErrorMessage] = useState("");
-  interface InitialValues {
-    fname: string;
-    lname: string;
-    email: string;
-    password: string;
-    acceptTerms: boolean;
-    avatar: string;
-  }
-  const handleChange = () => {};
   function register(values: InitialValues) {
     const formData = new FormData();
     formData.set("fname", values.fname);
@@ -47,7 +45,6 @@ function Signup() {
         },
       })
       .then((result) => {
-        const userData = result.data.data.user;
         const user = result.data.data.user;
         login(
           user.email,
@@ -56,12 +53,10 @@ function Signup() {
           user.avatar
         );
         nav("/chat");
-        setUserData(userData);
-        nav("/chat");
       })
       .catch((err) => {
         console.log(err);
-        // setErrorMessage(err.response.data);
+        setErrorMessage(err.response.data.message);
       });
   }
   const SignupSchema = Yup.object().shape({

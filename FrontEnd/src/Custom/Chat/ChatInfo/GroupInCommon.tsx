@@ -1,18 +1,9 @@
 import { useEffect, useState } from "react";
 import User from "../../../assets/manprvtcaht.png";
-interface CommonGroupProps {
-  data: {
-    adminId: string;
-    avatar: string | null;
-    createdAt: string;
-    description: string;
-    id: number;
-    name: string;
-    updatedAt: string | null;
-  };
-}
+import { CommonGroupProps, Group } from "../../../Types";
+
 const GroupInCommon: React.FC<CommonGroupProps> = ({ data }) => {
-  const [group, setGroup] = useState<CommonGroupProps["data"]>();
+  const [group, setGroup] = useState<Group>();
   useEffect(() => {
     setGroup(data);
   }, [data]);

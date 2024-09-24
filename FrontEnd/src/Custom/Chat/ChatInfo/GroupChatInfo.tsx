@@ -6,45 +6,36 @@ import Member from "./Member";
 import api from "../../../axiosConfig";
 import useStore from "../../../store";
 import AddGroupMembers from "../ChatList/AddGroupMembers";
-interface GroupChatInfoProps {
-  data: {
-    adminId: string;
-    avatar: string | null;
-    createdAt: string;
-    description: string;
-    id: number;
-    name: string;
-    updatedAt: string | null;
-  };
-  allMembers: any;
-}
-const GroupChatInfo: React.FC<GroupChatInfoProps> = ({ data, allMembers }) => {
+import { Group, GroupChatInfoProps, Member as Mem } from "../../../Types";
+
+const GroupChatInfo: React.FC<GroupChatInfoProps> = ({ data }) => {
   const { userId } = useStore();
-  const [group, setGroup] = useState<GroupChatInfoProps["data"]>();
-  const [mem, setMem] = useState<any[]>();
-  const [ErrorMessage, setErrorMessage] = useState("");
-  const [option, setOption] = useState("");
-  function members() {
+  const [group, setGroup] = useState<Group>();
+  const [mem, setMem] = useState<Mem[]>();
+  const [ErrorMessage, setErrorMessage] = useState<string>("");
+  const [option, setOption] = useState<string | null>();
+  function members(): void {
     api
       .get(`api/v1/groupmember/allMembers/${group?.id}`)
       .then((res) => {
         const data = res.data.data.group_members;
+        console.log("siuuuuu", data);
         setMem(data);
       })
       .catch((err) => {
         console.log(err);
       });
   }
-  function addGrpMembers() {
+  function addGrpMembers(): void {
     setOption("addGroupMembers");
   }
 
   useEffect(() => {
     setGroup(data);
     members();
-  }, [data, allMembers]);
+  }, [data]);
 
-  function deleteGroup() {
+  function deleteGroup(): void {
     api
       .delete(`api/v1/group`, {
         data: { memberId: userId, groupId: group?.id },

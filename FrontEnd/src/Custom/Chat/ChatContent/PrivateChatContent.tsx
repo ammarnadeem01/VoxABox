@@ -1,17 +1,12 @@
 import { useEffect, useState } from "react";
-import User from "../../../assets/manprvtcaht.png";
+import U from "../../../assets/manprvtcaht.png";
 import SendIcon from "@mui/icons-material/Send";
 import CustomDropdown from "../DropDown";
 import PrivateMessage from "./PrivateMessage";
 import api from "../../../axiosConfig";
 import useStore from "../../../store";
+import { PrivateChatContentProps } from "../../../Types";
 
-interface PrivateChatContentProps {
-  InfoOn: boolean;
-  toggleInfo: () => void;
-  data: any;
-  contact: any;
-}
 const PrivateChatContent: React.FC<PrivateChatContentProps> = ({
   InfoOn,
   toggleInfo,
@@ -19,12 +14,14 @@ const PrivateChatContent: React.FC<PrivateChatContentProps> = ({
   contact,
 }) => {
   const { userId } = useStore();
-  const [messages, setMessages] = useState<any[]>([]);
-  const [message, setMessage] = useState("");
-  const [friendName, setFriendName] = useState("");
-  const [friendId, setFriendId] = useState();
-  const [friendShipStatus, setFriendShipStatus] = useState<string>("Blocked");
-  function friendShipStatusCheck() {
+  const [messages, setMessages] = useState<any[]>();
+  const [message, setMessage] = useState<string | undefined>();
+  const [friendName, setFriendName] = useState<string>("");
+  const [friendId, setFriendId] = useState<string>();
+  const [friendShipStatus, setFriendShipStatus] = useState<
+    "Blocked" | "Pending" | "Accepted"
+  >("Blocked");
+  function friendShipStatusCheck(): void {
     api
       .get(`api/v1/friend/friendshipStatus`, { params: { userId, friendId } })
       .then((res) => {
@@ -44,8 +41,8 @@ const PrivateChatContent: React.FC<PrivateChatContentProps> = ({
   useEffect(() => {
     console.log("data in pcc", data, contact);
     setMessages(data?.privateChat);
-    setFriendId(contact.email);
-    setFriendName(contact.fname + " " + contact.lname);
+    setFriendId(contact?.email);
+    setFriendName(contact?.fname + " " + contact?.lname);
   }, [data, contact]);
 
   const clearChat = () => {
@@ -97,7 +94,7 @@ const PrivateChatContent: React.FC<PrivateChatContentProps> = ({
               onClick={toggleInfo}
             >
               <div>
-                <img src={User} alt="" className="w-12 h-12 rounded-full" />
+                <img src={U} alt="" className="w-12 h-12 rounded-full" />
               </div>
               <div className="flex flex-col gap-0.5">
                 <p className="font-semibold">{friendName}</p>

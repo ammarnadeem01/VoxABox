@@ -2,11 +2,10 @@ import { useState } from "react";
 import useStore from "../../../store";
 import api from "../../../axiosConfig";
 import * as React from "react";
-import { ErrorMessage } from "formik";
 
 interface AddGroupProps {
-  setMenuOption: any;
-  setGroupId: any;
+  setMenuOption: (option: string | null) => void;
+  setGroupId: (id: number) => void;
 }
 const AddGroup: React.FC<AddGroupProps> = ({ setMenuOption, setGroupId }) => {
   const { userId } = useStore();
