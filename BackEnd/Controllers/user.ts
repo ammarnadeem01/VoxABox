@@ -3,21 +3,34 @@ import { User } from "../Models/user";
 import asyncHandler from "../Utils/asyncErrorHandlers";
 import CustomError from "../Utils/CustomError";
 import { Op, where } from "sequelize";
+import { uploadToCloudinary } from "../Middlewares/multer.middleware";
 
 // Create a new user
 export const createUser = asyncHandler(
-  async (req: Request, res: Response, next: NextFunction) => {
+  async (req: any, res: Response, next: NextFunction) => {
     // get data
-    const { email, fname, lname, avatar, password, status } = req.body;
+    const { email, fname, lname, password, status } = req.body;
     //check if req data is available
-    if (!fname || !lname || !email || !password || !avatar) {
+    if (!fname || !lname || !email || !password) {
       return next(new CustomError("Missing Required Fields...", 400));
+    }
+
+    if (!req.file) {
+      return next(new CustomError("Avatar image is required.", 400));
+    }
+    let avatarUrl;
+    try {
+      const result: any = await uploadToCloudinary(req?.file.buffer);
+      console.log("result", result);
+      avatarUrl = result.secure_url;
+    } catch (error) {
+      return next(new CustomError("Failed to upload to Cloudinary", 500));
     }
     const user = await User.create({
       email,
       fname,
       lname,
-      avatar,
+      avatar: avatarUrl,
       password,
       status,
     });

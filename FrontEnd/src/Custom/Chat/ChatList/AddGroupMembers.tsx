@@ -1,11 +1,16 @@
 import { useState } from "react";
 import useStore from "../../../store";
 import FriendToAdd from "./FriendToAdd";
+import api from "../../../axiosConfig";
 
 interface AddGroupMembersProps {
   setMenuOption: any;
+  groupId: number | undefined;
 }
-const AddGroupMembers: React.FC<AddGroupMembersProps> = ({ setMenuOption }) => {
+const AddGroupMembers: React.FC<AddGroupMembersProps> = ({
+  setMenuOption,
+  groupId,
+}) => {
   const { friends } = useStore();
   const [checkedFriends, setCheckedFriends] = useState<string[]>([]);
   const handleCheckboxChange = (friendId: string) => {
@@ -18,8 +23,22 @@ const AddGroupMembers: React.FC<AddGroupMembersProps> = ({ setMenuOption }) => {
     });
   };
   const handleAddFriends = () => {
-    console.log("Checked friends to add:", checkedFriends);
-    setMenuOption(null);
+    if (groupId) {
+      checkedFriends.map((friend) => {
+        api
+          .post("api/v1/groupmember", {
+            groupId,
+            memberId: friend,
+          })
+          .then((res) => {
+            console.log(res);
+            setMenuOption(null);
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      });
+    }
   };
   return (
     <div className="w-full flex flex-start flex-wrap justify-center ">

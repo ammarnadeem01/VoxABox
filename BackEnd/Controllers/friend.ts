@@ -65,29 +65,38 @@ export const unfriend = asyncHandler(
       return next(new CustomError("Requried Fields: UserId,FriendId", 400));
     }
     // 3. if from and to are valid
-    const mutualFriends = await Friend.findOne({
+    const mutualFriends1 = await Friend.findOne({
       where: {
-        [Op.or]: [
-          {
-            userId,
-            friendId,
-          },
-          {
-            userId: friendId,
-            friendId: userId,
-          },
-        ],
+        userId,
+        friendId,
       },
     });
 
     // 4. if users are friends?
-    if (!mutualFriends) {
+    if (!mutualFriends1) {
       return next(new CustomError("Both users are not friends.", 404));
     }
 
     // unfriend status
 
-    await mutualFriends.destroy();
+    // 3. if from and to are valid
+    const mutualFriends2 = await Friend.findOne({
+      where: {
+        userId: friendId,
+        friendId: userId,
+      },
+    });
+
+    // 4. if users are friends?
+    if (!mutualFriends2) {
+      return next(new CustomError("Both users are not friends.", 404));
+    }
+
+    // unfriend status
+
+    await mutualFriends1.destroy();
+    await mutualFriends2.destroy();
+
     res.status(200).json({
       status: "Success",
       data: null,
@@ -226,28 +235,28 @@ export const fetchBlockedFriends = asyncHandler(
   }
 );
 
-//delete friend
-export const deleteFriend = asyncHandler(
-  async (req: Request, res: Response, next: NextFunction) => {
-    const { userId, friendId } = req.query;
-    if (!userId || !friendId) {
-      return next(new CustomError("GroupID is required", 400));
-    }
-    const mutualFriends = await Friend.findOne({
-      where: {
-        userId,
-        friendId,
-      },
-    });
-    if (!mutualFriends) {
-      return next(new CustomError("No friend with given ID found", 400));
-    }
-    await mutualFriends.destroy();
-    res.status(200).json({
-      status: "Success",
-      data: {
-        mutualFriends,
-      },
-    });
-  }
-);
+// //delete friend
+// export const deleteFriend = asyncHandler(
+//   async (req: Request, res: Response, next: NextFunction) => {
+//     const { userId, friendId } = req.query;
+//     if (!userId || !friendId) {
+//       return next(new CustomError("GroupID is required", 400));
+//     }
+//     const mutualFriends = await Friend.findOne({
+//       where: {
+//         userId,
+//         friendId,
+//       },
+//     });
+//     if (!mutualFriends) {
+//       return next(new CustomError("No friend with given ID found", 400));
+//     }
+//     await mutualFriends.destroy();
+//     res.status(200).json({
+//       status: "Success",
+//       data: {
+//         mutualFriends,
+//       },
+//     });
+//   }
+// );

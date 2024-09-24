@@ -4,6 +4,7 @@ import SendIcon from "@mui/icons-material/Send";
 import GroupMessage from "./GroupMessage";
 import CustomDropdown from "../DropDown";
 import api from "../../../axiosConfig";
+import useStore from "../../../store";
 
 interface GroupChatContentProps {
   InfoOn: boolean;
@@ -19,6 +20,7 @@ const GroupChatContent: React.FC<GroupChatContentProps> = ({
   group,
   members,
 }) => {
+  const { userId } = useStore();
   const [messages, setMessages] = useState<any[]>([]);
   const [membersOfGroup, setMembersOfGroup] = useState<any[]>([]);
   const [membersName, setMembersName] = useState<any[]>([]);
@@ -44,13 +46,35 @@ const GroupChatContent: React.FC<GroupChatContentProps> = ({
   const messageText = (event: any) => {
     setMessage(event?.target?.value);
   };
+  const [errorMessage, setErrorMessage] = useState("");
   useEffect(() => {
     setGroupName(group.name);
     setGroupId(group.id);
     setMessages(data?.groupChat);
   }, [data, members, group]);
-  const clearChat = () => {};
-  const leaveGroup = () => {};
+  const clearChat = () => {
+    api
+      .patch(`api/v1/groupchat/clearGroupChat`, { memberId: userId, groupId })
+      .then((res) => {
+        console.log(res);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+  const leaveGroup = () => {
+    api
+      .delete(`api/v1/groupmember/leaveGroup`, {
+        data: { memberId: userId, groupId },
+      })
+      .then((res) => {
+        console.log(res);
+      })
+      .catch((err) => {
+        setErrorMessage(err.response.data.message);
+        console.log(err);
+      });
+  };
   return (
     <div
       className={`${
@@ -90,6 +114,7 @@ const GroupChatContent: React.FC<GroupChatContentProps> = ({
         </div>
         {/* Messages */}
         <div className="w-full h-full flex flex-col justify-start py-2  text-gray-300 text-sm items-start  px-2 gap-1 overflow-hidden overflow-y-auto scrollbar-thin scrollbar-thumb-gray-900 scrollbar-track-[#363638]">
+          {errorMessage && <p className="text-red-500">{errorMessage}</p>}
           {messages && messages.length > 0 ? (
             messages?.map((msg: any) => {
               return (

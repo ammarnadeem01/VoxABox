@@ -54,6 +54,18 @@ const ContactChatInfo: React.FC<ContactChatInfoProps> = ({ data }) => {
       fetchCommonGroups();
     }
   }, [data, contact]);
+  const unFriend = () => {
+    api
+      .delete(`api/v1/friend/unfriend`, {
+        data: { userId, friendId: contact?.email },
+      })
+      .then((res) => {
+        console.log(res);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
   return (
     <>
       <div className="flex flex-col justify-center  items-center bg-[#404040] p-5 gap-1">
@@ -74,11 +86,8 @@ const ContactChatInfo: React.FC<ContactChatInfoProps> = ({ data }) => {
         </div>
       </div>
       <div className="bg-[#404040]  w-full flex flex-col justify-center  text-red-700 font-semibold items-start pl-4 gap-2 py-2">
-        <p className="cursor-pointer">
-          <DeleteIcon /> Delete Chat
-        </p>
-        <p className="cursor-pointer">
-          <AppBlockingIcon /> Block
+        <p className="cursor-pointer" onClick={() => unFriend()}>
+          <DeleteIcon /> UnFriend
         </p>
       </div>
     </>

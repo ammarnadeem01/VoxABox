@@ -5,15 +5,16 @@ import {
   fetchAllFriends,
   fetchBlockedFriends,
   unfriend,
-  deleteFriend,
+  // deleteFriend,
   unblockFriend,
 } from "../Controllers/friend";
 const router = Router();
-router.route("/").post(createFriends).delete(deleteFriend);
+router.route("/").post(createFriends);
+// .delete(deleteFriend);
 router.route("/fetchAllFriends/:email").get(fetchAllFriends);
 router.route("/fetchBlockedFriends/:email").get(fetchBlockedFriends);
 router.route("/blockFriends").patch(blockFriend);
 router.route("/unblockFriends").patch(unblockFriend);
-router.route("/unfriend").patch(unfriend);
+router.route("/unfriend").delete(unfriend);
 
 export default router;

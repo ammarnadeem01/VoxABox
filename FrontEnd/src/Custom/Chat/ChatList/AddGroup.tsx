@@ -2,28 +2,56 @@ import { useState } from "react";
 import useStore from "../../../store";
 import api from "../../../axiosConfig";
 import * as React from "react";
-import AddGroupMembers from "./AddGroupMembers";
-import { useNavigate } from "react-router-dom";
 
 interface AddGroupProps {
   setMenuOption: any;
+  setGroupId: any;
 }
-const AddGroup: React.FC<AddGroupProps> = ({ setMenuOption }) => {
-  const nav = useNavigate();
+const AddGroup: React.FC<AddGroupProps> = ({ setMenuOption, setGroupId }) => {
+  const { userId } = useStore();
   const createGroup = (e: any) => {
     e.preventDefault();
-    setMenuOption("addGroupMembers");
-    // api
-    //   .post(`api/v1/group`, groupFormData)
-    //   .then((res) => {
-    // console.log(res);
-    // })
-    // .catch((err) => {
-    //   console.log(err);
-    // });
+    const formData = new FormData();
+    if (groupFormData.name) {
+      formData.set("name", groupFormData.name);
+    }
+
+    if (groupFormData.description) {
+      formData.set("description", groupFormData.description);
+    }
+
+    if (groupFormData.avatar) {
+      formData.set("avatar", groupFormData.avatar);
+    }
+
+    if (userId) {
+      formData.set("adminId", userId);
+    }
+    formData.forEach((value, key) => {
+      console.log(key, value);
+    });
+    if (userId) {
+      api
+        .post(`api/v1/group`, groupFormData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        })
+        .then((res) => {
+          const data = res.data.data.group.id;
+          console.log("group id", data);
+          setGroupId(data);
+          console.log("group", res);
+          setMenuOption("addGroupMembers");
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    } else {
+      console.log("userid", userId);
+    }
   };
   function handleChange(e: any) {
-    console.log(e);
     const { name, value, type, files } = e.target;
     if (type === "file") {
       setGroupFormData({ ...groupFormData, [name]: files[0] });
@@ -32,11 +60,10 @@ const AddGroup: React.FC<AddGroupProps> = ({ setMenuOption }) => {
     }
   }
 
-  const { userId } = useStore();
   const [groupFormData, setGroupFormData] = useState({
     name: "",
     description: "",
-    avatar: "",
+    avatar: null,
     adminId: userId,
   });
   return (

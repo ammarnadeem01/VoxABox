@@ -7,6 +7,8 @@ import CustomDropdown from "../DropDown";
 import AddFriend from "./AddFriend";
 import AddGroup from "./AddGroup";
 import AddGroupMembers from "./AddGroupMembers";
+import useStore from "../../../store";
+import { useNavigate } from "react-router-dom";
 
 interface Friend {
   avatar: string | null;
@@ -65,11 +67,14 @@ const ChatList: React.FC<ChatListProps> = ({
   const [groups, setGroups] = useState<any | null>([]);
   const [option, setOption] = useState("All");
   const [menuOption, setMenuOption] = useState<string>("");
+  const [groupId, setGroupId] = useState<number>();
 
   const setMenu = (option: string) => {
     setMenuOption(option);
   };
 
+  const { logout } = useStore();
+  const nav = useNavigate();
   useEffect(() => {
     setOption(selectedOption);
   }, [selectedOption, data]);
@@ -95,7 +100,10 @@ const ChatList: React.FC<ChatListProps> = ({
   function createGroup() {
     setMenu("addGroup");
   }
-  function logout() {}
+  function Logout() {
+    logout();
+    nav("/");
+  }
   return (
     <div className="w-1/5 h-[95%] text-white flex flex-wrap justify-betweeen items-start overflow-hidden overflow-y-auto scrollbar-thin scrollbar-thumb-gray-900 scrollbar-track-[#363638]">
       <div className="w-full flex flex-wrap justify-start items-start  ">
@@ -104,7 +112,7 @@ const ChatList: React.FC<ChatListProps> = ({
             table={[
               { option: "Add Friend", action: addFriend },
               { option: "Create Group", action: createGroup },
-              { option: "Logout", action: logout },
+              { option: "Logout", action: Logout },
             ]}
           />
         </div>
@@ -173,9 +181,11 @@ const ChatList: React.FC<ChatListProps> = ({
               );
             })}
           {menuOption == "addFriend" && <AddFriend setMenuOption={setMenu} />}
-          {menuOption == "addGroup" && <AddGroup setMenuOption={setMenu} />}
+          {menuOption == "addGroup" && (
+            <AddGroup setMenuOption={setMenu} setGroupId={setGroupId} />
+          )}
           {menuOption == "addGroupMembers" && (
-            <AddGroupMembers setMenuOption={setMenu} />
+            <AddGroupMembers groupId={groupId} setMenuOption={setMenu} />
           )}
         </div>
       </div>

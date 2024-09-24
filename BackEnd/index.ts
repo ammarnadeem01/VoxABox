@@ -1,4 +1,5 @@
 import dotenv from "dotenv";
+dotenv.config({ path: "./config.env" });
 import app from "./app";
 import { Sequelize } from "sequelize-typescript";
 import { User } from "./Models/user";
@@ -12,7 +13,6 @@ import { PrivateMessageStatus } from "./Models/PrivateMessageStatus";
 import { createServer } from "http";
 import { Server } from "socket.io";
 
-dotenv.config({ path: "./config.env" });
 const port = process.env.PORT || 3000;
 
 const httpsServer = createServer(app);

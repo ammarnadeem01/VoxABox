@@ -7,6 +7,7 @@ import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import { useState } from "react";
 import api from "../../axiosConfig";
+import useStore from "../../store";
 function Signup() {
   const nav = useNavigate();
   const [userData, setUserData] = useState({});
@@ -16,7 +17,7 @@ function Signup() {
     email: "",
     password: "",
     acceptTerms: false,
-    avatar: "ammar.com",
+    avatar: null,
   };
   const [visibility, setVisibility] = useState(true);
   const [errMessage, setErrorMessage] = useState("");
@@ -26,15 +27,35 @@ function Signup() {
     email: string;
     password: string;
     acceptTerms: boolean;
-    avatar: string;
+    avatar: any;
   }
+  const handleChange = () => {};
   function register(values: InitialValues) {
-    console.log("values", values);
-    console.log("vars");
+    const formData = new FormData();
+    formData.set("fname", values.fname);
+    formData.set("lname", values.lname);
+    formData.set("password", values.password);
+    formData.set("email", values.email);
+    formData.set("avatar", values.avatar);
+    formData.forEach((value, key) => {
+      console.log(key, value);
+    });
     api
-      .post("api/v1/user", values)
+      .post("api/v1/user", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      })
       .then((result) => {
         const userData = result.data.data.user;
+        const user = result.data.data.user;
+        login(
+          user.email,
+          "dummy token",
+          user.fname + " " + user.lname,
+          user.avatar
+        );
+        nav("/chat");
         setUserData(userData);
         nav("/chat");
       })
@@ -57,7 +78,7 @@ function Signup() {
       .min(6, "Password must be at least 6 characters")
       .required("Password is required"),
   });
-
+  const { login } = useStore();
   return (
     <div className="min-w-full flex justify-center flex-wrap items-center w-full py-10 max-w-full bg-black text-white">
       <div className="bg-[#363638] w-1/3 p-10 rounded">
@@ -75,7 +96,7 @@ function Signup() {
             register(values);
           }}
         >
-          {({ isSubmitting }) => (
+          {({ isSubmitting, setFieldValue }) => (
             <Form className="max-w-md w-full flex flex-wrap justify-between mx-auto p-4  shadow-md rounded ">
               <div className="mb-4 w-[48%]">
                 <Field
@@ -141,6 +162,25 @@ function Signup() {
                   className="text-red-500"
                 />
               </div>
+              <div className="mb-4 w-full">
+                <label
+                  htmlFor="avatar-input"
+                  className="cursor-pointer text-center bg-purple-700 text-white px-4 py-2 rounded hover:bg-purple-500 w-full"
+                >
+                  Add Avatar
+                </label>
+                <input
+                  id="avatar-input"
+                  type="file"
+                  name="avatar"
+                  onChange={(e) => {
+                    setFieldValue("avatar", e.target.files![0]);
+                  }}
+                  className="hidden mt-1 p-2 bg-[#363638] w-full border focus:bg-[#363638] border-purple-400 outline outline-purple-950 rounded"
+                  accept="image/*"
+                />
+              </div>
+
               <div className="mb-4">
                 <label className="flex items-center">
                   <Field

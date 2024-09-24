@@ -53,10 +53,10 @@ const GroupChatInfo: React.FC<GroupChatInfoProps> = ({ data, allMembers }) => {
       </div>
       <div className="bg-[#404040]  w-full flex flex-col justify-center  text-red-700 font-semibold items-start pl-4 gap-2 py-2">
         <p className="cursor-pointer">
-          <DeleteIcon /> Clear Chat
+          <DeleteIcon /> Delete Group
         </p>
         <p className="cursor-pointer">
-          <AppBlockingIcon /> Block
+          <AppBlockingIcon /> Add Group Members
         </p>
       </div>
     </>
