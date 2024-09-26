@@ -1,8 +1,4 @@
 // user auth
-// middlewares of avatar,protect and restrict
-// block,unblock,unfriend
-// clear chat (private and group)
-// add friend and group
-// leave group and kick off member
-// type strict
+// passwd encrpyt
+// kick off group member
 // sockets

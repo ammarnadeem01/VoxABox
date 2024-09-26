@@ -10,13 +10,13 @@ import { Group, GroupChatInfoProps, Member as Mem } from "../../../Types";
 
 const GroupChatInfo: React.FC<GroupChatInfoProps> = ({ data }) => {
   const { userId } = useStore();
-  const [group, setGroup] = useState<Group>();
+  // const [group, setGroup] = useState<Group>();
   const [mem, setMem] = useState<Mem[]>();
   const [ErrorMessage, setErrorMessage] = useState<string>("");
   const [option, setOption] = useState<string | null>();
   function members(): void {
     api
-      .get(`api/v1/groupmember/allMembers/${group?.id}`)
+      .get(`api/v1/groupmember/allMembers/${data.id}`)
       .then((res) => {
         const data = res.data.data.group_members;
         console.log("siuuuuu", data);
@@ -30,15 +30,17 @@ const GroupChatInfo: React.FC<GroupChatInfoProps> = ({ data }) => {
     setOption("addGroupMembers");
   }
 
+  // useEffect(() => {
+  //   setGroup(data);
+  //   members();
+  // }, [data]);
   useEffect(() => {
-    setGroup(data);
     members();
-  }, [data]);
-
+  }, []);
   function deleteGroup(): void {
     api
       .delete(`api/v1/group`, {
-        data: { memberId: userId, groupId: group?.id },
+        data: { memberId: userId, groupId: data.id },
       })
       .then((res) => {
         console.log(res);
@@ -51,21 +53,21 @@ const GroupChatInfo: React.FC<GroupChatInfoProps> = ({ data }) => {
   return (
     <>
       {option === "addGroupMembers" && (
-        <AddGroupMembers setMenuOption={setOption} groupId={group?.id} />
+        <AddGroupMembers setMenuOption={setOption} groupId={data.id} />
       )}
       {!option && (
         <>
           <div className="flex flex-col justify-center  items-center bg-[#404040] p-5 gap-1">
             <img src={User} alt="" className="w-[75%] h-[75%] rounded-full" />
-            <p className="text-[#e5e5e7]">{group?.name}</p>
+            <p className="text-[#e5e5e7]">{data.name}</p>
           </div>
           <div className=" w-full  h-[40%] ">
             <p className="bg-[#404040] text-center font-semibold py-1">
               {mem?.length}&nbsp; Member(s) Of Group
             </p>
-            <div className="bg-[#404040] w-full h-full flex flex-col justify-start items-start pl-4 gap-1 py-2 overflow-hidden overflow-y-auto scrollbar-thin scrollbar-thumb-gray-900 scrollbar-track-[#363638]">
+            <div className="bg-[#404040] w-full h-full flex flex-col justify-start items-start pl-4 gap-1 py-10 overflow-hidden overflow-y-auto scrollbar-thin scrollbar-thumb-gray-900 scrollbar-track-[#363638]">
               {mem?.map((mem) => (
-                <Member data={mem} />
+                <Member data={mem} group={data} />
               ))}
             </div>
           </div>

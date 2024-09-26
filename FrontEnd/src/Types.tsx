@@ -149,6 +149,7 @@ export interface Member {
 
 export interface MemberProps {
   data: Member;
+  group: Group;
 }
 export interface AddGroupMembersProps {
   setMenuOption: (option: string | null) => void;

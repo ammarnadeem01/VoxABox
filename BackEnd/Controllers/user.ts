@@ -2,51 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { User } from "../Models/user";
 import asyncHandler from "../Utils/asyncErrorHandlers";
 import CustomError from "../Utils/CustomError";
-import { Op, where } from "sequelize";
-import { uploadToCloudinary } from "../Middlewares/multer.middleware";
-
-// Create a new user
-export const createUser = asyncHandler(
-  async (req: any, res: Response, next: NextFunction) => {
-    // get data
-    const { email, fname, lname, password, status } = req.body;
-    //check if req data is available
-    if (!fname || !lname || !email || !password) {
-      return next(new CustomError("Missing Required Fields...", 400));
-    }
-
-    if (!req.file) {
-      return next(new CustomError("Avatar image is required.", 400));
-    }
-    let avatarUrl;
-    try {
-      const result: any = await uploadToCloudinary(req?.file.buffer);
-      console.log("result", result);
-      avatarUrl = result.secure_url;
-    } catch (error) {
-      return next(new CustomError("Failed to upload to Cloudinary", 500));
-    }
-    const user = await User.create({
-      email,
-      fname,
-      lname,
-      avatar: avatarUrl,
-      password,
-      status,
-    });
-
-    if (!user) {
-      return next(new CustomError("User Creation Failed", 500));
-    }
-    res.status(201).json({
-      status: "Success",
-      data: {
-        user,
-      },
-    });
-  }
-);
-
+import { Op } from "sequelize";
 // Get all users
 export const getUsers = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -56,28 +12,6 @@ export const getUsers = asyncHandler(
       length: users.length,
       data: {
         users,
-      },
-    });
-  }
-);
-
-// Get a single user by ID
-export const getUserById = asyncHandler(
-  async (req: Request, res: Response, next: NextFunction) => {
-    // get email
-    const { email, password } = req.body;
-    // if email is avaiable
-    if (!email) {
-      return next(new CustomError("Email is required", 400));
-    }
-    const user = await User.findOne({ where: { email, password } });
-    if (!user) {
-      return next(new CustomError("Incorrect Email or password", 401));
-    }
-    res.status(200).json({
-      status: "Success",
-      data: {
-        user,
       },
     });
   }
@@ -209,15 +143,15 @@ export const updatePassword = asyncHandler(
 
 export const setStatus = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
-    console.log(
-      "===================================================================================="
-    );
-    console.log(1);
+    // console.log(
+    //   "===================================================================================="
+    // );
+    // console.log(1);
     const { userId, status } = req.body;
-    console.log(
-      "----------------------------------------------------------------------------------------"
-    );
-    console.log(userId, status);
+    // console.log(
+    //   "----------------------------------------------------------------------------------------"
+    // );
+    // console.log(userId, status);
     if (!userId || !status) {
       return next(new CustomError("Missing Required Fields", 400));
     }
@@ -244,13 +178,13 @@ export const setStatus = asyncHandler(
 export const checkStatus = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     const { userId } = req.query;
-    console.log(
-      "======================================================================================================"
-    );
-    console.log(userId);
-    console.log(
-      "======================================================================================================"
-    );
+    // console.log(
+    //   "======================================================================================================"
+    // );
+    // console.log(userId);
+    // console.log(
+    //   "======================================================================================================"
+    // );
 
     const userIdStr = userId as string;
     if (!userId) {

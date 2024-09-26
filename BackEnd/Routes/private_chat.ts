@@ -10,7 +10,7 @@ import {
 const router = Router();
 router
   .route("/")
-  .post(createPrivateMessage)
+  // .post(createPrivateMessage)
   .get(loadFriendMessages)
   .patch(clearPrivateChat);
 router.route("/deleteMessage").patch(deletePrivateMessage);

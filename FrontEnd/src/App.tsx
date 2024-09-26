@@ -12,10 +12,26 @@ import TermsAndConditions from "./Custom/LandingPage/TermsAndConditions.tsx";
 import PrivacyPolicy from "./Custom/LandingPage/PrivacyPolicy.tsx";
 import { useEffect } from "react";
 import useStore from "./store.tsx";
+import { io } from "socket.io-client";
 import api from "./axiosConfig.tsx";
 
 function App() {
   const { userId, setOnlineStatus } = useStore();
+  const { setSocketId, setRoomId, setPrivateMessages } = useStore();
+
+  useEffect(() => {
+    const socket = io("http://localhost:3000");
+    socket.on("connect", () => {
+      setSocketId(socket.id!);
+    });
+    socket.on("message", (roomId, message) => {
+      setPrivateMessages(roomId, message);
+    });
+    return () => {
+      socket.disconnect();
+    };
+  }, [setSocketId, setRoomId, setPrivateMessages]);
+
   const updateStatus = (status: "online" | "offline") => {
     api
       .patch(`api/v1/user/status/setStatus`, {

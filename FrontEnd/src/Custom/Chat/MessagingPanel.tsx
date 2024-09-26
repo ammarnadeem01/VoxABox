@@ -14,9 +14,12 @@ import {
   AllPrivateMessages,
   AllGroupMessages,
 } from "../../Types";
+import io from "socket.io-client";
+const socket = io("http://localhost:3000");
 
 function MessagingPanel() {
-  const { userId, setFriends } = useStore();
+  const { setRoomId, userId, roomId, setFriends, setSelectedPrivateChatId } =
+    useStore();
 
   const [selectedContact, setSelectedContact] = useState<User | null>(null);
   const [selectedContactId, setSelectedContactId] = useState<string | null>(
@@ -42,11 +45,11 @@ function MessagingPanel() {
         console.log(err);
       });
   };
-  const setUnreadGroupMessagesToSeen = (group: number) => {
+  const setUnreadGroupMessagesToSeen = (groupId: number) => {
     api
       .patch(`api/v1/groupchat/unreadMessageToSeen`, {
         memberId: userId,
-        groupId: group,
+        groupId: groupId,
       })
       .then((res) => {
         console.log("Group Messages set to seen", res);
@@ -64,13 +67,18 @@ function MessagingPanel() {
   const handleContactClick = (contact: User): void => {
     setUnreadPrivateMessagesToSeen(contact.email);
     setSelectedContactId(contact.email);
+    setRoomId(contact.email);
+    setSelectedPrivateChatId(contact.email);
+    socket.emit("joinRoom", contact.email);
     setSelectedContact(contact);
     setSelectedGroupId(null);
     setSelectedGroup(null);
   };
 
   const handleGroupClick = (group: Group): void => {
+    console.log("grp grp grp", group);
     setUnreadGroupMessagesToSeen(group.id);
+    setRoomId(group.id);
     setSelectedGroupId(group.id);
     setSelectedGroup(group);
     setSelectedContact(null);
@@ -130,19 +138,6 @@ function MessagingPanel() {
       });
   };
 
-  // const getCommonGroups = (): void => {
-  //   api
-  //     .get(`api/v1/friend/fetchBlockedFriends/${userId}`)
-  //     .then((res) => {
-  //       const data = res.data.data.BlockedFriends;
-  //       console.log("cmn grp", data);
-  //       setCommonGroupsCount(res.data.length);
-  //       setCommonGroups(data);
-  //     })
-  //     .catch((err) => {
-  //       console.log(err);
-  //     });
-  // };
   const getUnreadPrivateMessages = (): void => {
     api
       .get(`api/v1/privateChat/${userId}`)
@@ -188,6 +183,7 @@ function MessagingPanel() {
       .get(`api/v1/groupmember/allGroups/${userId}`)
       .then((res) => {
         const ans = res.data.data.allGroups;
+        console.log("ans", ans);
         setGroupsCount(res.data.length);
         setAllGroups(ans);
       })
@@ -233,21 +229,6 @@ function MessagingPanel() {
       });
   };
 
-  const getAllMembersOfAGroup = (): void => {
-    api
-      .get(`api/v1/groupmember/allMembers/${selectedGroupId}`)
-      .then((res) => {
-        const data = res.data.data.group_members;
-        data.map((member: any) => {
-          const user = member.member;
-          setMembers([...members, user]);
-        });
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  };
-
   useEffect(() => {
     getBlockedFriends();
     getUnreadPrivateMessages();
@@ -256,7 +237,6 @@ function MessagingPanel() {
     getAllGroups();
     getAllPrivateMessages();
     getAllGroupMessages();
-    getAllMembersOfAGroup();
   }, [
     selectedContact,
     selectedGroup,

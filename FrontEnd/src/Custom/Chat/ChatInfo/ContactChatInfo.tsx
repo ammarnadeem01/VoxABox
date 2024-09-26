@@ -15,7 +15,7 @@ const ContactChatInfo: React.FC<ContactChatInfoProps> = ({ data }) => {
       .get(`api/v1/groupmember/commonGroups`, {
         params: {
           userId1: userId,
-          userId2: selectedPrivateChatId.email,
+          userId2: selectedPrivateChatId,
         },
       })
       .then((res) => {

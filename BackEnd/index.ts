@@ -12,6 +12,9 @@ import { MessageStatus } from "./Models/MessageStatus";
 import { PrivateMessageStatus } from "./Models/PrivateMessageStatus";
 import { createServer } from "http";
 import { Server } from "socket.io";
+import { NextFunction } from "express";
+// import contrlllers for private chat and group chat
+import { createPrivateMessage } from "./Controllers/private_chat";
 
 const port = process.env.PORT || 3000;
 
@@ -60,69 +63,71 @@ sequelize
     console.error("Unable to connect to the database:", err);
   });
 
-// const users: any = {}; // Store connected users
+const users: any = {};
 
-// io.on("connection", (socket) => {
-//   console.log("A user connected: " + socket.id);
+io.on("connection", (socket) => {
+  console.log("A user connected: " + socket.id);
 
-//   // Handle user registration
-//   socket.on("register", (userId) => {
-//     users[userId] = socket.id;
-//   });
+  // Handle user registration
+  socket.on("register", (userId) => {
+    users[userId] = socket.id;
+  });
 
-// Private chat controller methods
-// Private chat event
-//   socket.on(
-//     "createPrivateMessage",
-//     async ({ fromUserId, toUserId, content }) => {
-//       const result = await handleCreatePrivateMessage(
-//         fromUserId,
-//         toUserId,
-//         content
-//       );
+  socket.on("joinRoom", (roomId) => {
+    console.log(`${socket.id} joining room: ${roomId}`);
+    socket.join(roomId);
+    socket.to(roomId).emit("userJoined", { userId: socket.id });
+  });
+  // chat chat event
+  socket.on("createPrivateMessage", async (data) => {
+    const next = (error: any) => {
+      console.error(error.message);
+      // Emit the error back to the client if necessary
+      socket.emit("privateMessageError", { error: error.message });
+    };
+    await createPrivateMessage(data, next);
+    console.log(data);
+    io.to(data.roomId).emit(data.message.content);
+  });
+  socket.on("createGroupMessage", (data) => {
+    console.log(data);
+    io.to(data.roomId).emit(data.message.content);
+  });
 
-//       if (result.success) {
-//         const receiverSocketId = users[toUserId];
-//         if (receiverSocketId) {
-//           io.to(receiverSocketId).emit("private_message", {
-//             senderId: fromUserId,
-//             message: content,
-//           });
-//         }
-//       } else {
-//         // Handle error if needed
-//         socket.emit("error", { message: result.error });
-//       }
-//     }
-//   );
+  // Deleting a message
+  socket.on("deleteMessage", async ({ roomId, messageId }) => {
+    try {
+      io.to(roomId).emit("messageDeleted", { messageId });
+    } catch (error) {
+      console.error("Error deleting message:", error);
+    }
+  });
 
-//   socket.on("deleteMessage", ({ messageId }) => {
-//     // Call your delete message method in the PrivateChatController
-//     // Example: PrivateChatController.deleteMessage(messageId);
-//   });
+  socket.on("upgradeMessageStatusToSeen", ({ messageId, userId }) => {
+    try {
+      io.emit("messageStatusUpdated", { messageId, userId, status: "seen" });
+    } catch (error) {
+      console.error("Error updating message status:", error);
+    }
+  });
 
-//   socket.on("upgradeMessageStatusToSeen", ({ messageId, userId }) => {
-//     // Call your method to update the message status
-//     // Example: PrivateChatController.upgradeMessageStatusToSeen(messageId, userId);
-//   });
+  // Fetch unread messages for a user
+  socket.on("unreadMessages", ({ userId, unreadMessages }) => {
+    socket.emit("unreadMessages", unreadMessages);
+  });
 
-//   socket.on("unreadMessages", ({ userId }) => {
-//     // Call your method to fetch unread messages
-//     // Example: PrivateChatController.unreadMessages(userId);
-//   });
+  socket.on("disconnect", () => {
+    console.log("A user disconnected: " + socket.id);
+    // Handle user disconnection
+    for (const userId in users) {
+      if (users[userId] === socket.id) {
+        delete users[userId];
+        break;
+      }
+    }
+  });
+});
 
-//   socket.on("disconnect", () => {
-//     console.log("A user disconnected: " + socket.id);
-//     // Handle user disconnection
-//     for (const userId in users) {
-//       if (users[userId] === socket.id) {
-//         delete users[userId];
-//         break;
-//       }
-//     }
-//   });
-// });
-
-app.listen(port, () => {
+httpsServer.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });

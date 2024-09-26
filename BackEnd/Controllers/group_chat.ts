@@ -105,7 +105,7 @@ const unreadseen = async (
     },
     attributes: ["id", "content", "fromUserId", "toGroupId"],
   });
-  console.log("UnfilteredMessages", UnfilteredMessages); // Initialize an array to store all messages with their statuses
+  // console.log("UnfilteredMessages", UnfilteredMessages); // Initialize an array to store all messages with their statuses
   let UnreadMessages = [];
 
   for (const message of UnfilteredMessages) {
@@ -272,7 +272,7 @@ export const fetchAllGroupMessages = asyncHandler(
     const groupIdNumber = Number(groupId);
 
     const AllMessages = await allMessages(memberIdString, groupIdNumber, next);
-    console.log("AllMessages", AllMessages);
+    // console.log("AllMessages", AllMessages);
     if (AllMessages?.length == 0) {
       return next(new CustomError("No Message in this group", 404));
     }
@@ -382,13 +382,13 @@ export const deleteGroupMessage = asyncHandler(
           where: { messageId: messageId, userId: memberId },
         }
       );
-      console.log(
-        "============================================================================="
-      );
-      console.log("ans", ans);
-      console.log(
-        "============================================================================="
-      );
+      // console.log(
+      //   "============================================================================="
+      // );
+      // console.log("ans", ans);
+      // console.log(
+      //   "============================================================================="
+      // );
     }
 
     // generate response
@@ -418,11 +418,11 @@ export const setUnreadMessageToSeen = asyncHandler(
       });
     } else {
       // loop through the unread messages and update the messageStatus to 'Seen'
-      console.log(
-        "sssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss1"
-      );
+      // console.log(
+      //   "sssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss1"
+      // );
       for (const message of UnreadMessages) {
-        console.log(message);
+        // console.log(message);
         const ans = await MessageStatus.update(
           { seenStatus: "Seen" },
           {
@@ -432,10 +432,10 @@ export const setUnreadMessageToSeen = asyncHandler(
             },
           }
         );
-        console.log(
-          "++++++++++++++++++++++++++++++++++++++++==+++++++++++++++++++++++++++++++++++"
-        );
-        console.log(ans);
+        // console.log(
+        //   "++++++++++++++++++++++++++++++++++++++++==+++++++++++++++++++++++++++++++++++"
+        // );
+        // console.log(ans);
       }
 
       // respond with success message

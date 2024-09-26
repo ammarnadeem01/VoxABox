@@ -56,7 +56,6 @@ export const allGroups = asyncHandler(
         {
           model: Group,
           as: "group",
-          attributes: ["id", "name", "description", "avatar"],
         },
       ],
     });
@@ -77,7 +76,7 @@ export const groupsInCommon = asyncHandler(
     // take two ids from query
 
     const { userId1, userId2 } = req.query;
-    console.log(userId1, userId2);
+    // console.log(userId1, userId2);
     // check if ids are present in query
     if (!userId1 || !userId2) {
       return next(new CustomError("Two IDs are requried.", 400));
@@ -208,7 +207,7 @@ export const removeMember = asyncHandler(
     if (!group) {
       return next(
         new CustomError(
-          `group with groupId ${groupIdN} doesn't exist or You are not allowes to perform this action`,
+          `group with groupId ${groupIdN} doesn't exist or You are not allowed to perform this action`,
           404
         )
       );

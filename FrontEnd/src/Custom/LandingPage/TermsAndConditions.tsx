@@ -1,4 +1,3 @@
-import React from "react";
 import { NavLink } from "react-router-dom";
 
 function TermsAndConditions() {
@@ -123,7 +122,7 @@ function TermsAndConditions() {
             >
               Privacy Policy
             </NavLink>
-            to learn more about how we handle your personal information.
+            &nbsp;to learn more about how we handle your personal information.
           </p>
         </section>
 

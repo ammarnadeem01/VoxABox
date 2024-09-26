@@ -1,6 +1,20 @@
 import { create } from "zustand";
 import { devtools, persist } from "zustand/middleware";
 
+interface SocketState {
+  socketId: string;
+  setSocketId: (socketId: string) => void;
+
+  roomId: string | number;
+  setRoomId: (roomId: string | number) => void;
+
+  privateMessages: { [key: string]: any[] };
+  setPrivateMessages: (roomId: string, message: any) => void;
+
+  groupMessages: { [key: string]: any[] };
+  setGroupMessages: (roomId: string, message: any) => void;
+}
+
 // Define the state for private chat
 interface PrivateChatState {
   selectedFriendId: string | null;
@@ -44,10 +58,35 @@ interface AuthState {
 const useAppStore = (
   set: (
     fn: (
-      state: AuthState & PrivateChatState & GroupChatState
-    ) => Partial<AuthState & PrivateChatState & GroupChatState>
+      state: AuthState & PrivateChatState & GroupChatState & SocketState
+    ) => Partial<AuthState & PrivateChatState & GroupChatState & SocketState>
   ) => void
-): AuthState & PrivateChatState & GroupChatState => ({
+): AuthState & PrivateChatState & GroupChatState & SocketState => ({
+  // Socket
+  socketId: "",
+  roomId: "",
+  privateMessages: {},
+  groupMessages: {},
+
+  setSocketId: (socketId: string) => set(() => ({ socketId })),
+
+  setRoomId: (roomId: string | number) => set(() => ({ roomId })),
+
+  setPrivateMessages: (roomId: string, message: any) =>
+    set((state) => ({
+      privateMessages: {
+        ...state.privateMessages,
+        [roomId]: [...(state.privateMessages[roomId] || []), message],
+      },
+    })),
+  setGroupMessages: (roomId: string, message: any) =>
+    set((state) => ({
+      privateMessages: {
+        ...state.groupMessages,
+        [roomId]: [...(state.groupMessages[roomId] || []), message],
+      },
+    })),
+
   // Private Chat slice
   onlineStatus: "online",
   friends: [],

@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import User from "../../../assets/manprvtcaht.png";
-import type { Group, GroupProps } from "../../../Types";
+import type { Group as G, GroupProps } from "../../../Types";
 
 const Group: React.FC<GroupProps> = ({ data, onClick }) => {
-  const [group, setGroup] = useState<Group>();
+  const [group, setGroup] = useState<G>();
 
   useEffect(() => {
     setGroup(data);

@@ -6,18 +6,29 @@ import PrivateMessage from "./PrivateMessage";
 import api from "../../../axiosConfig";
 import useStore from "../../../store";
 import { PrivateChatContentProps } from "../../../Types";
-
+import io from "socket.io-client";
+const socket = io("http://localhost:3000");
+interface MessageType {
+  fromUserId: string | null;
+  toUserId: string | undefined;
+  content: string;
+}
 const PrivateChatContent: React.FC<PrivateChatContentProps> = ({
   InfoOn,
   toggleInfo,
   data,
   contact,
 }) => {
-  const { userId } = useStore();
+  const { userId, roomId, socketId } = useStore();
   const [messages, setMessages] = useState<any[]>();
-  const [message, setMessage] = useState<string | undefined>();
+  // const [message, setMessage] = useState<string>("");
   const [friendName, setFriendName] = useState<string>("");
   const [friendId, setFriendId] = useState<string>();
+  const [messageData, setMessageData] = useState<MessageType>({
+    fromUserId: userId,
+    toUserId: friendId,
+    content: "",
+  });
   const [friendShipStatus, setFriendShipStatus] = useState<
     "Blocked" | "Pending" | "Accepted"
   >("Blocked");
@@ -34,9 +45,11 @@ const PrivateChatContent: React.FC<PrivateChatContentProps> = ({
   }
   useEffect(() => {
     friendShipStatusCheck();
-  });
+  }, []);
   const messageText = (event: any) => {
-    setMessage(event?.target?.value);
+    const { name, value } = event.target;
+    console.log(name, value);
+    setMessageData({ ...messageData, [name]: value });
   };
   useEffect(() => {
     console.log("data in pcc", data, contact);
@@ -79,6 +92,32 @@ const PrivateChatContent: React.FC<PrivateChatContentProps> = ({
         console.log("res", dataa);
       });
   };
+  // sendMessage
+  async function sendMessage(roomId: string | number) {
+    setMessageData({
+      fromUserId: userId,
+      toUserId: friendId,
+      content: "",
+    });
+    console.log(1);
+    try {
+      // Send message data to your server via Axios
+      const response = await api.post("/api/v1/privatechat", messageData);
+      const createdMessage = response.data.data.privateMessaage;
+      console.log("response", response, createdMessage);
+
+      // Once the message is created, emit it to the room via Socket.IO
+      socket.emit("createMessage", {
+        roomId,
+        message: createdMessage,
+      });
+      window.location.reload();
+      console.log("socket id ", socketId);
+    } catch (error) {
+      console.error("Error creating private message:", error);
+    }
+  }
+
   return (
     <div
       className={`${
@@ -137,14 +176,14 @@ const PrivateChatContent: React.FC<PrivateChatContentProps> = ({
             type="text"
             className="flex-grow border-none outline-none text-white bg-[#101717] py-2 pl-2"
             placeholder="Type Something..."
-            name="message"
-            value={message}
+            name="content"
+            value={messageData.content}
           />
           <div
             className="p-2 flex-shrink-0 cursor-pointer"
-            // onClick={() => {
-            //   () => sendMessage();
-            // }}
+            onClick={() => {
+              sendMessage(roomId);
+            }}
           >
             <SendIcon />
           </div>

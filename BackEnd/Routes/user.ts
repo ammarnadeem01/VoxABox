@@ -1,15 +1,14 @@
 import { Router } from "express";
 import {
   checkStatus,
-  createUser,
   deleteAccount,
-  getUserById,
   getUserByName,
   getUsers,
   setStatus,
   updateAccount,
   updatePassword,
 } from "../Controllers/user";
+import { createUser, getUserById, verifyToken } from "../Controllers/auth";
 
 const router = Router();
 import { upload } from "../Middlewares/multer.middleware";

@@ -10,12 +10,12 @@ import { uploadToCloudinary } from "../Middlewares/multer.middleware";
 // make group
 export const createGroup = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
-    console.log("+++++++++++++++++++++++++++++++++++++++++++++");
-    console.log("+++++++++++++++++++++++++++++++++++++++++++++");
+    // console.log("+++++++++++++++++++++++++++++++++++++++++++++");
+    // console.log("+++++++++++++++++++++++++++++++++++++++++++++");
     const { name, description, adminId } = req.body;
-    console.log(req.body);
-    console.log("+++++++++++++++++++++++++++++++++++++++++++++");
-    console.log("+++++++++++++++++++++++++++++++++++++++++++++");
+    // console.log(req.body);
+    // console.log("+++++++++++++++++++++++++++++++++++++++++++++");
+    // console.log("+++++++++++++++++++++++++++++++++++++++++++++");
     if (!name || !description || !adminId) {
       return next(
         new CustomError("Required Fields:name,description,admin", 400)
@@ -33,7 +33,7 @@ export const createGroup = asyncHandler(
     let avatarUrl;
     try {
       const result: any = await uploadToCloudinary(req?.file.buffer);
-      console.log("result", result);
+      // console.log("result", result);
       avatarUrl = result.secure_url;
     } catch (error) {
       return next(new CustomError("Failed to upload to Cloudinary", 500));
@@ -100,7 +100,7 @@ export const deleteGroup = asyncHandler(
     }
     // delete the group
     const deletedGroup = await group.destroy();
-    console.log("deleteGroup", deleteGroup);
+    // console.log("deleteGroup", deleteGroup);
     res.status(200).json({
       status: "Success",
       data: {

@@ -10,13 +10,16 @@ import AddGroupMembers from "./AddGroupMembers";
 import useStore from "../../../store";
 import { useNavigate } from "react-router-dom";
 import type { ChatListProps } from "../../../Types";
-
+import io from "socket.io-client";
+const socket = io("http://localhost:3000");
 const ChatList: React.FC<ChatListProps> = ({
   data,
   onContactClick,
   onGroupClick,
   selectedOption,
 }) => {
+  const { logout } = useStore();
+
   const [friends, setFriends] = useState<any>([]);
   const [search, setSearch] = useState<string>("");
   const [groups, setGroups] = useState<any>([]);
@@ -28,11 +31,10 @@ const ChatList: React.FC<ChatListProps> = ({
     setMenuOption(option);
   };
 
-  const { logout } = useStore();
   const nav = useNavigate();
   useEffect(() => {
     setOption(selectedOption);
-  }, [selectedOption, data]);
+  }, [selectedOption, data, menuOption, option]);
 
   useEffect(() => {
     if (option === "Blocked") {
@@ -47,6 +49,7 @@ const ChatList: React.FC<ChatListProps> = ({
     } else if (option === "All") {
       setFriends(data.allFriends);
       setGroups(data.allGroups);
+      console.log("data.allgroups", data.allGroups);
     }
   }, [data, option, menuOption]);
   function addFriend() {
@@ -112,7 +115,9 @@ const ChatList: React.FC<ChatListProps> = ({
                   <Contact
                     key={friend.fromUserId}
                     data={friendObj}
-                    onClick={() => onContactClick(friendObj)}
+                    onClick={() => {
+                      onContactClick(friendObj), socket.emit("joinRoom");
+                    }}
                   />
                 </>
               );
@@ -132,6 +137,7 @@ const ChatList: React.FC<ChatListProps> = ({
                   groupObj = group.group;
                   break;
               }
+              console.log("Selected grp obj,", groupObj);
               return (
                 <Group
                   key={group}

@@ -26,7 +26,7 @@ const allMessages = async (
   if (!mutualFriends) {
     return next(new CustomError("UserId and FriendId are not friends", 400));
   }
-  console.log();
+  // console.log();
 
   const initialdate = mutualFriends.clearedAt || mutualFriends.createdAt;
 
@@ -70,71 +70,138 @@ const allMessages = async (
 
   return AllMessages;
 };
+//  // send message
+// export const createPrivateMessage = asyncHandler(
+//   async (req: Request, res: Response, next: NextFunction) => {
+//     // 1. get data
+//     const { fromUserId, toUserId, content, seenStatus } = req.body;
+//     // console.log("==========");
+//     // console.log("==========");
+//     // console.log("==========");
+//     // console.log(req.body);
+//     // 2. check if required data is present
+//     if (!fromUserId || !toUserId || !content) {
+//       return next(
+//         new CustomError("Requried Fields: FromUserId, ToUserId, Content", 400)
+//       );
+//     }
+//     // 3. if from and to are valid  & if friend is not blocked
+
+//     const friendOne = await Friend.findOne({
+//       where: {
+//         userId: fromUserId,
+//         friendId: toUserId,
+//         status: { [Op.ne]: "Blocked" },
+//       },
+//     });
+
+//     const friendTwo = await Friend.findOne({
+//       where: {
+//         userId: toUserId,
+//         friendId: fromUserId,
+//         status: { [Op.ne]: "Blocked" },
+//       },
+//     });
+
+//     if (!friendOne || !friendTwo) {
+//       return next(
+//         new CustomError("Either contact is blocked or not friends.", 404)
+//       );
+//     }
+
+//     // 5. createMessage
+//     const privateMessaage = await PrivateChat.create({
+//       fromUserId,
+//       toUserId,
+//       content,
+//       seenStatus,
+//     });
+
+//     // create message status for both users
+//     const messageStatus1 = await PrivateMessageStatus.create({
+//       userId: toUserId,
+//       messageId: privateMessaage.id,
+//       isDeleted: false,
+//     });
+//     const messageStatus2 = await PrivateMessageStatus.create({
+//       userId: fromUserId,
+//       messageId: privateMessaage.id,
+//       isDeleted: false,
+//     });
+
+//     //6. send response
+//     res.status(200).json({
+//       status: "Success",
+//       data: {
+//         privateMessaage,
+//       },
+//     });
+//   }
+// );
+
+// ===============================================================================
+// ===============================================================================
+// ===============================================================================
+// ===============================================================================
 // send message
-export const createPrivateMessage = asyncHandler(
-  async (req: Request, res: Response, next: NextFunction) => {
-    // 1. get data
-    const { fromUserId, toUserId, content, seenStatus } = req.body;
-    // 2. check if required data is present
-    if (!fromUserId || !toUserId || !content) {
-      return next(
-        new CustomError("Requried Fields: FromUserId, ToUserId, Content", 400)
-      );
-    }
-    // 3. if from and to are valid  & if friend is not blocked
+export const createPrivateMessage = async (data: any, next: NextFunction) => {
+  // 1. get data
+  const { fromUserId, toUserId, content, seenStatus } = data;
 
-    const friendOne = await Friend.findOne({
-      where: {
-        userId: fromUserId,
-        friendId: toUserId,
-        status: { [Op.ne]: "Blocked" },
-      },
-    });
-
-    const friendTwo = await Friend.findOne({
-      where: {
-        userId: toUserId,
-        friendId: fromUserId,
-        status: { [Op.ne]: "Blocked" },
-      },
-    });
-
-    if (!friendOne || !friendTwo) {
-      return next(
-        new CustomError("Either contact is blocked or not friends.", 404)
-      );
-    }
-
-    // 5. createMessage
-    const privateMessaage = await PrivateChat.create({
-      fromUserId,
-      toUserId,
-      content,
-      seenStatus,
-    });
-
-    // create message status for both users
-    const messageStatus1 = await PrivateMessageStatus.create({
-      userId: toUserId,
-      messageId: privateMessaage.id,
-      isDeleted: false,
-    });
-    const messageStatus2 = await PrivateMessageStatus.create({
-      userId: fromUserId,
-      messageId: privateMessaage.id,
-      isDeleted: false,
-    });
-
-    //6. send response
-    res.status(200).json({
-      status: "Success",
-      data: {
-        privateMessaage,
-      },
-    });
+  if (!fromUserId || !toUserId || !content) {
+    return next(
+      new CustomError("Requried Fields: FromUserId, ToUserId, Content", 400)
+    );
   }
-);
+  // 3. if from and to are valid  & if friend is not blocked
 
+  const friendOne = await Friend.findOne({
+    where: {
+      userId: fromUserId,
+      friendId: toUserId,
+      status: { [Op.ne]: "Blocked" },
+    },
+  });
+
+  const friendTwo = await Friend.findOne({
+    where: {
+      userId: toUserId,
+      friendId: fromUserId,
+      status: { [Op.ne]: "Blocked" },
+    },
+  });
+
+  if (!friendOne || !friendTwo) {
+    return next(
+      new CustomError("Either contact is blocked or not friends.", 404)
+    );
+  }
+
+  // 5. createMessage
+  const privateMessaage = await PrivateChat.create({
+    fromUserId,
+    toUserId,
+    content,
+    seenStatus,
+  });
+
+  // create message status for both users
+  await PrivateMessageStatus.create({
+    userId: toUserId,
+    messageId: privateMessaage.id,
+    isDeleted: false,
+  });
+  await PrivateMessageStatus.create({
+    userId: fromUserId,
+    messageId: privateMessaage.id,
+    isDeleted: false,
+  });
+};
+
+// ===============================================================================
+// ===============================================================================
+// ===============================================================================
+// ===============================================================================
 // delete message
 export const deletePrivateMessage = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -198,12 +265,12 @@ export const clearPrivateChat = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     // get data from query
     const { userId, friendId } = req.body;
-    console.log(
-      "=================================================================================================userid",
-      userId,
-      "friendId",
-      friendId
-    );
+    // console.log(
+    //   "=================================================================================================userid",
+    //   userId,
+    //   "friendId",
+    //   friendId
+    // );
     // if data is present
     if (!userId || !friendId) {
       return next(new CustomError("UserId and FriendId are absent", 400));

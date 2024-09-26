@@ -1,5 +1,3 @@
-import React from "react";
-
 function PrivacyPolicy() {
   return (
     <div className="min-h-screen bg-gray-900 text-gray-300 font-sans">
@@ -202,10 +200,16 @@ function PrivacyPolicy() {
           <p className="text-sm">
             Please review our{" "}
             <a
-              href="/terms-and-conditions"
+              href="/termsnconditions"
               className="text-blue-500 hover:underline"
             >
               Terms and Conditions
+            </a>
+            .
+          </p>
+          <p className="text-sm">
+            <a href="/" className="text-blue-500 hover:underline">
+              Back Home
             </a>
             .
           </p>

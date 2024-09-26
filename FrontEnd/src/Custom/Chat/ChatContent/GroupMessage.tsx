@@ -45,21 +45,14 @@ const GroupMessage: React.FC<GroupMessageInterface> = ({ data }) => {
           ""
         ) : (
           <div
-            className={`max-w-full flex gap-2 text-xs justify-between items-center ${
-              userId != sender ? "border-b-2  border-gray-900" : ""
-            }`}
+            className={`max-w-full flex gap-2 text-xs justify-between items-center `}
           >
             <p className="text-gray-200">~ {senderName}</p>
             <p className="text-gray-500">{sender}</p>
           </div>
         )}
-        <p
-          className={`max-w-full text-white py-1  ${
-            userId != sender ? "border-t-2  border-gray-900" : ""
-          }`}
-        >
-          {content}
-        </p>
+        {userId != sender && <hr className="w-full bg-gray-950" />}
+        <p className={`max-w-full text-white py-1`}>{content}</p>
         <p className="text-[10px] text-right w-full text-gray-700">
           {new Date(time).toLocaleTimeString()},&nbsp;&nbsp;
           {new Date(time).toLocaleDateString()}
