@@ -200,67 +200,61 @@ const findAllUnreadMessages = async (
   return UnreadMessages;
 };
 
-export const createGroupMessage = asyncHandler(
-  async (req: Request, res: Response, next: NextFunction) => {
-    // 1. get data
-    const { fromUserId, toGroupId, content } = req.body;
-    // 2. check if required data is present
-    if (!fromUserId || !toGroupId || !content) {
-      return next(
-        new CustomError("Requried Fields: FromUserId, ToGroupId, Content", 400)
-      );
-    }
-    // 3. if from and to are valid  & if user not left the group
-    const isMember = await GroupMember.findOne({
-      where: {
-        memberId: fromUserId,
-        groupId: toGroupId,
-        membershipStatus: {
-          [Op.ne]: "Left",
-        },
-      },
-    });
-
-    if (!isMember) {
-      return next(
-        new CustomError(
-          "Either user has left the group OR group doesn't exist.",
-          404
-        )
-      );
-    }
-    // 5. createMessage
-    const groupMessage = await GroupChat.create({
-      fromUserId,
-      toGroupId,
-      content,
-    });
-
-    const groupMembers = await GroupMember.findAll({
-      where: { groupId: toGroupId },
-    });
-
-    for (const member of groupMembers) {
-      const ans = await MessageStatus.create({
-        userId: member.dataValues.memberId,
-        messageId: groupMessage.id,
-        isDeleted: false,
-        seenStatus: "Not Seen",
-      });
-      if (member.dataValues.memberId == fromUserId) {
-        await ans.update({ seenStatus: "Seen" });
-      }
-    }
-
-    //6. send response
-    res.status(200).json({
-      status: "Success",
-      data: {
-        groupMessage,
-      },
-    });
+export const createGroupMessage = async (data: any, next: NextFunction) => {
+  // 1. get data
+  const { fromUserId, toGroupId, content } = data;
+  // 2. check if required data is present
+  if (!fromUserId || !toGroupId || !content) {
+    return next(
+      new CustomError("Requried Fields: FromUserId, ToGroupId, Content", 400)
+    );
   }
-);
+  // 3. if from and to are valid  & if user not left the group
+  const isMember = await GroupMember.findOne({
+    where: {
+      memberId: fromUserId,
+      groupId: toGroupId,
+      membershipStatus: {
+        [Op.ne]: "Left",
+      },
+    },
+  });
+
+  if (!isMember) {
+    return next(
+      new CustomError(
+        "Either user has left the group OR group doesn't exist.",
+        404
+      )
+    );
+  }
+  // 5. createMessage
+  const groupMessage = await GroupChat.create({
+    fromUserId,
+    toGroupId,
+    content,
+  });
+
+  const groupMembers = await GroupMember.findAll({
+    where: { groupId: toGroupId },
+  });
+
+  for (const member of groupMembers) {
+    const ans = await MessageStatus.create({
+      userId: member.dataValues.memberId,
+      messageId: groupMessage.id,
+      isDeleted: false,
+      seenStatus: "Not Seen",
+    });
+    if (member.dataValues.memberId == fromUserId) {
+      await ans.update({ seenStatus: "Seen" });
+    }
+  }
+
+  //6. send response
+
+  return groupMessage;
+};
 
 export const fetchAllGroupMessages = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {

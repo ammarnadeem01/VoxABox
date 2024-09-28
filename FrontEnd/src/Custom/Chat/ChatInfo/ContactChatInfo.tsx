@@ -10,6 +10,7 @@ const ContactChatInfo: React.FC<ContactChatInfoProps> = ({ data }) => {
   const { userId, selectedPrivateChatId } = useStore();
   const [contact, setContact] = useState<U | null>();
   const [commonGroup, setCommonGroup] = useState<Group[]>();
+  const [forRendering, setForRendering] = useState();
   function fetchCommonGroups(): void {
     api
       .get(`api/v1/groupmember/commonGroups`, {
@@ -32,14 +33,14 @@ const ContactChatInfo: React.FC<ContactChatInfoProps> = ({ data }) => {
     if (userId && selectedPrivateChatId) {
       fetchCommonGroups();
     }
-  }, [data, contact]);
+  }, [data, contact, forRendering]);
   const unFriend = (): void => {
     api
       .delete(`api/v1/friend/unfriend`, {
         data: { userId, friendId: contact?.email },
       })
       .then((res) => {
-        console.log(res);
+        setForRendering(forRendering);
       })
       .catch((err) => {
         console.log(err);

@@ -5,7 +5,7 @@ import type { Member as Mem, MemberProps, User } from "../../../Types";
 import api from "../../../axiosConfig";
 import useStore from "../../../store";
 
-const Member: React.FC<MemberProps> = ({ data, group }) => {
+const Member: React.FC<MemberProps> = ({ data, group, setForRendering }) => {
   const [ErrorMessage, setErrorMessage] = useState("");
   const { userId } = useStore();
   function removeMember(email: string) {
@@ -18,6 +18,7 @@ const Member: React.FC<MemberProps> = ({ data, group }) => {
       })
       .then((res) => {
         console.log(res);
+        setForRendering((pre: any) => pre + 1);
       })
       .catch((err) => {
         console.log(err);
@@ -26,7 +27,7 @@ const Member: React.FC<MemberProps> = ({ data, group }) => {
   }
   useEffect(() => {
     console.log("first,", data);
-  });
+  }, []);
 
   return (
     <div className="flex w-full justify-start flex-wrap items-center">

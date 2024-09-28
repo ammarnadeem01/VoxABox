@@ -6,29 +6,74 @@ import PrivateMessage from "./PrivateMessage";
 import api from "../../../axiosConfig";
 import useStore from "../../../store";
 import { PrivateChatContentProps } from "../../../Types";
-import io from "socket.io-client";
-const socket = io("http://localhost:3000");
+
 interface MessageType {
-  fromUserId: string | null;
-  toUserId: string | undefined;
+  fromUserId: string;
+  toUserId: string;
   content: string;
 }
 const PrivateChatContent: React.FC<PrivateChatContentProps> = ({
   InfoOn,
   toggleInfo,
-  data,
+  // data,      console.log("===============")
+
+  socket,
   contact,
 }) => {
+  // const { selectedFriendId } = useStore();
+  const getAllPrivateMessages = (): void => {
+    console.log("sss", userId, contact);
+    api
+      .get(`api/v1/privateChat`, {
+        params: {
+          fromUserId: contact?.email,
+          toUserId: userId,
+        },
+      })
+      .then((res) => {
+        const data = res.data.data.AllMessages;
+        setMessages(data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+  useEffect(() => {
+    getAllPrivateMessages();
+  }, [contact]);
+  useEffect(() => {
+    if (!socket) {
+      console.log("no scoket ");
+      return;
+    }
+    console.log("socket is not null");
+    try {
+      socket.on("privateMessage", (newMessage: any) => {
+        console.log("===============");
+        console.log(newMessage);
+        console.log("===============");
+
+        setMessages((prevMessages: any) => [...prevMessages, newMessage]); // Add new message to state
+      });
+    } catch (error) {
+      console.log(error);
+    }
+
+    return () => {
+      socket.off("privateMessage"); // Clean up event listener on u                                         nmount
+    };
+  });
   const { userId, roomId, socketId } = useStore();
   const [messages, setMessages] = useState<any[]>();
-  // const [message, setMessage] = useState<string>("");
+  const [message, setMessage] = useState<string>("");
   const [friendName, setFriendName] = useState<string>("");
   const [friendId, setFriendId] = useState<string>();
   const [messageData, setMessageData] = useState<MessageType>({
-    fromUserId: userId,
-    toUserId: friendId,
+    fromUserId: userId!,
+    toUserId: contact!.email,
     content: "",
   });
+  useEffect(() => {}, [messages, socket]);
   const [friendShipStatus, setFriendShipStatus] = useState<
     "Blocked" | "Pending" | "Accepted"
   >("Blocked");
@@ -43,20 +88,46 @@ const PrivateChatContent: React.FC<PrivateChatContentProps> = ({
         console.log(err);
       });
   }
+  function fetchMessages() {
+    api
+      .get(`api/v1/privateChat`, {
+        params: {
+          fromUserId: contact?.email,
+          toUserId: userId,
+        },
+      })
+      .then((res) => {
+        const data = res.data.data.AllMessages;
+        console.log("msgs", data);
+        // setPrivateChatCount(res.data.length);
+        setMessages(data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
+
   useEffect(() => {
     friendShipStatusCheck();
   }, []);
   const messageText = (event: any) => {
     const { name, value } = event.target;
-    console.log(name, value);
+    console.log(messageData, name, value);
     setMessageData({ ...messageData, [name]: value });
   };
   useEffect(() => {
-    console.log("data in pcc", data, contact);
-    setMessages(data?.privateChat);
+    // console.log("data in pcc", data, contact);
+    // setMessages(data?.privateChat);
+    fetchMessages();
     setFriendId(contact?.email);
     setFriendName(contact?.fname + " " + contact?.lname);
-  }, [data, contact]);
+  }, [contact]);
+  // useEffect(() => {
+  //   console.log("data in pcc", data, contact);
+  //   setMessages(data?.privateChat);
+  //   setFriendId(contact?.email);
+  //   setFriendName(contact?.fname + " " + contact?.lname);
+  // }, [data, contact]);
 
   const clearChat = () => {
     api
@@ -93,29 +164,18 @@ const PrivateChatContent: React.FC<PrivateChatContentProps> = ({
       });
   };
   // sendMessage
-  async function sendMessage(roomId: string | number) {
-    setMessageData({
-      fromUserId: userId,
-      toUserId: friendId,
-      content: "",
-    });
-    console.log(1);
+  function sendMessage(roomId: string | number) {
+    console.log("msg sending");
+    console.log("", messageData);
     try {
-      // Send message data to your server via Axios
-      const response = await api.post("/api/v1/privatechat", messageData);
-      const createdMessage = response.data.data.privateMessaage;
-      console.log("response", response, createdMessage);
-
-      // Once the message is created, emit it to the room via Socket.IO
-      socket.emit("createMessage", {
+      socket.emit("privateMessage", {
         roomId,
-        message: createdMessage,
+        newMessage: messageData,
       });
-      window.location.reload();
-      console.log("socket id ", socketId);
     } catch (error) {
-      console.error("Error creating private message:", error);
+      console.log("eror co", error);
     }
+    messageData.content = "";
   }
 
   return (
@@ -158,7 +218,11 @@ const PrivateChatContent: React.FC<PrivateChatContentProps> = ({
             messages?.map((msg: any) => {
               return (
                 <>
-                  <PrivateMessage data={msg} />
+                  <PrivateMessage
+                    data={msg}
+                    socket={socket}
+                    setMessages={setMessages}
+                  />
                 </>
               );
             })

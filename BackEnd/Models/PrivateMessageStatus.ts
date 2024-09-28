@@ -38,6 +38,9 @@ export class PrivateMessageStatus extends Model {
   @BelongsTo(() => User, { foreignKey: "userId" })
   user!: User;
 
-  @BelongsTo(() => PrivateChat, { foreignKey: "messageId" })
+  @BelongsTo(() => PrivateChat, {
+    foreignKey: "messageId",
+    onDelete: "CASCADE",
+  })
   message!: PrivateChat;
 }

@@ -11,6 +11,9 @@ const router = Router();
 router.route("/fetchUnreadMessages").get(fetchUnreadMessages);
 router.route("/fetchAllGroupMessages").get(fetchAllGroupMessages);
 router.route("/unreadMessageToSeen").patch(setUnreadMessageToSeen);
-router.route("/").post(createGroupMessage).patch(deleteGroupMessage);
+router
+  .route("/")
+  // .post(createGroupMessage)
+  .patch(deleteGroupMessage);
 router.route("/clearGroupChat").patch(clearGroupChat);
 export default router;

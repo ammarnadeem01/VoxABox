@@ -48,6 +48,7 @@ const allMessages = async (
         { createdAt: { [Op.gt]: initialdate } },
       ],
     },
+    order: ["createdAt"],
   });
   let AllMessages = [];
   for (const message of UnfilteredMessages) {
@@ -196,45 +197,63 @@ export const createPrivateMessage = async (data: any, next: NextFunction) => {
     messageId: privateMessaage.id,
     isDeleted: false,
   });
+  return privateMessaage;
 };
 
-// ===============================================================================
+// ============== =================================================================
 // ===============================================================================
 // ===============================================================================
 // ===============================================================================
 // delete message
-export const deletePrivateMessage = asyncHandler(
-  async (req: Request, res: Response, next: NextFunction) => {
-    const { messageId, sender, userId } = req.body;
+export const deletePrivateMessage = async (data: any, next: NextFunction) => {
+  let { messageId, sender, userId } = data;
+  // [userId, sender] = [sender, userId];
 
-    // if msg with given id preseent and whoo is sender of message
-    const privateMessaage = await PrivateChat.findByPk(messageId, {
-      attributes: ["fromUserId", "content", "id"],
-    });
-    if (!privateMessaage) {
-      return next(new CustomError("No message with given ID found", 404));
-    }
+  // if msg with given id preseent and whoo is sender of message
+  const privateMessage = await PrivateChat.findByPk(messageId, {
+    attributes: ["fromUserId", "content", "id"],
+  });
+  if (!privateMessage) {
+    return next(new CustomError("No message with given ID found", 404));
+  }
 
-    if (userId === sender) {
-      //if own msg, detroy msg
-      await privateMessaage.destroy();
-    } else {
-      // delete for friend only
-      let ans;
-      ans = await PrivateMessageStatus.update(
-        { isDeleted: true },
-        { where: { userId, messageId } }
-      );
-    }
+  // Check if the current user is the sender of the message
+  console.log("===================================");
+  console.log("===================================");
 
-    res.status(200).json({
-      status: "Success",
-      data: {
-        deletedMessage: privateMessaage,
+  console.log("===================================");
+
+  console.log("===================================");
+
+  console.log("===================================");
+
+  console.log("===================================");
+
+  console.log(sender, userId);
+  const isSender = userId === sender;
+  console.log(isSender);
+  if (isSender) {
+    //if own msg, detroy msg
+
+    const msg = await PrivateMessageStatus.findOne({
+      where: {
+        userId: sender,
+        messageId,
       },
     });
+    if (msg) {
+      await msg.destroy();
+    }
+    await privateMessage.destroy();
+  } else {
+    // delete for friend onlyx
+    let ans;
+    ans = await PrivateMessageStatus.update(
+      { isDeleted: true },
+      { where: { userId, messageId } }
+    );
   }
-);
+};
 
 //get all messages
 export const loadFriendMessages = asyncHandler(

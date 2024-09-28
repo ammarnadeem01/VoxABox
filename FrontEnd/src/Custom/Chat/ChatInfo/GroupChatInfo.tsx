@@ -14,6 +14,7 @@ const GroupChatInfo: React.FC<GroupChatInfoProps> = ({ data }) => {
   const [mem, setMem] = useState<Mem[]>();
   const [ErrorMessage, setErrorMessage] = useState<string>("");
   const [option, setOption] = useState<string | null>();
+  const [forRendering, setForRendering] = useState(0);
   function members(): void {
     api
       .get(`api/v1/groupmember/allMembers/${data.id}`)
@@ -35,8 +36,9 @@ const GroupChatInfo: React.FC<GroupChatInfoProps> = ({ data }) => {
   //   members();
   // }, [data]);
   useEffect(() => {
+    console.log("rendering");
     members();
-  }, []);
+  }, [forRendering]);
   function deleteGroup(): void {
     api
       .delete(`api/v1/group`, {
@@ -67,7 +69,11 @@ const GroupChatInfo: React.FC<GroupChatInfoProps> = ({ data }) => {
             </p>
             <div className="bg-[#404040] w-full h-full flex flex-col justify-start items-start pl-4 gap-1 py-10 overflow-hidden overflow-y-auto scrollbar-thin scrollbar-thumb-gray-900 scrollbar-track-[#363638]">
               {mem?.map((mem) => (
-                <Member data={mem} group={data} />
+                <Member
+                  data={mem}
+                  group={data}
+                  setForRendering={setForRendering}
+                />
               ))}
             </div>
           </div>

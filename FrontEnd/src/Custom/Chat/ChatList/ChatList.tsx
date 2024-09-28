@@ -2,28 +2,50 @@ import SearchIcon from "@mui/icons-material/Search";
 import { useEffect, useState } from "react";
 
 import Contact from "../ChatContent/Contact";
-import Group from "./Group";
+import Grp from "./Group";
 import CustomDropdown from "../DropDown";
 import AddFriend from "./AddFriend";
 import AddGroup from "./AddGroup";
 import AddGroupMembers from "./AddGroupMembers";
 import useStore from "../../../store";
 import { useNavigate } from "react-router-dom";
-import type { ChatListProps } from "../../../Types";
-import io from "socket.io-client";
-const socket = io("http://localhost:3000");
+// import type { ChatListProps } from "../../../Types";
+import {
+  BlockedFriends,
+  Group,
+  UnreadGroupMessage,
+  UnreadPrivateMessage,
+  User,
+} from "../../../Types";
+export interface ChatListProps {
+  data: {
+    allFriends: User[] | undefined;
+    allGroups: Group[] | undefined;
+    blockedFriends: BlockedFriends[] | undefined;
+    unreadGroupMessages: UnreadGroupMessage[] | undefined;
+    unreadPrivateMessages: UnreadPrivateMessage[] | undefined;
+    friendsCount: number;
+    groupsCount: number;
+  };
+  // socket: any;
+  onContactClick: (contact: User) => void;
+  onGroupClick: (group: Group) => void;
+  selectedOption: string | undefined;
+}
+// const socket = io("http://localhost:3000");
 const ChatList: React.FC<ChatListProps> = ({
   data,
   onContactClick,
   onGroupClick,
   selectedOption,
+  // socket,
 }) => {
   const { logout } = useStore();
 
   const [friends, setFriends] = useState<any>([]);
   const [search, setSearch] = useState<string>("");
   const [groups, setGroups] = useState<any>([]);
-  const [option, setOption] = useState<string | undefined>("All");
+  // const [option, setOption] = useState<string | undefined>("All");
   const [menuOption, setMenuOption] = useState<string | null>();
   const [groupId, setGroupId] = useState<number>();
 
@@ -32,26 +54,43 @@ const ChatList: React.FC<ChatListProps> = ({
   };
 
   const nav = useNavigate();
-  useEffect(() => {
-    setOption(selectedOption);
-  }, [selectedOption, data, menuOption, option]);
+  // useEffect(() => {
+  //   setOption(selectedOption);
+  // }, [selectedOption, data, menuOption, option]);
+
+  // useEffect(() => {
+  //   if (selectedOption === "Blocked") {
+  //     setFriends(data?.blockedFriends);
+  //     setGroups(null);
+  //   } else if (selectedOption === "Groups") {
+  //     setFriends(null);
+  //     setGroups(data?.unreadGroupMessages);
+  //   } else if (selectedOption === "Direct Messages") {
+  //     setFriends(data?.unreadPrivateMessages);
+  //     setGroups(null);
+  //   } else if (selectedOption === "All") {
+  //     setFriends(data.allFriends);
+  //     setGroups(data.allGroups);
+  //     console.log("data.allgroups", data.allGroups);
+  //   }
+  // }, [data, selectedOption, menuOption]);
 
   useEffect(() => {
-    if (option === "Blocked") {
+    if (selectedOption === "Blocked") {
       setFriends(data?.blockedFriends);
       setGroups(null);
-    } else if (option === "Groups") {
+    } else if (selectedOption === "Groups") {
       setFriends(null);
       setGroups(data?.unreadGroupMessages);
-    } else if (option === "Direct Messages") {
+    } else if (selectedOption === "Direct Messages") {
       setFriends(data?.unreadPrivateMessages);
       setGroups(null);
-    } else if (option === "All") {
+    } else if (selectedOption === "All") {
       setFriends(data.allFriends);
       setGroups(data.allGroups);
       console.log("data.allgroups", data.allGroups);
     }
-  }, [data, option, menuOption]);
+  }, [selectedOption, menuOption]);
   function addFriend() {
     setMenu("addFriend");
   }
@@ -99,7 +138,7 @@ const ChatList: React.FC<ChatListProps> = ({
             friends.length > 0 &&
             friends.map((friend: any) => {
               let friendObj = null;
-              switch (option) {
+              switch (selectedOption) {
                 case "Direct Messages":
                   friendObj = friend.fromUser;
                   break;
@@ -116,7 +155,7 @@ const ChatList: React.FC<ChatListProps> = ({
                     key={friend.fromUserId}
                     data={friendObj}
                     onClick={() => {
-                      onContactClick(friendObj), socket.emit("joinRoom");
+                      onContactClick(friendObj);
                     }}
                   />
                 </>
@@ -127,9 +166,9 @@ const ChatList: React.FC<ChatListProps> = ({
             groups.length > 0 &&
             groups.map((group: any) => {
               let groupObj = null;
-              switch (option) {
+              switch (selectedOption) {
                 case "Groups":
-                  console.log(" grp in grps", group);
+                  // console.log(" grp in grps", group);
                   groupObj =
                     group && group.message ? group.message[0].group : group;
                   break;
@@ -137,12 +176,14 @@ const ChatList: React.FC<ChatListProps> = ({
                   groupObj = group.group;
                   break;
               }
-              console.log("Selected grp obj,", groupObj);
+              // console.log("Selected grp obj,", groupObj);
               return (
-                <Group
+                <Grp
                   key={group}
                   data={groupObj}
-                  onClick={() => onGroupClick(groupObj)}
+                  onClick={() => {
+                    onGroupClick(groupObj);
+                  }}
                 />
               );
             })}

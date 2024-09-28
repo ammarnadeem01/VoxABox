@@ -4,23 +4,49 @@ import useStore from "../../../store";
 import api from "../../../axiosConfig";
 interface PrivateMessageProps {
   data: any;
+  socket: any;
+  setMessages: any;
 }
-const PrivateMessage: React.FC<PrivateMessageProps> = ({ data }) => {
+const PrivateMessage: React.FC<PrivateMessageProps> = ({
+  data,
+  socket,
+  setMessages,
+}) => {
   const [content, setContent] = useState<string>("");
   const [sender, setSender] = useState<string>("");
   const { userId } = useStore();
   const [messageId, setMessageId] = useState<number>();
   const [time, setTime] = useState<string>("");
-  const deletePM = () => {
-    api
-      .patch(`api/v1/privatechat/deleteMessage`, { messageId, sender, userId })
-      .then((res) => {
-        console.log("ers", res);
-      })
-      .catch((err) => {
-        console.log(err);
+  useEffect(() => {
+    if (!socket) {
+      console.log("no scoket ");
+      return;
+    }
+    console.log("socket is not null");
+    try {
+      socket.on("deletePrivateMessage", ({ messageId }: any) => {
+        setMessages((prevMessages: any) =>
+          prevMessages.filter((msg: any) => msg.message.id !== messageId)
+        );
       });
+    } catch (error) {
+      console.log(error);
+    }
+
+    return () => {
+      socket.off("deletePrivateMes  sage");
+    };
+  });
+  const deletePM = () => {
+    socket.emit("deletePrivateMessage", { messageId, sender, userId });
   };
+  // useEffect(() => {
+  //   console.log("data in pm", data);
+  //   setContent(data?.message.content);
+  //   setSender(data?.message.fromUserId);
+  //   // setTime(data?.message.createdAt);
+  //   // setMessageId(data?.message.id);
+  // }, [data]);
   useEffect(() => {
     console.log("data in pm", data);
     setContent(data?.message.content);

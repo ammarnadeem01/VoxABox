@@ -205,3 +205,8 @@ export const checkStatus = asyncHandler(
     });
   }
 );
+
+export const findUser = async (id: string) => {
+  const user = await User.findByPk(id);
+  return user;
+};

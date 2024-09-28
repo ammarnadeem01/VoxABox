@@ -42,7 +42,7 @@ export class PrivateChat extends Model {
   })
   seenStatus!: "Seen" | "Not Seen";
 
-  @HasMany(() => PrivateMessageStatus)
+  @HasMany(() => PrivateMessageStatus, { onDelete: "CASCADE" })
   messageStatus!: PrivateMessageStatus[];
 
   @BelongsTo(() => User, { foreignKey: "fromUserId" })

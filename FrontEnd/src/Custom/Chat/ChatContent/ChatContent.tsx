@@ -1,11 +1,24 @@
+import { Group, User } from "../../../Types";
 import GroupChatContent from "./GroupChatContent";
 import PrivateChatContent from "./PrivateChatContent";
-import { ChatContentProps } from "../../../Types";
+// import { ChatContentProps } from "../../../Types";
 
+export interface ChatContentProps {
+  InfoOn: boolean;
+  toggleInfo: () => void;
+  // data: {
+  //   privateChat: AllPrivateMessages[] | undefined;
+  //   groupChat: AllGroupMessages[] | undefined;
+  // };
+  contact: User | null;
+  socket: any;
+  group: Group | null;
+}
 const ChatContent: React.FC<ChatContentProps> = ({
   InfoOn,
   toggleInfo,
-  data,
+  // data,
+  socket,
   contact,
   group,
 }) => {
@@ -15,7 +28,8 @@ const ChatContent: React.FC<ChatContentProps> = ({
         <PrivateChatContent
           InfoOn={InfoOn}
           toggleInfo={toggleInfo}
-          data={data}
+          // data={data}
+          socket={socket}
           contact={contact}
         />
       )}
@@ -23,7 +37,8 @@ const ChatContent: React.FC<ChatContentProps> = ({
         <GroupChatContent
           InfoOn={InfoOn}
           toggleInfo={toggleInfo}
-          data={data}
+          socket={socket}
+          // data={data}
           group={group}
         />
       )}

@@ -13,8 +13,13 @@ import { PrivateMessageStatus } from "./Models/PrivateMessageStatus";
 import { createServer } from "http";
 import { Server } from "socket.io";
 import { NextFunction } from "express";
-// import contrlllers for private chat and group chat
-import { createPrivateMessage } from "./Controllers/private_chat";
+// import controllers for private chat and group chat
+import {
+  createPrivateMessage,
+  deletePrivateMessage,
+} from "./Controllers/private_chat";
+import { createGroupMessage } from "./Controllers/group_chat";
+import { findUser } from "./Controllers/user";
 
 const port = process.env.PORT || 3000;
 
@@ -63,7 +68,8 @@ sequelize
     console.error("Unable to connect to the database:", err);
   });
 
-const users: any = {};
+const users: any = {}; // {userId:socketId,userId2:socketId2}
+const rooms: any = {}; // {roomId1:[userId1,userId2],roomId2:[userId3]}
 
 io.on("connection", (socket) => {
   console.log("A user connected: " + socket.id);
@@ -73,34 +79,123 @@ io.on("connection", (socket) => {
     users[userId] = socket.id;
   });
 
-  socket.on("joinRoom", (roomId) => {
-    console.log(`${socket.id} joining room: ${roomId}`);
-    socket.join(roomId);
-    socket.to(roomId).emit("userJoined", { userId: socket.id });
-  });
-  // chat chat event
-  socket.on("createPrivateMessage", async (data) => {
+  ///////////////////////////////
+  // Private chat event
+  ///////////////////////////////
+  socket.on("privateMessage", async (data) => {
     const next = (error: any) => {
       console.error(error.message);
-      // Emit the error back to the client if necessary
-      socket.emit("privateMessageError", { error: error.message });
+      socket.emit("privateMessageError", { error: error.newMessage });
     };
-    await createPrivateMessage(data, next);
+
     console.log(data);
-    io.to(data.roomId).emit(data.message.content);
+    console.log(users);
+    const createdMessage = await createPrivateMessage(data.newMessage, next);
+
+    const msgObj = {
+      message: {
+        id: createdMessage?.dataValues.id,
+        createdAt: new Date(),
+        fromUserId: data.newMessage.fromUserId,
+        toUserId: data.newMessage.toUserId,
+        content: data.newMessage.content,
+      },
+    };
+    if (users[data.newMessage.toUserId]) {
+      console.log("sering machine");
+      io.to(users[data.newMessage.toUserId]).emit("privateMessage", msgObj);
+    }
+    if (users[data.newMessage.fromUserId]) {
+      console.log("sering machine");
+      io.to(users[data.newMessage.fromUserId]).emit("privateMessage", msgObj);
+    }
   });
-  socket.on("createGroupMessage", (data) => {
-    console.log(data);
-    io.to(data.roomId).emit(data.message.content);
+  ///////////////////////////////
+  // Deleting a message
+  //////////////////////////////
+  socket.on("deletePrivateMessage", async (data) => {
+    const { userId, sender, messageId } = data;
+    const next = (error: any) => {
+      console.error(error.message);
+      socket.emit("privateMessageError", { error: error.newMessage });
+    };
+    await deletePrivateMessage(data, next);
+    io.to(users[sender]).emit("deletePrivateMessage", { messageId });
+    io.to(users[userId]).emit("deletePrivateMessage", { messageId });
   });
 
-  // Deleting a message
-  socket.on("deleteMessage", async ({ roomId, messageId }) => {
-    try {
-      io.to(roomId).emit("messageDeleted", { messageId });
-    } catch (error) {
-      console.error("Error deleting message:", error);
+  /////////////////////////////////
+  // Join Room
+  ////////////////////////////////
+  socket.on("joinRoom", ({ roomId, userId }) => {
+    socket.join(roomId); // Join the room
+    console.log(`${userId} joined room: ${roomId}`);
+
+    console.log(users);
+
+    // Optionally, track which users are in which room
+    if (!rooms[roomId]) {
+      rooms[roomId] = [];
     }
+    rooms[roomId].push(userId);
+    console.log(rooms);
+  });
+  ////////////////////////////
+  // Group Message
+  ////////////////////////////
+  socket.on("groupMessage", async (data) => {
+    const next = (error: any) => {
+      console.log(data);
+      console.log(users);
+      console.error(error.message);
+      socket.emit("groupMessageError", { error: error.newMessage });
+    };
+    const createdMessage = await createGroupMessage(data, next);
+    console.log(
+      "========================================================================="
+    );
+    console.log(
+      "========================================================================="
+    );
+    console.log(
+      "========================================================================="
+    );
+    console.log(data);
+    console.log(
+      "========================================================================="
+    );
+    console.log(
+      "========================================================================="
+    );
+    console.log(
+      "========================================================================="
+    );
+    console.log(
+      "========================================================================="
+    );
+    console.log(createdMessage);
+    const senderOfMessage = await findUser(data.fromUserId);
+
+    const msgObj = {
+      message: {
+        ...createdMessage?.dataValues,
+        user: senderOfMessage,
+      },
+      messageStatus: {
+        createdAt: new Date(),
+      },
+    };
+
+    io.to(data.toGroupId).emit("groupMessage", msgObj);
+  });
+
+  // Leaving a room
+  socket.on("leaveRoom", (roomId, userId) => {
+    socket.leave(roomId);
+    console.log(`${userId} left room: ${roomId}`);
+
+    // Optionally, remove user from tracking
+    rooms[roomId] = rooms[roomId].filter((id: any) => id !== userId);
   });
 
   socket.on("upgradeMessageStatusToSeen", ({ messageId, userId }) => {

@@ -6,8 +6,32 @@ import Logo from "../../../assets/logo1.png";
 import WorkspacePremiumIcon from "@mui/icons-material/WorkspacePremium";
 import GradingIcon from "@mui/icons-material/Grading";
 import { useNavigate } from "react-router-dom";
-import { SideBarProps } from "../../../Types";
-const SideBar: React.FC<SideBarProps> = ({ data, option }) => {
+import { Group, User } from "../../../Types";
+import { useEffect } from "react";
+// import { SideBarProps } from "../../../Types";
+
+export interface SideBarProps {
+  data: {
+    friendsCount: number;
+    groupsCount: number;
+    privateChatCount: number;
+    groupChatCount: number;
+    blockedFriendsCount: number;
+    unreadGroupMessagesCount: number;
+    unreadPrivateMessagesCount: number;
+  };
+  handleContactClick: (contact: User) => void;
+  handleGroupClick: (group: Group) => void;
+  option: (option: string) => void;
+}
+
+const SideBar: React.FC<SideBarProps> = ({
+  data,
+  option,
+  handleContactClick,
+  handleGroupClick,
+}) => {
+  useEffect(() => {}, [handleContactClick, handleGroupClick]);
   const nav = useNavigate();
   return (
     <div className="w-1/5 h-full bg-[#202020] text-white flex flex-wrap justify-betweeen items-center">

@@ -1,3 +1,5 @@
+import { Socket } from "socket.io-client";
+
 export interface CustomDropDownProps {
   table: {
     option: string;
@@ -150,6 +152,7 @@ export interface Member {
 export interface MemberProps {
   data: Member;
   group: Group;
+  setForRendering: any;
 }
 export interface AddGroupMembersProps {
   setMenuOption: (option: string | null) => void;
@@ -165,6 +168,7 @@ export interface ChatListProps {
     friendsCount: number;
     groupsCount: number;
   };
+  // socket: any;
   onContactClick: (contact: User) => void;
   onGroupClick: (group: Group) => void;
   selectedOption: string | undefined;
@@ -183,10 +187,10 @@ export interface GroupProps {
 export interface ChatContentProps {
   InfoOn: boolean;
   toggleInfo: () => void;
-  data: {
-    privateChat: AllPrivateMessages[] | undefined;
-    groupChat: AllGroupMessages[] | undefined;
-  };
+  // data: {
+  //   privateChat: AllPrivateMessages[] | undefined;
+  //   groupChat: AllGroupMessages[] | undefined;
+  // };
   contact: User | null;
   group: Group | null;
 }
@@ -198,20 +202,22 @@ export interface GroupMessageInterface {
 export interface GroupChatContentProps {
   InfoOn: boolean;
   toggleInfo: () => void;
-  data: {
-    privateChat: AllPrivateMessages[] | undefined;
-    groupChat: AllGroupMessages[] | undefined;
-  };
+  // data: {
+  //   privateChat: AllPrivateMessages[] | undefined;
+  //   groupChat: AllGroupMessages[] | undefined;
+  // };
   group: Group | null;
+  socket: any;
 }
 
 export interface PrivateChatContentProps {
   InfoOn: boolean;
   toggleInfo: () => void;
-  data: {
-    privateChat: AllPrivateMessages[] | undefined;
-    groupChat: AllGroupMessages[] | undefined;
-  };
+  // data: {
+  //   privateChat: AllPrivateMessages[] | undefined;
+  //   groupChat: AllGroupMessages[] | undefined;
+  // };
+  socket: any;
   contact: User | null;
 }
 

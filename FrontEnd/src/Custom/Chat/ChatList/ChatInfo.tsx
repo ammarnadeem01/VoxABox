@@ -15,13 +15,13 @@ const ChatInfo: React.FC<ChatInfoProps> = ({
   selectedCnt,
   selectedGrp,
 }) => {
-  const [contact, setContact] = useState<User | null>();
-  const [group, setGroup] = useState<Group | null>();
+  // const [contact, setContact] = useState<User | null>();
+  // const [group, setGroup] = useState<Group | null>();
 
-  useEffect(() => {
-    setContact(selectedCnt);
-    setGroup(selectedGrp);
-  }, [selectedCnt, selectedGrp]);
+  // useEffect(() => {
+  //   setContact(selectedCnt);
+  //   setGroup(selectedGrp);
+  // }, [selectedCnt, selectedGrp]);
   return (
     <div
       className={`${
@@ -38,8 +38,8 @@ const ChatInfo: React.FC<ChatInfoProps> = ({
           />
         </div>
         {/* start */}
-        {contact && <ContactChatInfo data={contact} />}
-        {group && <GroupChatInfo data={group} />}
+        {selectedCnt && <ContactChatInfo data={selectedCnt} />}
+        {selectedGrp && <GroupChatInfo data={selectedGrp} />}
         {/* end */}
       </div>
     </div>

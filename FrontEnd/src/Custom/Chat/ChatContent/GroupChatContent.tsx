@@ -10,25 +10,88 @@ import { GroupChatContentProps } from "../../../Types";
 const GroupChatContent: React.FC<GroupChatContentProps> = ({
   InfoOn,
   toggleInfo,
-  data,
+  // data,
+  socket,
   group,
 }) => {
+  useEffect(() => {
+    if (!socket) {
+      console.log("no scoket ");
+      return;
+    }
+    console.log("socket is not null");
+    try {
+      socket.on("groupMessage", (newMessage: any) => {
+        console.log("===============");
+        console.log(newMessage);
+        console.log("===============");
+
+        setMessages((prevMessages: any) => [...prevMessages, newMessage]); // Add new message to state
+      });
+    } catch (error) {
+      console.log(error);
+    }
+
+    return () => {
+      socket.off("groupMessage"); // Clean up event listener on u                                         nmount
+    };
+  });
+  const getAllGroupMessages = (): void => {
+    api
+      .get(`api/v1/groupChat/fetchAllGroupMessages`, {
+        params: {
+          memberId: userId,
+          groupId: group?.id,
+        },
+      })
+      .then((res) => {
+        const data = res.data.data.AllMessages;
+        console.log("datadatadata", data);
+        setMessages(data);
+        // console.log("allgrpmsg", data);
+      })
+      .catch((err) => {
+        console.log(err);
+        // console.log(err.response.data.message);
+      });
+  };
+  useEffect(() => {
+    getAllGroupMessages();
+  }, []);
   const { userId } = useStore();
   const [messages, setMessages] = useState<any[]>();
   const [message, setMessage] = useState<string | undefined>();
   const [groupName, setGroupName] = useState<string | null>();
   const [groupId, setGroupId] = useState<number | null>();
+  const [messageData, setMessageData] = useState({
+    fromUserId: userId!,
+    toGroupId: group?.id,
+    content: "",
+  });
 
-  // const seenIds = new Set();
   const messageText = (event: any): void => {
-    setMessage(event?.target?.value);
+    const { name, value } = event.target;
+    if (name == "content") {
+      setMessageData({ ...messageData, [name]: value });
+    }
   };
   const [errorMessage, setErrorMessage] = useState("");
+  // useEffect(() => {
+  //   setGroupName(group?.name);
+  //   setGroupId(group?.id);
+  //   setMessages(data?.groupChat);
+  // }, [data, group]);
+
+  const sendMessage = () => {
+    console.log(messageData);
+    socket.emit("groupMessage", messageData);
+  };
+
   useEffect(() => {
     setGroupName(group?.name);
     setGroupId(group?.id);
-    setMessages(data?.groupChat);
-  }, [data, group]);
+    // setMessages(data?.groupChat);
+  }, [group]);
   const clearChat = (): void => {
     api
       .patch(`api/v1/groupchat/clearGroupChat`, { memberId: userId, groupId })
@@ -110,14 +173,14 @@ const GroupChatContent: React.FC<GroupChatContentProps> = ({
             type="text"
             className="flex-grow border-none outline-none text-white bg-[#101717] py-2 pl-2"
             placeholder="Type Something..."
-            name="message"
+            name="content"
             value={message}
           />
           <div
             className="p-2 flex-shrink-0 cursor-pointer"
-            // onClick={() => {
-            //   () => sendMessage();
-            // }}
+            onClick={() => {
+              sendMessage();
+            }}
           >
             <SendIcon />
           </div>

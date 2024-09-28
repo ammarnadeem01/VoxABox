@@ -7,12 +7,12 @@ import { GroupMessageInterface } from "../../../Types";
 const GroupMessage: React.FC<GroupMessageInterface> = ({ data }) => {
   const { userId } = useStore();
   function deleteGM(): void {
-    api.patch(`api/v1/groupchat`, {
-      messageId,
-      groupId,
-      memberId: userId,
-      senderId: sender,
-    });
+    // api.patch(`api/v1/groupchat`, {
+    //   messageId,
+    //   groupId,
+    //   memberId: userId,
+    //   senderId: sender,
+    // });
   }
 
   const [content, setContent] = useState<string>("");
@@ -22,7 +22,7 @@ const GroupMessage: React.FC<GroupMessageInterface> = ({ data }) => {
   const [groupId, setGroupId] = useState<number>();
   const [time, setTime] = useState<string>("");
   useEffect(() => {
-    console.log("data", data);
+    console.log("data", data.message);
     setContent(data?.message.content);
     setSender(data.message.fromUserId);
     setSenderName(data?.message.user.fname + " " + data?.message.user.lname);
