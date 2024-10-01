@@ -184,6 +184,7 @@ export const fetchAllFriends = asyncHandler(
     const AllFriends = await Friend.findAll({
       where: {
         userId: email,
+        status: { [Op.ne]: "Blocked" },
       },
       include: [{ model: User, as: "friend" }],
     });

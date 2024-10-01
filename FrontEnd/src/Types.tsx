@@ -157,6 +157,7 @@ export interface MemberProps {
 export interface AddGroupMembersProps {
   setMenuOption: (option: string | null) => void;
   groupId: number | undefined;
+  setForRendering: any;
 }
 export interface ChatListProps {
   data: {
@@ -197,6 +198,9 @@ export interface ChatContentProps {
 
 export interface GroupMessageInterface {
   data: AllGroupMessages;
+  socket: any;
+  setMessages: any;
+  groupId: any;
 }
 
 export interface GroupChatContentProps {
@@ -208,6 +212,7 @@ export interface GroupChatContentProps {
   // };
   group: Group | null;
   socket: any;
+  setForRendering: any;
 }
 
 export interface PrivateChatContentProps {
@@ -219,6 +224,7 @@ export interface PrivateChatContentProps {
   // };
   socket: any;
   contact: User | null;
+  setStatus: any;
 }
 
 export interface CommonGroupProps {
@@ -227,4 +233,6 @@ export interface CommonGroupProps {
 
 export interface ContactChatInfoProps {
   data: User | null;
+  setForRender: any;
+  // onClick: () => void;
 }

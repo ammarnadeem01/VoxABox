@@ -7,7 +7,6 @@ import CustomDropdown from "../DropDown";
 import AddFriend from "./AddFriend";
 import AddGroup from "./AddGroup";
 import AddGroupMembers from "./AddGroupMembers";
-import useStore from "../../../store";
 import { useNavigate } from "react-router-dom";
 // import type { ChatListProps } from "../../../Types";
 import {
@@ -17,6 +16,7 @@ import {
   UnreadPrivateMessage,
   User,
 } from "../../../Types";
+import useStore from "../../../store";
 export interface ChatListProps {
   data: {
     allFriends: User[] | undefined;
@@ -31,6 +31,7 @@ export interface ChatListProps {
   onContactClick: (contact: User) => void;
   onGroupClick: (group: Group) => void;
   selectedOption: string | undefined;
+  setForRendering: any;
 }
 // const socket = io("http://localhost:3000");
 const ChatList: React.FC<ChatListProps> = ({
@@ -39,10 +40,11 @@ const ChatList: React.FC<ChatListProps> = ({
   onGroupClick,
   selectedOption,
   // socket,
+  setForRendering,
 }) => {
   const { logout } = useStore();
 
-  const [friends, setFriends] = useState<any>([]);
+  const [friends, setFriends] = useState<any>();
   const [search, setSearch] = useState<string>("");
   const [groups, setGroups] = useState<any>([]);
   // const [option, setOption] = useState<string | undefined>("All");
@@ -54,6 +56,7 @@ const ChatList: React.FC<ChatListProps> = ({
   };
 
   const nav = useNavigate();
+  const { unreadPrivateMessages } = useStore();
   // useEffect(() => {
   //   setOption(selectedOption);
   // }, [selectedOption, data, menuOption, option]);
@@ -76,6 +79,7 @@ const ChatList: React.FC<ChatListProps> = ({
   // }, [data, selectedOption, menuOption]);
 
   useEffect(() => {
+    console.log("clicked on unfriend");
     if (selectedOption === "Blocked") {
       setFriends(data?.blockedFriends);
       setGroups(null);
@@ -83,14 +87,19 @@ const ChatList: React.FC<ChatListProps> = ({
       setFriends(null);
       setGroups(data?.unreadGroupMessages);
     } else if (selectedOption === "Direct Messages") {
-      setFriends(data?.unreadPrivateMessages);
+      // setFriends(data?.unreadPrivateMessages);
+      console.log("unread 1 ", data.unreadPrivateMessages);
+      console.log("unread 2 ", unreadPrivateMessages);
+      const dat = unreadPrivateMessages.data;
+      setFriends(dat);
+      // console.log("unread", unreadPrivateMessages);
       setGroups(null);
     } else if (selectedOption === "All") {
       setFriends(data.allFriends);
       setGroups(data.allGroups);
       console.log("data.allgroups", data.allGroups);
     }
-  }, [selectedOption, menuOption]);
+  }, [selectedOption, menuOption, data]);
   function addFriend() {
     setMenu("addFriend");
   }
@@ -133,11 +142,13 @@ const ChatList: React.FC<ChatListProps> = ({
           )}
         </div>
         <div className="w-full flex flex-wrap justify-center items-center py-3 pl-2 gap-3">
+          {console.log("shit", friends)}
           {!menuOption &&
             friends &&
             friends.length > 0 &&
             friends.map((friend: any) => {
               let friendObj = null;
+              console.log(friend);
               switch (selectedOption) {
                 case "Direct Messages":
                   friendObj = friend.fromUser;
@@ -192,7 +203,11 @@ const ChatList: React.FC<ChatListProps> = ({
             <AddGroup setMenuOption={setMenu} setGroupId={setGroupId} />
           )}
           {menuOption == "addGroupMembers" && (
-            <AddGroupMembers groupId={groupId} setMenuOption={setMenu} />
+            <AddGroupMembers
+              groupId={groupId}
+              setMenuOption={setMenu}
+              setForRendering={setForRendering}
+            />
           )}
         </div>
       </div>

@@ -8,6 +8,7 @@ import GradingIcon from "@mui/icons-material/Grading";
 import { useNavigate } from "react-router-dom";
 import { Group, User } from "../../../Types";
 import { useEffect } from "react";
+import useStore from "../../../store";
 // import { SideBarProps } from "../../../Types";
 
 export interface SideBarProps {
@@ -31,7 +32,13 @@ const SideBar: React.FC<SideBarProps> = ({
   handleContactClick,
   handleGroupClick,
 }) => {
-  useEffect(() => {}, [handleContactClick, handleGroupClick]);
+  const { unreadPrivateMessages } = useStore();
+  useEffect(() => {}, [
+    handleContactClick,
+    handleGroupClick,
+    data,
+    unreadPrivateMessages,
+  ]);
   const nav = useNavigate();
   return (
     <div className="w-1/5 h-full bg-[#202020] text-white flex flex-wrap justify-betweeen items-center">
@@ -55,7 +62,7 @@ const SideBar: React.FC<SideBarProps> = ({
           </div>
           <div
             onClick={() => {
-              option("Groups");
+              // option("Groups");
             }}
             className="flex w-full gap-2 pl-10  py-3 rounded cursor-pointer active:bg-gray-300 active:text-black"
           >
@@ -63,15 +70,15 @@ const SideBar: React.FC<SideBarProps> = ({
             New Groups Messages
             <div className="w-1/6   text-black text-xs flex justify-center items-center ">
               <p className="bg-white rounded-full px-1">
-                {data.unreadGroupMessagesCount > 0
-                  ? data.unreadGroupMessagesCount
-                  : ""}
+                {/* {data.unreadGroupMessagesCount > 0
+                    ? data.unreadGroupMessagesCount
+                    : ""} */}
               </p>
             </div>
           </div>
           <div
             onClick={() => {
-              option("Direct Messages");
+              // option("Direct Messages");
             }}
             className="flex py-3 gap-2 pl-10 w-full rounded  cursor-pointer active:bg-gray-300 active:text-black"
           >
@@ -79,9 +86,9 @@ const SideBar: React.FC<SideBarProps> = ({
             New Direct Messages
             <div className="w-1/6   text-black text-xs flex justify-center items-center ">
               <p className="bg-white rounded-full px-1">
-                {data.unreadPrivateMessagesCount > 0
-                  ? data.unreadPrivateMessagesCount
-                  : ""}
+                {/* {unreadPrivateMessages.data.length > 0
+                  ? unreadPrivateMessages.data.length
+                  : ""} */}
               </p>
             </div>
           </div>

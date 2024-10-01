@@ -6,11 +6,14 @@ import useStore from "../../../store";
 import GroupInCommon from "./GroupInCommon";
 import { ContactChatInfoProps, Group, User as U } from "../../../Types";
 
-const ContactChatInfo: React.FC<ContactChatInfoProps> = ({ data }) => {
+const ContactChatInfo: React.FC<ContactChatInfoProps> = ({
+  data,
+  setForRender,
+}) => {
   const { userId, selectedPrivateChatId } = useStore();
   const [contact, setContact] = useState<U | null>();
   const [commonGroup, setCommonGroup] = useState<Group[]>();
-  const [forRendering, setForRendering] = useState();
+  const [forRendering, setForRendering] = useState(0);
   function fetchCommonGroups(): void {
     api
       .get(`api/v1/groupmember/commonGroups`, {
@@ -40,7 +43,7 @@ const ContactChatInfo: React.FC<ContactChatInfoProps> = ({ data }) => {
         data: { userId, friendId: contact?.email },
       })
       .then((res) => {
-        setForRendering(forRendering);
+        setForRender((pre: any) => pre + 1);
       })
       .catch((err) => {
         console.log(err);
@@ -49,7 +52,11 @@ const ContactChatInfo: React.FC<ContactChatInfoProps> = ({ data }) => {
   return (
     <>
       <div className="flex flex-col justify-center  items-center bg-[#404040] p-5 gap-1">
-        <img src={User} alt="" className="w-[50%] h-[50%] rounded-full" />
+        <img
+          src={contact?.avatar ? contact.avatar : User}
+          alt=""
+          className="w-[50%] h-[50%] rounded-full"
+        />
         <p className="text-[#e5e5e7]">
           {contact?.fname + " " + contact?.lname}
         </p>

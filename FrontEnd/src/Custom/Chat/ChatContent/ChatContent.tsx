@@ -1,6 +1,9 @@
+import { useEffect } from "react";
 import { Group, User } from "../../../Types";
+import DummyElement from "./DummyElement";
 import GroupChatContent from "./GroupChatContent";
 import PrivateChatContent from "./PrivateChatContent";
+import useStore from "../../../store";
 // import { ChatContentProps } from "../../../Types";
 
 export interface ChatContentProps {
@@ -13,6 +16,10 @@ export interface ChatContentProps {
   contact: User | null;
   socket: any;
   group: Group | null;
+  setStatus: any;
+  setForRendering: any;
+  setSelectedContact: any;
+  setSelectedGroup: any;
 }
 const ChatContent: React.FC<ChatContentProps> = ({
   InfoOn,
@@ -21,25 +28,34 @@ const ChatContent: React.FC<ChatContentProps> = ({
   socket,
   contact,
   group,
+  setStatus,
+  setForRendering,
+  setSelectedContact,
+  setSelectedGroup,
 }) => {
+  const { selectedFriend, selectedGrp } = useStore();
+  useEffect(() => {}, [selectedFriend]);
   return (
     <>
-      {contact && (
+      {!selectedFriend && !selectedGrp && <DummyElement />}
+      {selectedFriend && (
         <PrivateChatContent
           InfoOn={InfoOn}
           toggleInfo={toggleInfo}
           // data={data}
           socket={socket}
           contact={contact}
+          setStatus={setStatus}
         />
       )}
-      {group && (
+      {selectedGrp && (
         <GroupChatContent
           InfoOn={InfoOn}
           toggleInfo={toggleInfo}
           socket={socket}
           // data={data}
           group={group}
+          setForRendering={setForRendering}
         />
       )}
     </>

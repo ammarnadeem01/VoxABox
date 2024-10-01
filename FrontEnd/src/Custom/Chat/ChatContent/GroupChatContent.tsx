@@ -13,7 +13,9 @@ const GroupChatContent: React.FC<GroupChatContentProps> = ({
   // data,
   socket,
   group,
+  setForRendering,
 }) => {
+  const { setSelectedGrp } = useStore();
   useEffect(() => {
     if (!socket) {
       console.log("no scoket ");
@@ -33,12 +35,12 @@ const GroupChatContent: React.FC<GroupChatContentProps> = ({
     }
 
     return () => {
-      socket.off("groupMessage"); // Clean up event listener on u                                         nmount
+      socket.off("groupMessage"); // Clean up event listener on unmount
     };
   });
   const getAllGroupMessages = (): void => {
     api
-      .get(`api/v1/groupChat/fetchAllGroupMessages`, {
+      .get(`api/v1/groupchat/fetchAllGroupMessages`, {
         params: {
           memberId: userId,
           groupId: group?.id,
@@ -55,9 +57,11 @@ const GroupChatContent: React.FC<GroupChatContentProps> = ({
         // console.log(err.response.data.message);
       });
   };
-  useEffect(() => {
-    getAllGroupMessages();
-  }, []);
+  const [rendering, setRendering] = useState(0);
+  // useEffect(() => {
+  //   getAllGroupMessages();
+  //   console.log("rendering again for messages");
+  // }, [rendering]);
   const { userId } = useStore();
   const [messages, setMessages] = useState<any[]>();
   const [message, setMessage] = useState<string | undefined>();
@@ -85,21 +89,26 @@ const GroupChatContent: React.FC<GroupChatContentProps> = ({
   const sendMessage = () => {
     console.log(messageData);
     socket.emit("groupMessage", messageData);
+    messageData.content = "";
   };
 
   useEffect(() => {
     setGroupName(group?.name);
     setGroupId(group?.id);
+    getAllGroupMessages();
+    console.log("rendering again for messages");
     // setMessages(data?.groupChat);
-  }, [group]);
+  }, [group, rendering]);
   const clearChat = (): void => {
     api
       .patch(`api/v1/groupchat/clearGroupChat`, { memberId: userId, groupId })
       .then((res) => {
         console.log(res);
+        setRendering(rendering + 1);
       })
       .catch((err) => {
         console.log(err);
+        setRendering(rendering + 1);
       });
   };
   const leaveGroup = (): void => {
@@ -109,6 +118,8 @@ const GroupChatContent: React.FC<GroupChatContentProps> = ({
       })
       .then((res) => {
         console.log(res);
+        setForRendering((pre: number) => pre + 1);
+        setSelectedGrp(null);
       })
       .catch((err) => {
         setErrorMessage(err.response.data.message);
@@ -130,7 +141,11 @@ const GroupChatContent: React.FC<GroupChatContentProps> = ({
               onClick={toggleInfo}
             >
               <div>
-                <img src={User} alt="" className="w-12 h-12 rounded-full" />
+                <img
+                  src={group?.avatar || User}
+                  alt=""
+                  className="w-12 h-12 rounded-full"
+                />
               </div>
               <div className="flex flex-col gap-0.5">
                 <p className="font-semibold">{groupName}</p>
@@ -155,7 +170,12 @@ const GroupChatContent: React.FC<GroupChatContentProps> = ({
             messages?.map((msg: any) => {
               return (
                 <>
-                  <GroupMessage data={msg} />
+                  <GroupMessage
+                    groupId={groupId}
+                    data={msg}
+                    socket={socket}
+                    setMessages={setMessages}
+                  />
                 </>
               );
             })

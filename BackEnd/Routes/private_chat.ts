@@ -14,6 +14,6 @@ router
   .get(loadFriendMessages)
   .patch(clearPrivateChat);
 // router.route("/deleteMessage").patch(deletePrivateMessage);
-router.route("/:friendID").patch(setUnreadMessageToSeen);
+// router.route("/:friendID").patch(setUnreadMessageToSeen);
 router.route("/:email").get(loadUnreadPrivateMessages);
 export default router;

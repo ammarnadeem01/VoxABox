@@ -9,7 +9,7 @@ import AddGroupMembers from "../ChatList/AddGroupMembers";
 import { Group, GroupChatInfoProps, Member as Mem } from "../../../Types";
 
 const GroupChatInfo: React.FC<GroupChatInfoProps> = ({ data }) => {
-  const { userId } = useStore();
+  const { userId, setSelectedGrp } = useStore();
   // const [group, setGroup] = useState<Group>();
   const [mem, setMem] = useState<Mem[]>();
   const [ErrorMessage, setErrorMessage] = useState<string>("");
@@ -38,13 +38,14 @@ const GroupChatInfo: React.FC<GroupChatInfoProps> = ({ data }) => {
   useEffect(() => {
     console.log("rendering");
     members();
-  }, [forRendering]);
+  }, [forRendering, option]);
   function deleteGroup(): void {
     api
       .delete(`api/v1/group`, {
         data: { memberId: userId, groupId: data.id },
       })
       .then((res) => {
+        setSelectedGrp(null);
         console.log(res);
       })
       .catch((err) => {
@@ -55,12 +56,20 @@ const GroupChatInfo: React.FC<GroupChatInfoProps> = ({ data }) => {
   return (
     <>
       {option === "addGroupMembers" && (
-        <AddGroupMembers setMenuOption={setOption} groupId={data.id} />
+        <AddGroupMembers
+          setMenuOption={setOption}
+          groupId={data.id}
+          setForRendering={setForRendering}
+        />
       )}
       {!option && (
         <>
           <div className="flex flex-col justify-center  items-center bg-[#404040] p-5 gap-1">
-            <img src={User} alt="" className="w-[75%] h-[75%] rounded-full" />
+            <img
+              src={data.avatar ? data.avatar : User}
+              alt=""
+              className="w-[75%] h-[75%] rounded-full"
+            />
             <p className="text-[#e5e5e7]">{data.name}</p>
           </div>
           <div className=" w-full  h-[40%] ">

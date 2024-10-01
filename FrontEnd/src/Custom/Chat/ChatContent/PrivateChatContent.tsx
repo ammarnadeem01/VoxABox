@@ -15,12 +15,16 @@ interface MessageType {
 const PrivateChatContent: React.FC<PrivateChatContentProps> = ({
   InfoOn,
   toggleInfo,
-  // data,      console.log("===============")
-
   socket,
   contact,
+  setStatus,
 }) => {
-  // const { selectedFriendId } = useStore();
+  const {
+    selectedPrivateChatId,
+    setUnreadPrivateMessagesStore,
+    unreadPrivateMessages,
+    setSelectedFriend,
+  } = useStore();
   const getAllPrivateMessages = (): void => {
     console.log("sss", userId, contact);
     api
@@ -52,15 +56,21 @@ const PrivateChatContent: React.FC<PrivateChatContentProps> = ({
         console.log("===============");
         console.log(newMessage);
         console.log("===============");
-
-        setMessages((prevMessages: any) => [...prevMessages, newMessage]); // Add new message to state
+        console.log("selectedChatId", selectedPrivateChatId);
+        if (selectedPrivateChatId === newMessage.fromUserId) {
+          socket.emit("upgradePrivateMessageStatusToSeen", {
+            userId,
+            friendId,
+          });
+        }
+        setMessages((prevMessages: any) => [...prevMessages, newMessage]);
       });
     } catch (error) {
       console.log(error);
     }
 
     return () => {
-      socket.off("privateMessage"); // Clean up event listener on u                                         nmount
+      socket.off("privateMessage");
     };
   });
   const { userId, roomId, socketId } = useStore();
@@ -68,12 +78,13 @@ const PrivateChatContent: React.FC<PrivateChatContentProps> = ({
   const [message, setMessage] = useState<string>("");
   const [friendName, setFriendName] = useState<string>("");
   const [friendId, setFriendId] = useState<string>();
+  const [rendering, setRendering] = useState(0);
   const [messageData, setMessageData] = useState<MessageType>({
     fromUserId: userId!,
     toUserId: contact!.email,
     content: "",
   });
-  useEffect(() => {}, [messages, socket]);
+  useEffect(() => {}, [messages, socket, rendering]);
   const [friendShipStatus, setFriendShipStatus] = useState<
     "Blocked" | "Pending" | "Accepted"
   >("Blocked");
@@ -81,7 +92,8 @@ const PrivateChatContent: React.FC<PrivateChatContentProps> = ({
     api
       .get(`api/v1/friend/friendshipStatus`, { params: { userId, friendId } })
       .then((res) => {
-        console.log(res);
+        console.log("status", res);
+        console.log(res.data.data.friendShipStatus.status);
         setFriendShipStatus(res.data.data.friendShipStatus.status);
       })
       .catch((err) => {
@@ -108,8 +120,8 @@ const PrivateChatContent: React.FC<PrivateChatContentProps> = ({
   }
 
   useEffect(() => {
-    friendShipStatusCheck();
-  }, []);
+    // friendShipStatusCheck();
+  }, [friendShipStatus]);
   const messageText = (event: any) => {
     const { name, value } = event.target;
     console.log(messageData, name, value);
@@ -121,14 +133,14 @@ const PrivateChatContent: React.FC<PrivateChatContentProps> = ({
     fetchMessages();
     setFriendId(contact?.email);
     setFriendName(contact?.fname + " " + contact?.lname);
-  }, [contact]);
+  }, [contact, rendering, friendShipStatus]);
   // useEffect(() => {
   //   console.log("data in pcc", data, contact);
   //   setMessages(data?.privateChat);
   //   setFriendId(contact?.email);
   //   setFriendName(contact?.fname + " " + contact?.lname);
   // }, [data, contact]);
-
+  // useEffect(() => {}, [rendering]);
   const clearChat = () => {
     api
       .patch(`api/v1/privatechat`, {
@@ -137,6 +149,7 @@ const PrivateChatContent: React.FC<PrivateChatContentProps> = ({
       })
       .then((dataa) => {
         console.log("res", dataa);
+        setRendering(1);
       });
   };
   const blockFriend = () => {
@@ -145,8 +158,12 @@ const PrivateChatContent: React.FC<PrivateChatContentProps> = ({
         userId: userId,
         friendId: friendId,
       })
-      .then((dataa) => {
-        console.log("res", dataa);
+      .then((res) => {
+        // console.log("res status", res.data.data.mutualFriends.status);
+        const st = res.data.data.mutualFriends.status;
+        setFriendShipStatus(st);
+        setStatus(st);
+        setSelectedFriend(null);
       })
       .catch((err) => {
         console.log("err", err);
@@ -159,8 +176,14 @@ const PrivateChatContent: React.FC<PrivateChatContentProps> = ({
         userId: userId,
         friendId: friendId,
       })
-      .then((dataa) => {
-        console.log("res", dataa);
+      .then((res) => {
+        const st = res.data.data.mutualFriends.status;
+        setFriendShipStatus(st);
+        setStatus(st);
+        setSelectedFriend(null);
+      })
+      .catch((err) => {
+        console.log(err);
       });
   };
   // sendMessage
@@ -193,7 +216,11 @@ const PrivateChatContent: React.FC<PrivateChatContentProps> = ({
               onClick={toggleInfo}
             >
               <div>
-                <img src={U} alt="" className="w-12 h-12 rounded-full" />
+                <img
+                  src={contact?.avatar ? contact.avatar : U}
+                  alt=""
+                  className="w-12 h-12 rounded-full"
+                />
               </div>
               <div className="flex flex-col gap-0.5">
                 <p className="font-semibold">{friendName}</p>

@@ -17,9 +17,11 @@ import { NextFunction } from "express";
 import {
   createPrivateMessage,
   deletePrivateMessage,
+  setUnreadMessageToSeen,
 } from "./Controllers/private_chat";
 import { createGroupMessage } from "./Controllers/group_chat";
 import { findUser } from "./Controllers/user";
+import { deleteGroupMessage } from "./Controllers/group_chat";
 
 const port = process.env.PORT || 3000;
 
@@ -69,80 +71,216 @@ sequelize
   });
 
 const users: any = {}; // {userId:socketId,userId2:socketId2}
-const rooms: any = {}; // {roomId1:[userId1,userId2],roomId2:[userId3]}
+// const rooms: any = {}; // {roomId1:[userId1,userId2],roomId2:[userId3]}
+const rooms: { [roomId: string | number]: Set<string> } = {};
 
 io.on("connection", (socket) => {
   console.log("A user connected: " + socket.id);
-
-  // Handle user registration
+  /* ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+  |=====================================================================================================|
+  |                                            REGISTER                                                 |
+  |=====================================================================================================|
+  ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||*/
   socket.on("register", (userId) => {
     users[userId] = socket.id;
   });
 
-  ///////////////////////////////
-  // Private chat event
-  ///////////////////////////////
+  /* ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+  |=====================================================================================================|
+  |                                           PRIVATE CHAT                                              |
+  |=====================================================================================================|
+  ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||*/
+  // socket.on("privateMessage", async (data) => {
+  //   const next = (error: any) => {
+  //     console.error(error.message);
+  //     socket.emit("privateMessageError", { error: error.newMessage });
+  //   };
+
+  //   console.log(data);
+  //   console.log(users);
+  //   const createdMessage = await createPrivateMessage(data.newMessage, next);
+
+  //   const msgObj = {
+  //     message: {
+  //       id: createdMessage?.dataValues.id,
+  //       createdAt: new Date(),
+  //       fromUserId: data.newMessage.fromUserId,
+  //       toUserId: data.newMessage.toUserId,
+  //       content: data.newMessage.content,
+  //     },
+  //   };
+  //   if (users[data.newMessage.toUserId]) {
+  //     console.log("sering machine");
+  //     io.to(users[data.newMessage.toUserId]).emit("privateMessage", msgObj);
+  //   }
+  //   if (users[data.newMessage.fromUserId]) {
+  //     console.log("sering machine");
+  //     io.to(users[data.newMessage.fromUserId]).emit("privateMessage", msgObj);
+  //   }
+  // });
+
   socket.on("privateMessage", async (data) => {
     const next = (error: any) => {
       console.error(error.message);
       socket.emit("privateMessageError", { error: error.newMessage });
     };
 
-    console.log(data);
-    console.log(users);
-    const createdMessage = await createPrivateMessage(data.newMessage, next);
+    try {
+      console.log(data);
 
-    const msgObj = {
-      message: {
-        id: createdMessage?.dataValues.id,
-        createdAt: new Date(),
+      // Create the message in the database
+      const createdMessage = await createPrivateMessage(data.newMessage, next);
+
+      const msgObj = {
+        message: {
+          id: createdMessage?.dataValues.id,
+          createdAt: createdMessage?.dataValues.createdAt,
+          fromUserId: data.newMessage.fromUserId,
+          toUserId: data.newMessage.toUserId,
+          content: data.newMessage.content,
+        },
         fromUserId: data.newMessage.fromUserId,
-        toUserId: data.newMessage.toUserId,
-        content: data.newMessage.content,
-      },
-    };
-    if (users[data.newMessage.toUserId]) {
-      console.log("sering machine");
-      io.to(users[data.newMessage.toUserId]).emit("privateMessage", msgObj);
-    }
-    if (users[data.newMessage.fromUserId]) {
-      console.log("sering machine");
-      io.to(users[data.newMessage.fromUserId]).emit("privateMessage", msgObj);
+        unreadCount: 1,
+      };
+
+      // Create a consistent roomId using the emails
+      const roomId = [data.newMessage.fromUserId, data.newMessage.toUserId]
+        .sort()
+        .join("-");
+
+      // Emit the message to the room, so both participants receive it
+      io.to(roomId).emit("privateMessage", msgObj);
+      console.log(`Message sent to room: ${roomId}`);
+    } catch (error) {
+      next(error);
     }
   });
+
   ///////////////////////////////
   // Deleting a message
   //////////////////////////////
   socket.on("deletePrivateMessage", async (data) => {
-    const { userId, sender, messageId } = data;
+    const { userId, sender, messageId, friendId } = data;
+    const roomId = [friendId, userId].sort().join("-");
     const next = (error: any) => {
       console.error(error.message);
       socket.emit("privateMessageError", { error: error.newMessage });
     };
     await deletePrivateMessage(data, next);
-    io.to(users[sender]).emit("deletePrivateMessage", { messageId });
-    io.to(users[userId]).emit("deletePrivateMessage", { messageId });
+    io.to(roomId).emit("deletePrivateMessage", { messageId });
   });
 
   /////////////////////////////////
-  // Join Room
+  // UNREAD PRIVATE MESSAGE TO READ
   ////////////////////////////////
+
+  socket.on("upgradePrivateMessageStatusToSeen", async (data) => {
+    try {
+      const next = (error: any) => {
+        console.error(error.message);
+        socket.emit("upgradePrivateMessageStatusToSeen", {
+          error: error.newMessage,
+        });
+      };
+
+      const { userId, friendId } = data;
+      await setUnreadMessageToSeen(data, next);
+      io.emit("messageStatusUpdated", { friendId, userId, status: "Seen" });
+    } catch (error) {
+      console.error("Error updating message status:", error);
+    }
+  });
+  /* ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+  |=====================================================================================================|
+  |                                        JOIN AND LEAVE ROOM                                          |
+  |=====================================================================================================|
+  ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||*/
   socket.on("joinRoom", ({ roomId, userId }) => {
     socket.join(roomId); // Join the room
+    console.log("====================================================");
     console.log(`${userId} joined room: ${roomId}`);
-
+    console.log("''''''''''''''''''''''''''''''''''''''''''''''");
     console.log(users);
 
     // Optionally, track which users are in which room
     if (!rooms[roomId]) {
-      rooms[roomId] = [];
+      // rooms[roomId] = [];
+      rooms[roomId] = new Set();
     }
-    rooms[roomId].push(userId);
+    // rooms[roomId].push(userId);
+    rooms[roomId].add(userId);
     console.log(rooms);
   });
-  ////////////////////////////
-  // Group Message
-  ////////////////////////////
+
+  ///////////////////////////////
+  // When a user leaves the room
+  ///////////////////////////////
+  socket.on("leaveRoom", (roomId, userId) => {
+    socket.leave(roomId);
+    console.log(`${userId} left room: ${roomId}`);
+
+    // Check if the room exists and if the user is in the room
+    if (rooms[roomId]) {
+      rooms[roomId].delete(userId); // Remove the user from the Set
+      console.log(`User ${userId} removed from room ${roomId}`);
+    }
+
+    // Optionally, you can delete the room if it becomes empty
+    if (rooms[roomId].size === 0) {
+      delete rooms[roomId];
+      console.log(`Room ${roomId} is now empty and deleted.`);
+    }
+  });
+
+  /* ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+  |=====================================================================================================|
+  |                                     JOIN AND LEAVE PRIVATE ROOM                                     |
+  |=====================================================================================================|
+  ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||*/
+
+  ///////////////////////////////
+  //     user joinns private room
+  ///////////////////////////////
+  socket.on("joinPrivateRoom", (data) => {
+    const roomId = [data.userId, data.friendId].sort().join("-");
+    socket.join(roomId);
+    if (!rooms[roomId]) {
+      rooms[roomId] = new Set();
+    }
+    rooms[roomId].add(data.userId);
+    rooms[roomId].add(data.friendId);
+    console.log(rooms);
+  });
+
+  //////////////////////////////////
+  //     user leaevs private room
+  //////////////////////////////////
+  socket.on("leavePrivateRoom", (data) => {
+    const roomId = [data.userId, data.friendId].sort().join("-");
+    socket.leave(roomId);
+
+    // Check if the room exists
+    if (rooms[roomId]) {
+      // Remove the user from the room's participants list
+      rooms[roomId].delete(data.userId);
+
+      // If the room is now empty, delete it
+      if (rooms[roomId].size === 0) {
+        delete rooms[roomId];
+        console.log(`Room ${roomId} is now empty and deleted.`);
+      } else {
+        console.log(`User ${data.userId} left room: ${roomId}`);
+      }
+    } else {
+      console.log(`Room ${roomId} does not exist or is already empty.`);
+    }
+  });
+
+  /* ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+  |=====================================================================================================|
+  |                                             GROUP CHAT                                              |
+  |=====================================================================================================|
+  ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||*/
   socket.on("groupMessage", async (data) => {
     const next = (error: any) => {
       console.log(data);
@@ -151,28 +289,7 @@ io.on("connection", (socket) => {
       socket.emit("groupMessageError", { error: error.newMessage });
     };
     const createdMessage = await createGroupMessage(data, next);
-    console.log(
-      "========================================================================="
-    );
-    console.log(
-      "========================================================================="
-    );
-    console.log(
-      "========================================================================="
-    );
-    console.log(data);
-    console.log(
-      "========================================================================="
-    );
-    console.log(
-      "========================================================================="
-    );
-    console.log(
-      "========================================================================="
-    );
-    console.log(
-      "========================================================================="
-    );
+
     console.log(createdMessage);
     const senderOfMessage = await findUser(data.fromUserId);
 
@@ -189,16 +306,26 @@ io.on("connection", (socket) => {
     io.to(data.toGroupId).emit("groupMessage", msgObj);
   });
 
-  // Leaving a room
-  socket.on("leaveRoom", (roomId, userId) => {
-    socket.leave(roomId);
-    console.log(`${userId} left room: ${roomId}`);
+  ///////////////////////////////////////
+  // DELETE GROUP MESSAGE
+  ///////////////////////////////////////
 
-    // Optionally, remove user from tracking
-    rooms[roomId] = rooms[roomId].filter((id: any) => id !== userId);
+  socket.on("deleteGroupMessage", async (data) => {
+    const { groupId, messageId } = data;
+
+    const next = (error: any) => {
+      console.error(error.message);
+      socket.emit("deleteMessageError", { error: error.newMessage });
+    };
+    const ans = await deleteGroupMessage(data, next);
+    // console.log("ans", ans);
+    io.to(groupId).emit("deleteGroupMessage", messageId);
   });
 
-  socket.on("upgradeMessageStatusToSeen", ({ messageId, userId }) => {
+  /////////////////////////////////
+  // UNREAD GROUP MESSAGE TO READ
+  ////////////////////////////////
+  socket.on("upgradeGroupMessageStatusToSeen", ({ messageId, userId }) => {
     try {
       io.emit("messageStatusUpdated", { messageId, userId, status: "seen" });
     } catch (error) {
@@ -206,11 +333,11 @@ io.on("connection", (socket) => {
     }
   });
 
-  // Fetch unread messages for a user
-  socket.on("unreadMessages", ({ userId, unreadMessages }) => {
-    socket.emit("unreadMessages", unreadMessages);
-  });
-
+  /* ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+  |=====================================================================================================|
+  |                                             DISCONNECT                                              |
+  |=====================================================================================================|
+  ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||*/
   socket.on("disconnect", () => {
     console.log("A user disconnected: " + socket.id);
     // Handle user disconnection

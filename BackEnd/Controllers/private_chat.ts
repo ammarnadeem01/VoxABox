@@ -350,30 +350,54 @@ export const loadUnreadPrivateMessages = asyncHandler(
   }
 );
 
-export const setUnreadMessageToSeen = asyncHandler(
-  async (req: Request, res: Response, next: NextFunction) => {
-    // friendID
-    const { friendID } = req.params;
-    // if id  present
-    if (!friendID) {
-      return next(new CustomError("FriendID is required...", 400));
-    }
+// export const setUnreadMessageToSeen = asyncHandler(
+//   async (req: Request, res: Response, next: NextFunction) => {
+//     // friendID
+//     const { friendId, userId } = req.body;
+//     // if id  present
+//     if (!friendId || !userId) {
+//       return next(new CustomError("FriendID is required...", 400));
+//     }
 
-    // set status to seen
-    const [updatedRows] = await PrivateChat.update(
-      { seenStatus: "Seen" },
-      {
-        where: {
-          fromUserId: friendID,
-        },
-      }
-    );
-    if (updatedRows == 0) {
-      return next(new CustomError("No Unread Message", 404));
-    }
-    res.status(200).json({
-      status: "Success",
-      data: `${updatedRows} rows updated.`,
-    });
+//     // set status to seen
+//     const [updatedRows] = await PrivateChat.update(
+//       { seenStatus: "Seen" },
+//       {
+//         where: {
+//           toUserId: userId,
+//           fromUserId: friendId,
+//         },
+//       }
+//     );
+//     if (updatedRows == 0) {
+//       return next(new CustomError("No Unread Message", 404));
+//     }
+//     res.status(200).json({
+//       status: "Success",
+//       data: `${updatedRows} rows updated.`,
+//     });
+//   }
+// );
+
+export const setUnreadMessageToSeen = async (data: any, next: NextFunction) => {
+  // friendID
+  const { friendId, userId } = data;
+  // if id  present
+  if (!friendId || !userId) {
+    return next(new CustomError("FriendID is required...", 400));
   }
-);
+
+  // set status to seen
+  const [updatedRows] = await PrivateChat.update(
+    { seenStatus: "Seen" },
+    {
+      where: {
+        toUserId: userId,
+        fromUserId: friendId,
+      },
+    }
+  );
+  if (updatedRows == 0) {
+    return next(new CustomError("No Unread Message", 404));
+  }
+};

@@ -19,6 +19,8 @@ import { io, Socket } from "socket.io-client";
 
 function MessagingPanel() {
   const socketRef = useRef<Socket | null>(null); // Initialize socket reference with null
+  const [forRendering, setForRendering] = useState(0);
+  const [status, setStatus] = useState("Blocked");
 
   useEffect(() => {
     // Establish connection only once when the component mounts
@@ -33,8 +35,17 @@ function MessagingPanel() {
       socketRef.current?.disconnect();
     };
   }, []);
-  const { setRoomId, userId, roomId, setFriends, setSelectedPrivateChatId } =
-    useStore();
+  const {
+    setRoomId,
+    userId,
+    roomId,
+    setFriends,
+    setSelectedPrivateChatId,
+    setUnreadPrivateMessagesStore,
+    selectedPrivateChatId,
+    setSelectedFriend,
+    setSelectedGrp,
+  } = useStore();
 
   const [selectedContact, setSelectedContact] = useState<User | null>(null);
   const [selectedContactId, setSelectedContactId] = useState<string | null>(
@@ -50,16 +61,7 @@ function MessagingPanel() {
   // |                                     SET UNREAD MESSAGES TO SEEN APIS                                  |
   // |=======================================================================================================|
   // |=======================================================================================================|
-  const setUnreadPrivateMessagesToSeen = (contact: string) => {
-    api
-      .patch(`api/v1/privatechat/${contact}`)
-      .then((res) => {
-        console.log("contact Messages set to seen", res);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  };
+
   const setUnreadGroupMessagesToSeen = (groupId: number) => {
     api
       .patch(`api/v1/groupchat/unreadMessageToSeen`, {
@@ -80,22 +82,48 @@ function MessagingPanel() {
   // |=======================================================================================================|
   // |=======================================================================================================|
   const handleContactClick = (contact: User): void => {
-    // socket.emit("joinRoom", contact.email);
-    setUnreadPrivateMessagesToSeen(contact.email);
+    const friendId = contact.email;
+
+    // Leave the current room (if selectedPrivateChatId exists)
+
+    if (selectedPrivateChatId) {
+      socketRef.current?.emit("leavePrivateRoom", {
+        userId,
+        friendId: selectedPrivateChatId, // Leaving the previous room
+      });
+    }
+
+    socketRef.current?.emit("upgradePrivateMessageStatusToSeen", {
+      userId,
+      friendId: contact.email,
+    });
+    // Join the new room (the one for the clicked contact)
+    socketRef.current?.emit("joinPrivateRoom", {
+      userId,
+      friendId, // Joining the new room based on the clicked contact's email
+    });
+    setUnreadPrivateMessagesCount(0);
     setSelectedContactId(contact.email);
     setRoomId(contact.email);
     setSelectedPrivateChatId(contact.email);
+    setSelectedFriend(contact);
     setSelectedContact(contact);
     setSelectedGroupId(null);
     setSelectedGroup(null);
   };
 
   const handleGroupClick = (group: Group): void => {
-    console.log(socketRef, "===============");
+    if (selectedGroupId) {
+      socketRef.current?.emit("leavePrivateRoom", {
+        userId,
+        friendId: selectedGroupId,
+      });
+    }
     socketRef.current?.emit("joinRoom", { roomId: group.id, userId });
     setUnreadGroupMessagesToSeen(group.id);
     setSelectedGroupId(group.id);
     setSelectedGroup(group);
+    setSelectedGrp(group);
     setSelectedContact(null);
     setSelectedContactId(null);
   };
@@ -158,8 +186,10 @@ function MessagingPanel() {
       .get(`api/v1/privateChat/${userId}`)
       .then((res) => {
         const data = res.data.data.UnreadMessages;
+        console.log("dara", data);
         setUnreadPrivateMessagesCount(res.data.length);
         setUnreadPrivateMessages(data);
+        setUnreadPrivateMessagesStore(data);
       })
       .catch((err) => {
         console.log(err);
@@ -168,7 +198,7 @@ function MessagingPanel() {
   const getUnreadGroupMessages = (): void => {
     api
       .get(`api/v1/groupChat/fetchUnreadMessages`, {
-        params: { memberId: userId, groupId: 5 },
+        params: { memberId: userId, groupId: selectedGroupId },
       })
       .then((res) => {
         const data = res.data.data.UnreadMessages;
@@ -198,7 +228,6 @@ function MessagingPanel() {
       .get(`api/v1/groupmember/allGroups/${userId}`)
       .then((res) => {
         const ans = res.data.data.allGroups;
-        // console.log("ans", ans);
         setGroupsCount(res.data.length);
         setAllGroups(ans);
       })
@@ -206,68 +235,19 @@ function MessagingPanel() {
         console.log(err);
       });
   };
-  // const getAllPrivateMessages = (): void => {
-  //   api
-  //     .get(`api/v1/privateChat`, {
-  //       params: {
-  //         fromUserId: selectedContactId,
-  //         toUserId: userId,
-  //       },
-  //     })
-  //     .then((res) => {
-  //       const data = res.data.data.AllMessages;
-  //       setPrivateChatCount(res.data.length);
-  //       setPrivateChat(data);
-  //     })
-  //     .catch((err) => {
-  //       console.log(err);
-  //     });
-  // };
-  // const getAllGroupMessages = (): void => {
-  //   api
-  //     .get(`api/v1/groupChat/fetchAllGroupMessages`, {
-  //       params: {
-  //         memberId: userId,
-  //         groupId: selectedGroupId,
-  //       },
-  //     })
-  //     .then((res) => {
-  //       const data = res.data.data.AllMessages;
-  //       // console.log("allgrpmsg", data);
-  //       setGroupChatCount(res.data.length);
-  //       setGroupChat(data);
-  //     })
-  //     .catch((err) => {
-  //       console.log(err);
-  //       // console.log(err.response.data.message);
-  //     });
-  // };
-
-  // useEffect(() => {
-  //   getBlockedFriends();
-  //   getUnreadPrivateMessages();
-  //   getUnreadGroupMessages();
-  //   getAllFriends();
-  //   getAllGroups();
-  //   // getAllPrivateMessages();
-  //   // getAllGroupMessages();
-  // }, [
-  //   selectedContact,
-  //   selectedGroup,
-  //   selectedGroupId,
-  //   selectedContactId,
-  //   selectedOption,
-  // ]);
 
   useEffect(() => {
-    getBlockedFriends();
+    console.log("again doinf it");
     getUnreadPrivateMessages();
     getUnreadGroupMessages();
+    getBlockedFriends();
     getAllFriends();
     getAllGroups();
-    // getAllPrivateMessages();
-    // getAllGroupMessages();
-  }, []);
+  }, [forRendering]);
+  useEffect(() => {
+    getBlockedFriends();
+    getAllFriends();
+  }, [status]);
   const toggleInfo = (): void => {
     setInfoOn(!infoOn);
   };
@@ -301,6 +281,7 @@ function MessagingPanel() {
           onContactClick={handleContactClick}
           onGroupClick={handleGroupClick}
           selectedOption={selectedOption}
+          setForRendering={setForRendering}
         />
         <ChatContent
           InfoOn={infoOn}
@@ -309,12 +290,22 @@ function MessagingPanel() {
           socket={socketRef.current}
           contact={selectedContact}
           group={selectedGroup}
+          setStatus={setStatus}
+          setForRendering={setForRendering}
+          setSelectedContact={setSelectedContact}
+          setSelectedGroup={setSelectedGroup}
         />
+
         <ChatInfo
           InfoOn={infoOn}
           toggleInfo={toggleInfo}
           selectedCnt={selectedContact}
           selectedGrp={selectedGroup}
+          onContactClick={handleContactClick}
+          onGroupClick={handleGroupClick}
+          setForRendering={setForRendering}
+          setSelectedContact={setSelectedContact}
+          setSelectedGroup={setSelectedGroup}
         />
       </div>
     </div>

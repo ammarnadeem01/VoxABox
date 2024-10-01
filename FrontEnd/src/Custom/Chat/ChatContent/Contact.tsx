@@ -32,7 +32,11 @@ const Contact: React.FC<ContactProps> = ({ data, onClick }) => {
       <div className="w-full flex justify-between items-center p-1 rounded-xl">
         <div className="w-4/5 flex justify-start items-center">
           <div className="w-1/4 ">
-            <img src={User} alt="" className="w-12 h-12 rounded-full" />
+            <img
+              src={friend?.avatar ? friend.avatar : User}
+              alt=""
+              className="w-12 h-12 rounded-full"
+            />
           </div>
           <div className="w-3/5 flex flex-wrap justify-start items-center">
             <p className="w-full font-semibold">

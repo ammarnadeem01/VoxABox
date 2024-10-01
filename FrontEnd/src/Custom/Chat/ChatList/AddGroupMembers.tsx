@@ -7,6 +7,7 @@ import { AddGroupMembersProps, Member, User } from "../../../Types";
 const AddGroupMembers: React.FC<AddGroupMembersProps> = ({
   setMenuOption,
   groupId,
+  setForRendering,
 }) => {
   const { friends } = useStore();
   const [checkedFriends, setCheckedFriends] = useState<string[]>([]);
@@ -49,6 +50,7 @@ const AddGroupMembers: React.FC<AddGroupMembersProps> = ({
           .then((res) => {
             console.log(res);
             setMenuOption(null);
+            setForRendering(4);
           })
           .catch((err) => {
             setMenuOption(null);

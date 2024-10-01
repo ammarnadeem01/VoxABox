@@ -267,9 +267,9 @@ export const fetchAllGroupMessages = asyncHandler(
 
     const AllMessages = await allMessages(memberIdString, groupIdNumber, next);
     // console.log("AllMessages", AllMessages);
-    if (AllMessages?.length == 0) {
-      return next(new CustomError("No Message in this group", 404));
-    }
+    // if (AllMessages?.length == 0) {
+    //   return next(new CustomError("No Message in this group", 404));
+    // }
     res.status(200).json({
       status: "Success",
       length: AllMessages?.length,
@@ -339,61 +339,116 @@ export const clearGroupChat = asyncHandler(
   }
 );
 
-export const deleteGroupMessage = asyncHandler(
-  async (req: Request, res: Response, next: NextFunction) => {
-    // check id
-    const { messageId, groupId, memberId, senderId } = req.body;
-    if (!messageId || !groupId || !memberId) {
-      return next(
-        new CustomError("Req fields : messageId, groupId,memberId", 400)
-      );
-    }
+// export const deleteGroupMessage = asyncHandler(
+//   async (req: Request, res: Response, next: NextFunction) => {
+//     // check id
+//     const { messageId, groupId, memberId, senderId } = req.body;
+//     if (!messageId || !groupId || !memberId) {
+//       return next(
+//         new CustomError("Req fields : messageId, groupId,memberId", 400)
+//       );
+//     }
 
-    const messageIdN = Number(messageId);
+//     const messageIdN = Number(messageId);
 
-    // if msg with given id present
-    const deletedMessage = await GroupChat.findByPk(messageIdN, {
-      include: {
-        model: MessageStatus,
-        attributes: ["id", "isDeleted", "userId"], // to update status for this user
-      },
-    });
-    if (!deletedMessage) {
-      return next(new CustomError("No message with given ID found", 404));
-    }
+//     // if msg with given id present
+//     const deletedMessage = await GroupChat.findByPk(messageIdN, {
+//       include: {
+//         model: MessageStatus,
+//         attributes: ["id", "isDeleted", "userId"], // to update status for this user
+//       },
+//     });
+//     if (!deletedMessage) {
+//       return next(new CustomError("No message with given ID found", 404));
+//     }
 
-    if (memberId === senderId) {
-      // if sender is deleting its own message, delete it for all members
-      await deletedMessage.destroy();
-    } else {
-      //  if some other user is deleting message, then delete just for that user
-      // try {
-      const ans = await MessageStatus.update(
-        {
-          isDeleted: true,
-        },
-        {
-          where: { messageId: messageId, userId: memberId },
-        }
-      );
-      // console.log(
-      //   "============================================================================="
-      // );
-      // console.log("ans", ans);
-      // console.log(
-      //   "============================================================================="
-      // );
-    }
+//     if (memberId === senderId) {
+//       // if sender is deleting its own message, delete it for all members
+//       await deletedMessage.destroy();
+//     } else {
+//       //  if some other user is deleting message, then delete just for that user
+//       // try {
+//       const ans = await MessageStatus.update(
+//         {
+//           isDeleted: true,
+//         },
+//         {
+//           where: { messageId: messageId, userId: memberId },
+//         }
+//       );
+//       // console.log(
+//       //   "============================================================================="
+//       // );
+//       // console.log("ans", ans);
+//       // console.log(
+//       //   "============================================================================="
+//       // );
+//     }
 
-    // generate response
-    res.status(200).json({
-      status: "Success",
-      data: {
-        deletedMessage,
-      },
-    });
+//     // generate response
+//     res.status(200).json({
+//       status: "Success",
+//       data: {
+//         deletedMessage,
+//       },
+//     });
+//   }
+// );
+
+export const deleteGroupMessage = async (data: any, next: NextFunction) => {
+  // check id
+  const { messageId, groupId, memberId, senderId } = data;
+  if (!messageId || !groupId || !memberId) {
+    return next(
+      new CustomError("Req fields : messageId, groupId,memberId,messageId", 400)
+    );
   }
-);
+
+  const messageIdN = Number(messageId);
+
+  // if msg with given id present
+  const deletedMessage = await GroupChat.findByPk(messageIdN, {
+    include: {
+      model: MessageStatus,
+      attributes: ["id", "isDeleted", "userId"], // to update status for this user
+    },
+  });
+  console.log("==========|||||||||||||||||||||================");
+  console.log("==========|||||||||||||||||||||================");
+
+  if (!deletedMessage) {
+    return next(new CustomError("No message with given ID found", 404));
+  }
+  let ans;
+  console.log("------------------------------------");
+  console.log("------------------------------------");
+  console.log("------------------------------------");
+  console.log("------------------------------------");
+  console.log("------------------------------------");
+  if (memberId === senderId) {
+    // if sender is deleting its own message, delete it for all members
+    const deletedCount = await deletedMessage.destroy();
+    console.log("deletedCount", deletedCount);
+    // if (!deletedCount) {
+    //   return next(new CustomError("Failed to delete the message", 500));
+    // }
+  } else {
+    // if some other user is deleting message, then delete just for that user
+    ans = await MessageStatus.update(
+      {
+        isDeleted: true,
+      },
+      {
+        where: { messageId: messageId, userId: memberId },
+      }
+    );
+    console.log("ans", ans);
+  }
+
+  console.log("deletedMessage", deletedMessage);
+  // generate response
+  return { success: true, message: "Message deleted successfully" };
+};
 
 export const setUnreadMessageToSeen = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {

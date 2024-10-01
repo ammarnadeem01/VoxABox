@@ -8,12 +8,20 @@ interface ChatInfoProps {
   toggleInfo: () => void;
   selectedCnt: User | null;
   selectedGrp: Group | null;
+  onContactClick: (contact: User) => void;
+  onGroupClick: (group: Group) => void;
+  setForRendering: any;
+  setSelectedContact: any;
+  setSelectedGroup: any;
 }
 const ChatInfo: React.FC<ChatInfoProps> = ({
   InfoOn,
   toggleInfo,
   selectedCnt,
   selectedGrp,
+  setForRendering,
+  setSelectedContact,
+  setSelectedGroup,
 }) => {
   // const [contact, setContact] = useState<User | null>();
   // const [group, setGroup] = useState<Group | null>();
@@ -38,7 +46,9 @@ const ChatInfo: React.FC<ChatInfoProps> = ({
           />
         </div>
         {/* start */}
-        {selectedCnt && <ContactChatInfo data={selectedCnt} />}
+        {selectedCnt && (
+          <ContactChatInfo data={selectedCnt} setForRender={setForRendering} />
+        )}
         {selectedGrp && <GroupChatInfo data={selectedGrp} />}
         {/* end */}
       </div>
