@@ -1,31 +1,41 @@
 import EmailIcon from "@mui/icons-material/Email";
 import { useState } from "react";
 import useStore from "../../../store";
-import api from "../../../axiosConfig";
 interface AddProps {
   setMenuOption: any;
+  setForRendering: any;
+  socket: any;
 }
-const AddFriend: React.FC<AddProps> = ({ setMenuOption }) => {
+const AddFriend: React.FC<AddProps> = ({
+  setMenuOption,
+  setForRendering,
+  socket,
+}) => {
   const [friendId, setFriendId] = useState("");
   const [errMessage, setErrMessage] = useState("");
   const { userId } = useStore();
   const addFriend = () => {
-    api
-      .post(`api/v1/friend`, {
-        userId,
-        friendId,
-      })
-      .then((res) => {
-        setMenuOption(null);
-        console.log("friend", res);
-      })
-      .catch((err) => {
-        if (friendId == "") {
-          setErrMessage("Please enter email of friend.");
-        } else {
-          setErrMessage(err.response.data.message);
-        }
-      });
+    // api
+    //   .post(`api/v1/friend`, {
+    //     userId,
+    //     friendId,
+    //   })
+    //   .then((res) => {
+    //     setMenuOption(null);
+    //     setForRendering((pre: number) => pre + 1);
+    //     console.log("friend", res);
+    //   })
+    //   .catch((err) => {
+    //     if (friendId == "") {
+    //       setErrMessage("Please enter email of friend.");
+    //     } else {
+    //       setErrMessage(err.response.data.message);
+    //     }
+    //   })
+
+    socket?.emit("addFriend", { userId, friendId });
+    setMenuOption(null);
+    setForRendering((pre: number) => pre + 1);
   };
   return (
     <div className="w-full flex flex-start flex-wrap justify-center gap-3">

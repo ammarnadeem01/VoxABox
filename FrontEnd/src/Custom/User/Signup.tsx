@@ -185,7 +185,10 @@ function Signup() {
                   />
                   I accept the{" "}
                   <NavLink to="/termsnconditions">
-                    &nbsp; terms and conditions
+                    &nbsp;{" "}
+                    <span className="text-purple-500 underline">
+                      terms and conditions
+                    </span>
                   </NavLink>
                 </label>
                 <ErrorMessage

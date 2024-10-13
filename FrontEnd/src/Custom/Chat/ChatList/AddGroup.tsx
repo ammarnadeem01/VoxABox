@@ -6,8 +6,13 @@ import * as React from "react";
 interface AddGroupProps {
   setMenuOption: (option: string | null) => void;
   setGroupId: (id: number) => void;
+  setForRendering: any;
 }
-const AddGroup: React.FC<AddGroupProps> = ({ setMenuOption, setGroupId }) => {
+const AddGroup: React.FC<AddGroupProps> = ({
+  setMenuOption,
+  setGroupId,
+  setForRendering,
+}) => {
   const { userId } = useStore();
   const [errorMessage, setErrorMessage] = useState("");
   const createGroup = (e: any) => {
@@ -44,6 +49,7 @@ const AddGroup: React.FC<AddGroupProps> = ({ setMenuOption, setGroupId }) => {
           setGroupId(data);
           console.log("group", res);
           setMenuOption("addGroupMembers");
+          setForRendering((pre: number) => pre + 1);
         })
         .catch((err) => {
           setErrorMessage(err.response.data.message);

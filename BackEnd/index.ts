@@ -22,6 +22,7 @@ import {
 import { createGroupMessage } from "./Controllers/group_chat";
 import { findUser } from "./Controllers/user";
 import { deleteGroupMessage } from "./Controllers/group_chat";
+import { createFriends } from "./Controllers/friend";
 
 const port = process.env.PORT || 3000;
 
@@ -149,7 +150,9 @@ io.on("connection", (socket) => {
         .join("-");
 
       // Emit the message to the room, so both participants receive it
-      io.to(roomId).emit("privateMessage", msgObj);
+      if (createdMessage) {
+        io.to(roomId).emit("privateMessage", msgObj);
+      }
       console.log(`Message sent to room: ${roomId}`);
     } catch (error) {
       next(error);
@@ -332,6 +335,26 @@ io.on("connection", (socket) => {
       console.error("Error updating message status:", error);
     }
   });
+
+  /*|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+  |=====================================================================================================|
+  |                                         ADD AND DELETE FRIEND                                       |
+  |=====================================================================================================|
+  |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||*/
+  socket.on("addFriend", async (data) => {
+    const next = (error: any) => {
+      console.log(data);
+      console.log(users);
+      console.error(error.message);
+      socket.emit("addFriendError", { error: error.newMessage });
+    };
+    const roomId = [data.userId, data.friendId].sort().join("-");
+    const ans = await createFriends(data, next);
+    console.log(ans, ans, ans, ans, ans);
+    const friend = await User.findByPk(data.friendId);
+    socket.to(roomId).emit("friendAdded", friend);
+  });
+  // socket.on("deleteFriend", () => {});
 
   /* ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
   |=====================================================================================================|

@@ -134,6 +134,8 @@ export interface AllGroupMessages {
 
 export interface GroupChatInfoProps {
   data: Group;
+  setForRender: any;
+  toggleInfo: () => void;
 }
 export interface Member {
   clearedAt: string | null;
@@ -234,5 +236,6 @@ export interface CommonGroupProps {
 export interface ContactChatInfoProps {
   data: User | null;
   setForRender: any;
+  toggleInfo: () => void;
   // onClick: () => void;
 }

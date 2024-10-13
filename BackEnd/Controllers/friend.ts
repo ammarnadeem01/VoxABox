@@ -9,51 +9,89 @@ import { User } from "../Models/user";
 // );
 
 // create friend
-export const createFriends = asyncHandler(
-  async (req: Request, res: Response, next: NextFunction) => {
-    const { userId, friendId } = req.body;
-    // if required data is present
-    if (!userId || !friendId) {
-      return next(new CustomError("Required Field Missing", 400));
-    }
-    // if they are already friends
-    const alreadyFriends = await Friend.findOne({
-      where: {
-        [Op.or]: [
-          { userId, friendId },
-          { userId: friendId, friendId: userId },
-        ],
-      },
-    });
-    if (alreadyFriends) {
-      return next(
-        new CustomError("UserId and FriendId are already friends.", 409)
-      );
-    }
-    //creatre friends
-    const friend = await Friend.create({
-      userId,
-      friendId,
-    });
+// export const createFriends = asyncHandler(
+//   async (req: Request, res: Response, next: NextFunction) => {
+//     const { userId, friendId } = req.body;
+//     // if required data is present
+//     if (!userId || !friendId) {
+//       return next(new CustomError("Required Field Missing", 400));
+//     }
+//     // if they are already friends
+//     const alreadyFriends = await Friend.findOne({
+//       where: {
+//         [Op.or]: [
+//           { userId, friendId },
+//           { userId: friendId, friendId: userId },
+//         ],
+//       },
+//     });
+//     if (alreadyFriends) {
+//       return next(
+//         new CustomError("UserId and FriendId are already friends.", 409)
+//       );
+//     }
+//     //creatre friends
+//     const friend = await Friend.create({
+//       userId,
+//       friendId,
+//     });
 
-    if (!friend) {
-      return next(new CustomError("Friendship bond not created", 404));
-    }
-    // Create the friendship from friendId to userId
-    await Friend.create({
-      userId: friendId,
-      friendId: userId,
-    });
+//     if (!friend) {
+//       return next(new CustomError("Friendship bond not created", 404));
+//     }
+//     // Create the friendship from friendId to userId
+//     await Friend.create({
+//       userId: friendId,
+//       friendId: userId,
+//     });
 
-    //send response
-    res.status(200).json({
-      status: "Success",
-      data: {
-        friend,
-      },
-    });
+//     //send response
+//     res.status(200).json({
+//       status: "Success",
+//       data: {
+//         friend,
+//       },
+//     });
+//   }
+// );
+
+export const createFriends = async (data: any, next: NextFunction) => {
+  const { userId, friendId } = data;
+  // if required data is present
+  if (!userId || !friendId) {
+    return next(new CustomError("Required Field Missing", 400));
   }
-);
+  // if they are already friends
+  const alreadyFriends = await Friend.findOne({
+    where: {
+      [Op.or]: [
+        { userId, friendId },
+        { userId: friendId, friendId: userId },
+      ],
+    },
+  });
+  if (alreadyFriends) {
+    return next(
+      new CustomError("UserId and FriendId are already friends.", 409)
+    );
+  }
+  //creatre friends
+  const friend = await Friend.create({
+    userId,
+    friendId,
+  });
+
+  if (!friend) {
+    return next(new CustomError("Friendship bond not created", 404));
+  }
+  // Create the friendship from friendId to userId
+  await Friend.create({
+    userId: friendId,
+    friendId: userId,
+  });
+
+  return friend;
+};
 
 //unfriend
 export const unfriend = asyncHandler(

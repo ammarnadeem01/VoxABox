@@ -1,7 +1,9 @@
 import Logo from "../../assets/logo1.png";
 import { useNavigate } from "react-router-dom";
+import useStore from "../../store";
 function Navbar() {
   const nav = useNavigate();
+  const { token } = useStore();
   return (
     <div className="max-w-full min-w-full bg-black flex justify-between py-2 px-5 text-white">
       <div
@@ -18,12 +20,22 @@ function Navbar() {
         </p>
       </div>
       <div className=" flex gap-10">
-        <button
-          onClick={() => nav("/signup")}
-          className="px-5 py-0 text-sm rounded-full  outline outline-white hover:bg-white hover:text-black"
-        >
-          Get Started
-        </button>
+        {token && (
+          <button
+            onClick={() => nav("/chat")}
+            className="px-5 py-0 text-sm rounded-full  outline outline-white hover:bg-white hover:text-black"
+          >
+            Chat
+          </button>
+        )}
+        {!token && (
+          <button
+            onClick={() => nav("/signup")}
+            className="px-5 py-0 text-sm rounded-full  outline outline-white hover:bg-white hover:text-black"
+          >
+            Get Started
+          </button>
+        )}
       </div>
     </div>
   );

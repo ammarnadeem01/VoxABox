@@ -82,6 +82,7 @@ function MessagingPanel() {
   // |=======================================================================================================|
   // |=======================================================================================================|
   const handleContactClick = (contact: User): void => {
+    setSelectedGrp(null);
     const friendId = contact.email;
 
     // Leave the current room (if selectedPrivateChatId exists)
@@ -113,6 +114,7 @@ function MessagingPanel() {
   };
 
   const handleGroupClick = (group: Group): void => {
+    setSelectedFriend(null);
     if (selectedGroupId) {
       socketRef.current?.emit("leavePrivateRoom", {
         userId,
@@ -247,7 +249,8 @@ function MessagingPanel() {
   useEffect(() => {
     getBlockedFriends();
     getAllFriends();
-  }, [status]);
+  }, [status, setForRendering]);
+
   const toggleInfo = (): void => {
     setInfoOn(!infoOn);
   };
@@ -278,6 +281,8 @@ function MessagingPanel() {
             friendsCount,
             groupsCount,
           }}
+          setAllFriends={setAllFriends}
+          socket={socketRef.current}
           onContactClick={handleContactClick}
           onGroupClick={handleGroupClick}
           selectedOption={selectedOption}

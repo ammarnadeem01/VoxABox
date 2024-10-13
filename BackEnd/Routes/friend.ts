@@ -10,7 +10,7 @@ import {
   fetchFriendShipStatus,
 } from "../Controllers/friend";
 const router = Router();
-router.route("/").post(createFriends);
+// router.route("/").post(createFriends);
 // .delete(deleteFriend);
 router.route("/fetchAllFriends/:email").get(fetchAllFriends);
 router.route("/fetchBlockedFriends/:email").get(fetchBlockedFriends);

@@ -28,10 +28,12 @@ export interface ChatListProps {
     groupsCount: number;
   };
   // socket: any;
+  setAllFriends: any;
   onContactClick: (contact: User) => void;
   onGroupClick: (group: Group) => void;
   selectedOption: string | undefined;
   setForRendering: any;
+  socket: any;
 }
 // const socket = io("http://localhost:3000");
 const ChatList: React.FC<ChatListProps> = ({
@@ -39,16 +41,16 @@ const ChatList: React.FC<ChatListProps> = ({
   onContactClick,
   onGroupClick,
   selectedOption,
-  // socket,
+  socket,
   setForRendering,
+  setAllFriends,
 }) => {
   const { logout } = useStore();
-
   const [friends, setFriends] = useState<any>();
   const [search, setSearch] = useState<string>("");
   const [groups, setGroups] = useState<any>([]);
   // const [option, setOption] = useState<string | undefined>("All");
-  const [menuOption, setMenuOption] = useState<string | null>();
+  const [menuOption, setMenuOption] = useState<string | null>(null);
   const [groupId, setGroupId] = useState<number>();
 
   const setMenu = (option: string | null): void => {
@@ -100,6 +102,16 @@ const ChatList: React.FC<ChatListProps> = ({
       console.log("data.allgroups", data.allGroups);
     }
   }, [selectedOption, menuOption, data]);
+
+  // const { setFriends } = useStore()
+  useEffect(() => {
+    console.log("Friends added");
+    socket?.on("friendAdded", (friend: any) => {
+      setFriends((prev: any) => [...prev, friend]);
+      setAllFriends((prev: any) => [...prev, friend]);
+    });
+  }, [selectedOption, menuOption, data, socket]);
+
   function addFriend() {
     setMenu("addFriend");
   }
@@ -198,9 +210,19 @@ const ChatList: React.FC<ChatListProps> = ({
                 />
               );
             })}
-          {menuOption == "addFriend" && <AddFriend setMenuOption={setMenu} />}
+          {menuOption == "addFriend" && (
+            <AddFriend
+              setMenuOption={setMenu}
+              setForRendering={setForRendering}
+              socket={socket}
+            />
+          )}
           {menuOption == "addGroup" && (
-            <AddGroup setMenuOption={setMenu} setGroupId={setGroupId} />
+            <AddGroup
+              setMenuOption={setMenu}
+              setGroupId={setGroupId}
+              setForRendering={setForRendering}
+            />
           )}
           {menuOption == "addGroupMembers" && (
             <AddGroupMembers

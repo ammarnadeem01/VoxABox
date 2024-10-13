@@ -9,8 +9,9 @@ import { ContactChatInfoProps, Group, User as U } from "../../../Types";
 const ContactChatInfo: React.FC<ContactChatInfoProps> = ({
   data,
   setForRender,
+  toggleInfo,
 }) => {
-  const { userId, selectedPrivateChatId } = useStore();
+  const { userId, selectedPrivateChatId, setSelectedFriend } = useStore();
   const [contact, setContact] = useState<U | null>();
   const [commonGroup, setCommonGroup] = useState<Group[]>();
   const [forRendering, setForRendering] = useState(0);
@@ -44,6 +45,7 @@ const ContactChatInfo: React.FC<ContactChatInfoProps> = ({
       })
       .then((res) => {
         setForRender((pre: any) => pre + 1);
+        setSelectedFriend(null);
       })
       .catch((err) => {
         console.log(err);
@@ -73,7 +75,13 @@ const ContactChatInfo: React.FC<ContactChatInfoProps> = ({
         </div>
       </div>
       <div className="bg-[#404040]  w-full flex flex-col justify-center  text-red-700 font-semibold items-start pl-4 gap-2 py-2">
-        <p className="cursor-pointer" onClick={() => unFriend()}>
+        <p
+          className="cursor-pointer"
+          onClick={() => {
+            unFriend();
+            toggleInfo();
+          }}
+        >
           <DeleteIcon /> UnFriend
         </p>
       </div>

@@ -8,7 +8,11 @@ import useStore from "../../../store";
 import AddGroupMembers from "../ChatList/AddGroupMembers";
 import { Group, GroupChatInfoProps, Member as Mem } from "../../../Types";
 
-const GroupChatInfo: React.FC<GroupChatInfoProps> = ({ data }) => {
+const GroupChatInfo: React.FC<GroupChatInfoProps> = ({
+  data,
+  setForRender,
+  toggleInfo,
+}) => {
   const { userId, setSelectedGrp } = useStore();
   // const [group, setGroup] = useState<Group>();
   const [mem, setMem] = useState<Mem[]>();
@@ -45,6 +49,7 @@ const GroupChatInfo: React.FC<GroupChatInfoProps> = ({ data }) => {
         data: { memberId: userId, groupId: data.id },
       })
       .then((res) => {
+        setForRender((pre: number) => pre + 1);
         setSelectedGrp(null);
         console.log(res);
       })
@@ -88,7 +93,13 @@ const GroupChatInfo: React.FC<GroupChatInfoProps> = ({ data }) => {
           </div>
           <div className="bg-[#404040]  w-full flex flex-col justify-center  text-red-700 font-semibold items-start pl-4 gap-2 py-2">
             {ErrorMessage && <p className="text-red-600">{ErrorMessage}</p>}
-            <p className="cursor-pointer" onClick={deleteGroup}>
+            <p
+              className="cursor-pointer"
+              onClick={() => {
+                toggleInfo();
+                deleteGroup();
+              }}
+            >
               <DeleteIcon /> Delete Group
             </p>
             <p className="cursor-pointer" onClick={addGrpMembers}>

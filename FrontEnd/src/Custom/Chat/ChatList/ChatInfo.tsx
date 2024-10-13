@@ -47,9 +47,19 @@ const ChatInfo: React.FC<ChatInfoProps> = ({
         </div>
         {/* start */}
         {selectedCnt && (
-          <ContactChatInfo data={selectedCnt} setForRender={setForRendering} />
+          <ContactChatInfo
+            data={selectedCnt}
+            setForRender={setForRendering}
+            toggleInfo={toggleInfo}
+          />
         )}
-        {selectedGrp && <GroupChatInfo data={selectedGrp} />}
+        {selectedGrp && (
+          <GroupChatInfo
+            data={selectedGrp}
+            setForRender={setForRendering}
+            toggleInfo={toggleInfo}
+          />
+        )}
         {/* end */}
       </div>
     </div>

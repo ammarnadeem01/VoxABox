@@ -6,7 +6,9 @@ function NewFeatures() {
     <div className="min-w-full flex justify-center items-center text-white my-10 py-10">
       <div className="w-10/12 flex flex-wrap justify-center items-center">
         <div className="w-full flex flex-wrap justify-center items-center  py-10">
-          <p className="w-full text-center text-3xl">Our New Features</p>
+          <p className="w-full text-center text-5xl font-semibold">
+            Our New Features
+          </p>
           <p className="w-full text-center">
             Save every minute with our new feature. We will <br />
             help you feel your interlocutor next to you

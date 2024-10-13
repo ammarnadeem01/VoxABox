@@ -81,7 +81,7 @@ const PrivateChatContent: React.FC<PrivateChatContentProps> = ({
   const [rendering, setRendering] = useState(0);
   const [messageData, setMessageData] = useState<MessageType>({
     fromUserId: userId!,
-    toUserId: contact!.email,
+    toUserId: contact?.email || "",
     content: "",
   });
   useEffect(() => {}, [messages, socket, rendering]);

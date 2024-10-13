@@ -7,9 +7,9 @@ function PrivateMessages() {
     <div className="min-w-full text-white flex justify-center items-center flex-wrap py-24">
       <div className="flex px-5  py-5 w-3/4 flex-wrap">
         <div className="text-left w-full pl-100 pl-[110px]">
-          <p className="font-semibold text-3xl">Send private messages</p>
+          <p className="font-semibold text-4xl">Send private messages</p>
         </div>
-        <div className="w-full flex justify-around py-5">
+        <div className="w-full flex justify-around pb-5">
           <div className="w-1/4 h-[50vh] ">
             <p className="text-sm py-7">
               Simple, secure and private messaging <br /> and calling free

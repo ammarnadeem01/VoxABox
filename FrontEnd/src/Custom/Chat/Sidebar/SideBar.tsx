@@ -5,6 +5,7 @@ import TextsmsIcon from "@mui/icons-material/Textsms";
 import Logo from "../../../assets/logo1.png";
 import WorkspacePremiumIcon from "@mui/icons-material/WorkspacePremium";
 import GradingIcon from "@mui/icons-material/Grading";
+import Home from "@mui/icons-material/Home";
 import { useNavigate } from "react-router-dom";
 import { Group, User } from "../../../Types";
 import { useEffect } from "react";
@@ -60,7 +61,7 @@ const SideBar: React.FC<SideBarProps> = ({
           >
             <GradingIcon /> All
           </div>
-          <div
+          {/* <div
             onClick={() => {
               // option("Groups");
             }}
@@ -72,11 +73,11 @@ const SideBar: React.FC<SideBarProps> = ({
               <p className="bg-white rounded-full px-1">
                 {/* {data.unreadGroupMessagesCount > 0
                     ? data.unreadGroupMessagesCount
-                    : ""} */}
+                    : ""} 
               </p>
             </div>
-          </div>
-          <div
+          </div> */}
+          {/* <div
             onClick={() => {
               // option("Direct Messages");
             }}
@@ -88,11 +89,19 @@ const SideBar: React.FC<SideBarProps> = ({
               <p className="bg-white rounded-full px-1">
                 {/* {unreadPrivateMessages.data.length > 0
                   ? unreadPrivateMessages.data.length
-                  : ""} */}
+                  : ""} 
               </p>
             </div>
+          </div> */}
+          <div
+            className="flex w-full gap-2 pl-10  py-3 rounded cursor-pointer active:bg-gray-300 active:text-black"
+            onClick={() => {
+              nav("/");
+            }}
+          >
+            <Home /> Go to Home
+            <div className="w-1/6   text-black text-xs flex justify-center items-center "></div>
           </div>
-
           <div
             className="flex w-full gap-2 pl-10  py-3 rounded cursor-pointer active:bg-gray-300 active:text-black"
             onClick={() => {
