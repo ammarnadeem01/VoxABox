@@ -126,6 +126,13 @@ const GroupChatContent: React.FC<GroupChatContentProps> = ({
         console.log(err);
       });
   };
+  const handleKeyDown = (e: any) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      sendMessage();
+    }
+  };
+
   return (
     <div
       className={`${
@@ -194,7 +201,8 @@ const GroupChatContent: React.FC<GroupChatContentProps> = ({
             className="flex-grow border-none outline-none text-white bg-[#101717] py-2 pl-2"
             placeholder="Type Something..."
             name="content"
-            value={message}
+            value={messageData.content}
+            onKeyDown={(e) => handleKeyDown(e)}
           />
           <div
             className="p-2 flex-shrink-0 cursor-pointer"

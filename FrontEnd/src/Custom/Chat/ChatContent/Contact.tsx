@@ -47,11 +47,11 @@ const Contact: React.FC<ContactProps> = ({ data, onClick }) => {
             </p>
           </div>
         </div>
-        {status === "online" && (
+        {/* {status === "online" && (
           <div className="w-1/6  flex justify-center items-center ">
             <p className="bg-green-500 w-2 h-2 rounded-full"></p>
           </div>
-        )}
+        )} */}
       </div>
     </div>
   );

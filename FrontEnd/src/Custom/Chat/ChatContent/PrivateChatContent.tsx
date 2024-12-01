@@ -200,6 +200,12 @@ const PrivateChatContent: React.FC<PrivateChatContentProps> = ({
     }
     messageData.content = "";
   }
+  const handleKeyDown = (e: any, roomId: any) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      sendMessage(roomId);
+    }
+  };
 
   return (
     <div
@@ -269,6 +275,7 @@ const PrivateChatContent: React.FC<PrivateChatContentProps> = ({
             placeholder="Type Something..."
             name="content"
             value={messageData.content}
+            onKeyDown={(e) => handleKeyDown(e, roomId)}
           />
           <div
             className="p-2 flex-shrink-0 cursor-pointer"

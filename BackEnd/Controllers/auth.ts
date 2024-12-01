@@ -8,13 +8,13 @@ import asyncHandler from "../Utils/asyncErrorHandlers";
 
 const signToken = (email: string) => {
   console.log(process.env.JWT_EXPIRES_IN, typeof process.env.JWT_EXPIRES_IN);
-  return jwt.sign(email, process.env.JWT_ACCESS_SECRET as string, {
+  return jwt.sign({ email }, process.env.JWT_ACCESS_SECRET as string, {
     expiresIn: "15s",
   });
 };
 
 const signRefreshToken = (email: string) => {
-  return jwt.sign(email, process.env.JWT_REFRESH_SECRET as string, {
+  return jwt.sign({ email }, process.env.JWT_REFRESH_SECRET as string, {
     expiresIn: "15s",
   });
 };
@@ -53,8 +53,18 @@ export const createUser = asyncHandler(
     if (!user) {
       return next(new CustomError("User Creation Failed", 500));
     }
-    const accessToken = signToken(user.email);
-    const refreshToken = signRefreshToken(user.email);
+    let accessToken, refreshToken;
+    try {
+      accessToken = signToken(user.email);
+      console.log("succeed 2");
+
+      refreshToken = signRefreshToken(user.email);
+      console.log("succeed 3");
+    } catch (error) {
+      console.error("Token generation failed:", error);
+      return next(new CustomError("Failed to generate tokens", 500));
+    }
+
     res.status(201).json({
       status: "Success",
       data: {
@@ -78,21 +88,21 @@ export const getUserById = asyncHandler(
 
     const user = await User.findOne({ where: { email } });
 
-    // if (!user || !(await bcrypt.compare(password, user.dataValues.password))) {
-    //   return next(new CustomError("Incorrect Credentials", 401));
-    // }
+    if (!user) {
+      return next(new CustomError("Incorrect Credentials", 401));
+    }
     if (!user || user?.dataValues.password != password) {
       return next(new CustomError("Incorrect Credentials", 401));
     }
-    // const accessToken = signToken(user.email);
-    // const refreshToken = signRefreshToken(user.email);
+    const accessToken = signToken(user.email);
+    const refreshToken = signRefreshToken(user.email);
 
     res.status(200).json({
       status: "Success",
       data: {
         user,
-        // accessToken,
-        // refreshToken,
+        accessToken,
+        refreshToken,
       },
     });
   }

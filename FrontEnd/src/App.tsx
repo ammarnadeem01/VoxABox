@@ -10,35 +10,35 @@ import Signup from "./Custom/User/Signup.tsx";
 import MessagingPanel from "./Custom/Chat/MessagingPanel.tsx";
 import TermsAndConditions from "./Custom/LandingPage/TermsAndConditions.tsx";
 import PrivacyPolicy from "./Custom/LandingPage/PrivacyPolicy.tsx";
-import { useEffect } from "react";
-import useStore from "./store.tsx";
-import api from "./axiosConfig.tsx";
+// import { useEffect } from "react";
+// import useStore from "./store.tsx";
+// import api from "./axiosConfig.tsx";
 
 function App() {
-  const { userId, setOnlineStatus } = useStore();
+  // const { userId, setOnlineStatus } = useStore();
 
-  const updateStatus = (status: "online" | "offline") => {
-    api
-      .patch(`api/v1/user/status/setStatus`, {
-        userId,
-        status,
-      })
-      .then(() => {
-        setOnlineStatus(status);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  };
+  // const updateStatus = (status: "online" | "offline") => {
+  //   api
+  //     .patch(`api/v1/user/status/setStatus`, {
+  //       userId,
+  //       status,
+  //     })
+  //     .then(() => {
+  //       setOnlineStatus(status);
+  //     })
+  //     .catch((err) => {
+  //       console.log(err);
+  //     });
+  // };
   const location = useLocation();
-  const url = "/chat";
-  useEffect(() => {
-    if (location.pathname === url) {
-      updateStatus("online");
-    } else {
-      updateStatus("offline");
-    }
-  }, [location]);
+  // const url = "/chat";
+  // useEffect(() => {
+  //   if (location.pathname === url) {
+  //     updateStatus("online");
+  //   } else {
+  //     updateStatus("offline");
+  //   }
+  // }, [location]);
   const showFooter =
     location.pathname !== "/chat" &&
     location.pathname !== "/termsnconditions" &&

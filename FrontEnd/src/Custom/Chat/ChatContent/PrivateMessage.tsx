@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import CustomDropdown from "../DropDown";
 import useStore from "../../../store";
-import api from "../../../axiosConfig";
-import DoneAllIcon from "@mui/icons-material/DoneAll";
+// import api from "../../../axiosConfig";
+// import DoneAllIcon from "@mui/icons-material/DoneAll";
 interface PrivateMessageProps {
   data: any;
   socket: any;
@@ -72,22 +72,22 @@ const PrivateMessage: React.FC<PrivateMessageProps> = ({
       } `}
     >
       <div
-        className={`bg-[#0d0d0d] px-3 py-1 max-w-full flex flex-wrap items-center  ${
+        className={`bg-[#0d0d0d] px-3 py-1 max-w-full flex flex-wrap items-center md:max-w-[60%]  ${
           sender === userId ? "rounded-bl-xl" : "rounded-br-xl"
         } rounded-t-xl  flex items-center `}
       >
-        <p className={` w-full py-1 max-w-[60%]`}>{content}</p>
+        <p className={` w-full py-1`}>{content}</p>
         <p className="text-[10px] text-right w-full  gap-1 flex justify-end text-gray-700">
           {new Date(time).toLocaleTimeString()},&nbsp;&nbsp;
           {new Date(time).toLocaleDateString()}
-          <div className="text-sm flex items-end">
+          {/* <div className="text-sm flex items-end">
             {sender == userId && (
               <DoneAllIcon
                 fontSize="inherit"
                 color={data.message.SeenStatus === "Seen" ? "primary" : "info"}
               />
             )}
-          </div>
+          </div> */}
         </p>
       </div>
       <div>
