@@ -1,7 +1,7 @@
 import CloseIcon from "@mui/icons-material/Close";
-import { useEffect, useState } from "react";
-import ContactChatInfo from "../ChatInfo/ContactChatInfo";
-import GroupChatInfo from "../ChatInfo/GroupChatInfo";
+// import { useEffect, useState } from "react";
+import ContactChatInfo from "./ContactChatInfo";
+import GroupChatInfo from "./GroupChatInfo";
 import { Group, User } from "../../../Types";
 interface ChatInfoProps {
   InfoOn: boolean;
@@ -13,6 +13,7 @@ interface ChatInfoProps {
   setForRendering: any;
   setSelectedContact: any;
   setSelectedGroup: any;
+  socket: any;
 }
 const ChatInfo: React.FC<ChatInfoProps> = ({
   InfoOn,
@@ -20,8 +21,8 @@ const ChatInfo: React.FC<ChatInfoProps> = ({
   selectedCnt,
   selectedGrp,
   setForRendering,
-  setSelectedContact,
-  setSelectedGroup,
+
+  socket,
 }) => {
   // const [contact, setContact] = useState<User | null>();
   // const [group, setGroup] = useState<Group | null>();
@@ -58,6 +59,7 @@ const ChatInfo: React.FC<ChatInfoProps> = ({
             data={selectedGrp}
             setForRender={setForRendering}
             toggleInfo={toggleInfo}
+            socket={socket}
           />
         )}
         {/* end */}

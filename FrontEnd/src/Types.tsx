@@ -1,4 +1,4 @@
-import { Socket } from "socket.io-client";
+// import { Socket } from "socket.io-client";
 
 export interface CustomDropDownProps {
   table: {
@@ -136,6 +136,7 @@ export interface GroupChatInfoProps {
   data: Group;
   setForRender: any;
   toggleInfo: () => void;
+  socket: any;
 }
 export interface Member {
   clearedAt: string | null;
@@ -160,6 +161,7 @@ export interface AddGroupMembersProps {
   setMenuOption: (option: string | null) => void;
   groupId: number | undefined;
   setForRendering: any;
+  socket: any;
 }
 export interface ChatListProps {
   data: {

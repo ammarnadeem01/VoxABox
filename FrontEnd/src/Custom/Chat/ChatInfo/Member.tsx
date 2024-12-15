@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import U from "../../../assets/manprvtcaht.png";
 import * as React from "react";
-import type { Member as Mem, MemberProps, User } from "../../../Types";
+import type { MemberProps } from "../../../Types";
 import api from "../../../axiosConfig";
 import useStore from "../../../store";
 

@@ -7,7 +7,7 @@ import User from "../../assets/manprvtcaht.png";
 import { US, PK, IN, DE } from "country-flag-icons/react/3x2";
 function HeroSection() {
   return (
-    <div className="max-w-full text-white">
+    <div className="max-w-full h-[100vh] text-white">
       <div className="flex w-full justify-center items-center flex-wrap h-[80vh] ">
         <p className="font-semibold text-5xl w-full text-center flex-wrap ">
           Connect with your <br />

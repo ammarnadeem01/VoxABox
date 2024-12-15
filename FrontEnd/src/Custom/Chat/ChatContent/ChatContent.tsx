@@ -30,8 +30,6 @@ const ChatContent: React.FC<ChatContentProps> = ({
   group,
   setStatus,
   setForRendering,
-  setSelectedContact,
-  setSelectedGroup,
 }) => {
   const { selectedFriend, selectedGrp } = useStore();
   useEffect(() => {}, [selectedFriend]);

@@ -6,12 +6,13 @@ import Member from "./Member";
 import api from "../../../axiosConfig";
 import useStore from "../../../store";
 import AddGroupMembers from "../ChatList/AddGroupMembers";
-import { Group, GroupChatInfoProps, Member as Mem } from "../../../Types";
+import { GroupChatInfoProps, Member as Mem } from "../../../Types";
 
 const GroupChatInfo: React.FC<GroupChatInfoProps> = ({
   data,
   setForRender,
   toggleInfo,
+  socket,
 }) => {
   const { userId, setSelectedGrp } = useStore();
   // const [group, setGroup] = useState<Group>();
@@ -65,6 +66,7 @@ const GroupChatInfo: React.FC<GroupChatInfoProps> = ({
           setMenuOption={setOption}
           groupId={data.id}
           setForRendering={setForRendering}
+          socket={socket}
         />
       )}
       {!option && (

@@ -12,7 +12,7 @@ const AddFriend: React.FC<AddProps> = ({
   socket,
 }) => {
   const [friendId, setFriendId] = useState("");
-  const [errMessage, setErrMessage] = useState("");
+  // const [errMessage, setErrMessage] = useState("");
   const { userId } = useStore();
   const addFriend = () => {
     // api
@@ -57,7 +57,7 @@ const AddFriend: React.FC<AddProps> = ({
           }}
         />
       </div>
-      {errMessage && <p className="text-red-500">{errMessage}</p>}
+      {/* {errMessage && <p className="text-red-500">{errMessage}</p>} */}
       <div className="flex justify-evenly items-center w-full gap-1">
         <button
           className="bg-purple-400 py-1 px-2 rounded-lg flex-1"

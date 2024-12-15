@@ -21,8 +21,8 @@ const PrivateChatContent: React.FC<PrivateChatContentProps> = ({
 }) => {
   const {
     selectedPrivateChatId,
-    setUnreadPrivateMessagesStore,
-    unreadPrivateMessages,
+    // setUnreadPrivateMessagesStore,
+    // unreadPrivateMessages,
     setSelectedFriend,
   } = useStore();
   const getAllPrivateMessages = (): void => {
@@ -73,9 +73,8 @@ const PrivateChatContent: React.FC<PrivateChatContentProps> = ({
       socket.off("privateMessage");
     };
   });
-  const { userId, roomId, socketId } = useStore();
+  const { userId, roomId } = useStore();
   const [messages, setMessages] = useState<any[]>();
-  const [message, setMessage] = useState<string>("");
   const [friendName, setFriendName] = useState<string>("");
   const [friendId, setFriendId] = useState<string>();
   const [rendering, setRendering] = useState(0);
@@ -87,10 +86,12 @@ const PrivateChatContent: React.FC<PrivateChatContentProps> = ({
   useEffect(() => {}, [messages, socket, rendering]);
   const [friendShipStatus, setFriendShipStatus] = useState<
     "Blocked" | "Pending" | "Accepted"
-  >("Blocked");
+  >("Pending");
   function friendShipStatusCheck(): void {
     api
-      .get(`api/v1/friend/friendshipStatus`, { params: { userId, friendId } })
+      .get(`api/v1/friend/friendshipStatus`, {
+        params: { userId, friendId: selectedPrivateChatId },
+      })
       .then((res) => {
         console.log("status", res);
         console.log(res.data.data.friendShipStatus.status);
@@ -120,7 +121,7 @@ const PrivateChatContent: React.FC<PrivateChatContentProps> = ({
   }
 
   useEffect(() => {
-    // friendShipStatusCheck();
+    friendShipStatusCheck();
   }, [friendShipStatus]);
   const messageText = (event: any) => {
     const { name, value } = event.target;

@@ -59,26 +59,30 @@ const ChatList: React.FC<ChatListProps> = ({
 
   const nav = useNavigate();
   const { unreadPrivateMessages } = useStore();
-  // useEffect(() => {
-  //   setOption(selectedOption);
-  // }, [selectedOption, data, menuOption, option]);
+  ////add group socket listener
+  useEffect(() => {
+    if (!socket) {
+      console.log("no scoket");
+      return;
+    }
+    console.log("socket is not null");
+    try {
+      socket.on("friendAddedInGroup", (newGroup: any) => {
+        console.log("===============");
+        console.log(newGroup);
+        console.log("===============");
 
-  // useEffect(() => {
-  //   if (selectedOption === "Blocked") {
-  //     setFriends(data?.blockedFriends);
-  //     setGroups(null);
-  //   } else if (selectedOption === "Groups") {
-  //     setFriends(null);
-  //     setGroups(data?.unreadGroupMessages);
-  //   } else if (selectedOption === "Direct Messages") {
-  //     setFriends(data?.unreadPrivateMessages);
-  //     setGroups(null);
-  //   } else if (selectedOption === "All") {
-  //     setFriends(data.allFriends);
-  //     setGroups(data.allGroups);
-  //     console.log("data.allgroups", data.allGroups);
-  //   }
-  // }, [data, selectedOption, menuOption]);
+        setGroups((prevGroups: any) => [...prevGroups, newGroup]);
+      });
+    } catch (error) {
+      console.log(error);
+    }
+
+    return () => {
+      socket.off("groupMessage"); // Clean up event listener on unmount
+    };
+  });
+  ////
 
   useEffect(() => {
     console.log("clicked on unfriend");
@@ -229,6 +233,7 @@ const ChatList: React.FC<ChatListProps> = ({
               groupId={groupId}
               setMenuOption={setMenu}
               setForRendering={setForRendering}
+              socket={socket}
             />
           )}
         </div>

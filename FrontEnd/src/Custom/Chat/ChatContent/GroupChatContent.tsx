@@ -10,7 +10,6 @@ import { GroupChatContentProps } from "../../../Types";
 const GroupChatContent: React.FC<GroupChatContentProps> = ({
   InfoOn,
   toggleInfo,
-  // data,
   socket,
   group,
   setForRendering,
@@ -50,21 +49,15 @@ const GroupChatContent: React.FC<GroupChatContentProps> = ({
         const data = res.data.data.AllMessages;
         console.log("datadatadata", data);
         setMessages(data);
-        // console.log("allgrpmsg", data);
       })
       .catch((err) => {
         console.log(err);
-        // console.log(err.response.data.message);
       });
   };
   const [rendering, setRendering] = useState(0);
-  // useEffect(() => {
-  //   getAllGroupMessages();
-  //   console.log("rendering again for messages");
-  // }, [rendering]);
+
   const { userId } = useStore();
   const [messages, setMessages] = useState<any[]>();
-  const [message, setMessage] = useState<string | undefined>();
   const [groupName, setGroupName] = useState<string | null>();
   const [groupId, setGroupId] = useState<number | null>();
   const [messageData, setMessageData] = useState({
@@ -80,12 +73,6 @@ const GroupChatContent: React.FC<GroupChatContentProps> = ({
     }
   };
   const [errorMessage, setErrorMessage] = useState("");
-  // useEffect(() => {
-  //   setGroupName(group?.name);
-  //   setGroupId(group?.id);
-  //   setMessages(data?.groupChat);
-  // }, [data, group]);
-
   const sendMessage = () => {
     console.log(messageData);
     socket.emit("groupMessage", messageData);
@@ -97,7 +84,6 @@ const GroupChatContent: React.FC<GroupChatContentProps> = ({
     setGroupId(group?.id);
     getAllGroupMessages();
     console.log("rendering again for messages");
-    // setMessages(data?.groupChat);
   }, [group, rendering]);
   const clearChat = (): void => {
     api

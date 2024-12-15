@@ -355,6 +355,26 @@ io.on("connection", (socket) => {
     socket.to(roomId).emit("friendAdded", friend);
   });
   // socket.on("deleteFriend", () => {});
+  /*|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+  |=====================================================================================================|
+  |                                         ADD AND DELETE FRIEND                                       |
+  |=====================================================================================================|
+  |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||*/
+  socket.on("friendAddedInGroup", ({ friend, groupId }) => {
+    socket.on("addUserToGroup", ({ groupId, userId }) => {
+      // Add the user to the group
+      if (!rooms[groupId]) {
+        rooms[groupId] = new Set();
+      }
+      rooms[groupId].add(userId);
+
+      // Notify the added user
+      if (users[userId]) {
+        io.to(users[userId]).emit("userAddedToGroup", groupId);
+        console.log(`User ${userId} added to group ${groupId}`);
+      }
+    });
+  });
 
   /* ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
   |=====================================================================================================|

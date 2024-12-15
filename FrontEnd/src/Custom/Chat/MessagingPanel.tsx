@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import ChatContent from "./ChatContent/ChatContent";
-import ChatInfo from "./ChatList/ChatInfo";
+import ChatInfo from "./ChatInfo/ChatInfo";
 import ChatList from "./ChatList/ChatList";
 import SideBar from "./Sidebar/SideBar";
 import api from "../../axiosConfig";
@@ -304,6 +304,7 @@ function MessagingPanel() {
         <ChatInfo
           InfoOn={infoOn}
           toggleInfo={toggleInfo}
+          socket={socketRef.current}
           selectedCnt={selectedContact}
           selectedGrp={selectedGroup}
           onContactClick={handleContactClick}
